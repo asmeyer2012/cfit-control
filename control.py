@@ -25,7 +25,6 @@ else:
  data,dset = make_data(df.mdp,do_makedata=df.do_makedata,\
                        do_db=False,filename="./import-correlators");
  models = make_models(mdp=df.mdp);
- #prior = make_prior(df.mdp,models);
  prior = make_prior(models);
 ## --
 

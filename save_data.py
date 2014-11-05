@@ -3,6 +3,7 @@ import datetime
 import meta_data
 
 def save_data(out_fname,fit,data):
+ ## -- save the fit parameters found after fitting
  try:
   fit_file = open(out_fname,'w');
   write_header(fit_file);
@@ -37,6 +38,7 @@ def save_data(out_fname,fit,data):
   pass;
 
 def write_header(outfile):
+ ## -- write a header to the output file
  outfile.seek(0,2);
  dtime = datetime.datetime.now();
  try:

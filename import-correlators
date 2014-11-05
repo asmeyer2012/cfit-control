@@ -1,0 +1,116 @@
+output_fname pi2pt-db
+#output_fname pi2pt-corr
+#input_path ../correlators-mes
+#input_path ../master-cor-mes
+input_path /project/axial/database/correlators/pi2pt
+#output_path ./data-files
+output_path /project/axial/database/corrfitter-input
+input_type real
+#input_type mod
+corr_len 48
+flag_overwrite True
+
+#corr_num 1,2
+corr_num 1
+#for input_fname example.cor
+key Gaa
+for input_fname pi2pt-l1648f211-200-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-205-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-210-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-215-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-220-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-225-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-230-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-235-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-240-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-245-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-250-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-255-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-260-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-265-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-270-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-275-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-280-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-285-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-290-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-295-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-300-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-305-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-310-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-315-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-320-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-325-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-330-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-335-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-340-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-345-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-350-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-355-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-360-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-365-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-370-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-375-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-380-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-385-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-390-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-395-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-400-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-405-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-410-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-415-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-420-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-425-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-430-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-435-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-440-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-445-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-450-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-455-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-460-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-465-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-470-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-475-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-480-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-485-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-490-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-495-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-500-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-505-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-510-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-515-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-520-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-525-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-530-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-535-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-540-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-545-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-550-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-555-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-560-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-565-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-570-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-575-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-580-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-585-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-590-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-595-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-900-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-905-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-910-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-915-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-920-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-925-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-930-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-935-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-940-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-945-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-950-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-955-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-960-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-965-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-970-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-975-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-980-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-985-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-990-To0-PPpi0.cor
+for input_fname pi2pt-l1648f211-995-To0-PPpi0.cor

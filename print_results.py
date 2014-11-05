@@ -3,6 +3,10 @@ import numpy as np
 import util_funcs as ut
 
 def print_fit(fit, prior):
+ ## -- print the fit parameters neatly
+ ## -- give both summed and differential energies
+ ## -- if variables fit as logs, give both log and linear
+ ## --
  do_unicode=True;
  do_sigdigit=True;
  #
@@ -65,6 +69,7 @@ def print_fit(fit, prior):
 ##
 
 def print_error_budget(fit):
+ ## -- sometimes fails, just ignore for now
  try:
   print fit.fmt_errorbudget(outputs,inputs);
  except:
@@ -92,12 +97,12 @@ def get_sigma_str(key,fit,prior,j,do_unicode=True):
        /(prior['log'+key][j]).sdev)));
  if do_unicode:
   if sig > 0:
-   sigstr=str(sig)+u'\u03C3'; # unicode for sigma
+   sigstr=str(sig)+u'\u03C3'; # unicode for sigma (cannot be saved to string)
   else:
    sigstr='  ';
  else:
   if sig > 0:
-   sigstr=str(sig)+'sig'; # unicode for sigma
+   sigstr=str(sig)+'sig';
   else:
    sigstr='    ';
  return sigstr;

@@ -8,18 +8,7 @@ import sys
 sys.path.append('/project/axial/database/scripts/');
 from DB             import *
 
-### -- database defines
-#dbpath   ='/project/axial/database/db-files/';
-#config   ='l1648f211b580m013m065m838';
-#campaign ='-pi2pt-2';
-#DBEngine = create_engine('sqlite:///'+dbpath+config+campaign+'.sqlite');
-#Session  = sessionmaker(bind=DBEngine);
-#session  = Session();
-##
-### -- output defines
-#out_path ='/project/axial/database/corrfitter-input/';
-#out_fname='pi2pt-2-db';
-#do_makedata=True;
+## -- database defines in defines.py
 
 ## -- Database tables:
 ##      TABLENAME        -> CLASS

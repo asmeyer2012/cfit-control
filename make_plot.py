@@ -108,14 +108,14 @@ def plot_correlator(models,data,fit,fig,key,plot_type):
    for i in range(1,len(data[key])/2)],[data[key][len(data[key])/2]]));
   tav =np.array(range(len(avdat)));
   ndat=avdat/gv.mean(fit_func(tav));
-  ##
+  #
   dmean = gv.mean(ndat);
   dsdev = gv.sdev(ndat);
-  ##
+  #
   ax.errorbar(tslc[0:len(tslc)/2+1],dmean,yerr=dsdev,ls='None',mfc='None',\
    mec='k',color='r',marker='o',ms=ms);
   ax.scatter(tfit,dmean[tfit],color='r',marker='o',s=ms*ms);
-  ##
+  #
   ### -- axis modifications
   axis_mods_fit_normalized(fig,key,len(tslc));
   #

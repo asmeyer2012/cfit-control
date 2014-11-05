@@ -20,17 +20,22 @@ do_db=True;
 do_plot=True;
 
 ## -- other parameters
-lkey=['pion05RWRW']
-maxit      =5000;
-#svdcut     =1e-2;
-svdcut     =3e-3;
+lkey=['pion05RWRW'] # keys to process
+maxit      =5000;   # maximum iterations
+#svdcut     =1e-2;  # svd cut
+#svdcut     =3e-3;
 #svdcut     =1e-6;
-#svdcut     =None;
+svdcut     =None;
 ## -- tolerance check does not work if lots of variation from + to -
+## -- need to fix
 ctol       =None; # tolerance for consecutive correlator points
-#ctol       =1e2; # tolerance for consecutive correlator points
+#ctol       =1e2; 
 
+## ------
+## FROM MAKE_DATA_RAW.PY
+## ------
 ## -- create meta_data, initial setup
+## -- trying to eliminate need for meta_data
 mdp = meta_data.md_params();
 mdp.corr_len=48;
 mdp.t_min   =4;
@@ -93,7 +98,7 @@ define_model['rho0RWRW'  ]=define_model['pion05RWRW'];
 define_model['rhoisRWRW' ]=define_model['pion05RWRW'];
 define_model['pioni5RWRW']=define_model['pion5RWRW' ];
 define_model['pionijRWRW']=define_model['pion5RWRW' ];
-
+## -- more specific assignments
 tmin=2;
 define_model['pion05RWRW']['tfit']=range(tmin,trang-tmin+1);
 
