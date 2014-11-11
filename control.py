@@ -9,6 +9,7 @@ from print_results  import print_fit
 from print_results  import print_error_budget
 from save_data      import save_data
 from make_plot      import make_plot
+from make_plot      import make_plot_1plus1
 from meta_data      import *
 import defines      as df
 import gvar         as gv
@@ -36,9 +37,11 @@ fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut);
 print_fit(fit,prior);
 print_error_budget(fit);
 #save_data(mdp.output_path +'/'+ mdp.fit_fname,fit,data);
+save_data('./test-fit.out',fit,data);
 
 if df.do_plot:
  if df.do_default_plot:
   fitter.display_plots();
  make_plot(models,data,fit);
+ make_plot_1plus1(models,data,fit);
 

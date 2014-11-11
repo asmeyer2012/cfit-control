@@ -99,7 +99,8 @@ define_model['rhoisRWRW' ]=define_model['pion05RWRW'];
 define_model['pioni5RWRW']=define_model['pion5RWRW' ];
 define_model['pionijRWRW']=define_model['pion5RWRW' ];
 ## -- more specific assignments
-tmin=2;
+tmin=4; #3+1
+#tmin=9; #1+1
 define_model['pion05RWRW']['tfit']=range(tmin,trang-tmin+1);
 
 ## ------
@@ -110,14 +111,21 @@ define_prior['pion5RWRW']=\
 {'an':gv.gvar([4.542],[0.4]),\
  'En':gv.gvar([0.230],[0.01])};
 define_prior['pion05RWRW']=\
-{'an':gv.gvar([0.47,2.48,6.75],[0.15,0.3,0.5]),'ao':gv.gvar([0.54],[0.06]),\
- 'En':gv.gvar([0.238,0.330,0.91],[0.02,0.05,0.08]),'Eo':gv.gvar([0.271],[0.04])};
-#{'an':gv.gvar([0.45],[0.15]),'ao':gv.gvar([0.49],[0.06]),\
-# 'En':gv.gvar([0.235],[0.02]),'Eo':gv.gvar([0.263],[0.04])};
-#{'an':gv.gvar([0.42,2.60],[0.15,0.3]),'ao':gv.gvar([0.56],[0.06]),\
-# 'En':gv.gvar([0.238,0.320],[0.02,0.05]),'Eo':gv.gvar([0.277],[0.04])};
+{'an':gv.gvar([0.60,2.70,6.75],[0.15,0.3,0.5]),'ao':gv.gvar([0.54],[0.06]),\
+ 'En':gv.gvar([0.260,0.340,0.91],[0.02,0.05,0.08]),'Eo':gv.gvar([0.271],[0.04])};
 #{'an':gv.gvar([0.43,2.70],[0.15,0.3]),'ao':gv.gvar([0.56,0.2],[0.06,0.05]),\
 # 'En':gv.gvar([0.238,0.335],[0.02,0.05]),'Eo':gv.gvar([0.277,0.250],[0.04,0.05])};
+#{'an':gv.gvar([0.42,2.60],[0.15,0.3]),'ao':gv.gvar([0.56],[0.06]),\
+# 'En':gv.gvar([0.238,0.320],[0.02,0.05]),'Eo':gv.gvar([0.277],[0.04])};
+#{'an':gv.gvar([0.45],[0.15]),'ao':gv.gvar([0.49],[0.06]),\
+# 'En':gv.gvar([0.235],[0.02]),'Eo':gv.gvar([0.263],[0.04])};
+#tmin = 9
+#{'an':gv.gvar([0.70],[0.12]),'ao':gv.gvar([0.441],[0.032]),\
+# 'En':gv.gvar([0.302],[0.012]),'Eo':gv.gvar([0.270],[0.012])};
+## -- 
+#tmin = 4
+#{'an':gv.gvar([0.47,2.48,6.75],[0.15,0.3,0.5]),'ao':gv.gvar([0.54],[0.06]),\
+# 'En':gv.gvar([0.238,0.330,0.91],[0.02,0.05,0.08]),'Eo':gv.gvar([0.271],[0.04])};
 define_prior['pioni5RWRW']=\
 {'an':gv.gvar([0.31,1.54],[0.08,0.2]),\
  'En':gv.gvar([0.253,0.22],[0.01,0.03])};
