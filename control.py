@@ -9,6 +9,7 @@ from print_results  import print_fit
 from print_results  import print_error_budget
 from save_data      import save_data
 from make_plot      import make_plot
+from make_plot      import make_plot_corr_neg
 from make_plot      import make_plot_1plus1
 from meta_data      import *
 import defines      as df
@@ -42,6 +43,8 @@ save_data('./test-fit.out',fit,data);
 if df.do_plot:
  if df.do_default_plot:
   fitter.display_plots();
+ make_plot_corr_neg(models,data,fit);
  make_plot(models,data,fit);
- make_plot_1plus1(models,data,fit);
+ if df.do_effmass:
+  make_plot_1plus1(models,data,fit);
 

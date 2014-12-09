@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from   matplotlib.ticker import MaxNLocator
+#from   matplotlib        import gridspec
 import numpy as np
 import copy
 import gvar as gv
@@ -15,40 +17,140 @@ def make_plot(models,data,fit):
  #kwargs['testao']=gv.gvar(0.441,0.032); #actual
  #kwargs['erbaroff']=True;
 
+ #kwargs['ylim']=[1e-5,1e1];
  fig1 = plt.figure();
  plot_correlator(models,data,fit,fig1,key,"correlator",**kwargs);
- kwargs['ylim']=[-3,5];
+ #kwargs['ylim']=[-3,5];
+ kwargs['ylim']=[-1,2];
  fig3 = plt.figure();
  plot_correlator(models,data,fit,fig3,key,"fit_normalized",**kwargs);
  ## --
  plt.show();
 
+def make_plot_corr_neg(models,data,fit):
+ ## -- determine index of models to use
+ key=models[0].datatag;
+ curr_mod=models[models[0].all_datatags.index(key)];
+
+ ## -- use models to determine fit ranges, etc
+ tslc = curr_mod.tdata;
+ tfit = curr_mod.tfit;
+ ls='None';   # linestyle
+ ls2='--';
+ mfc='None';  # marker face color (errorbar plot)
+ mec='k';     # marker edge color
+ color='r';   # marker/line color (non-error plot)
+ color2='b';  # marker/line color (fit plot)
+ color3='g';  # marker/line color (plateau plot)
+ marker='o';  # marker shape
+ ms=6.0;      # marker size
+ #testao=None; # test fit function for 1+1 - ao
+ #testan=None; # test fit function for 1+1 - an
+ #testEo=None; # test fit function for 1+1 - Eo
+ #testEn=None; # test fit function for 1+1 - En
+
+ yplim=[1e-4,1e1];
+ ymlim=[1e-4,1e1];
+ fig,(axp,axm) = plt.subplots(2,sharex=True);
+ fig.subplots_adjust(hspace=0);
+ 
+ axp.set_yscale('log');
+ axm.set_yscale('log');
+ axp.set_ylim(yplim);
+ axm.set_ylim(ymlim);
+ axm.set_ylim(axm.get_ylim()[::-1]);
+ #axp.set_yticklabels([]);
+ #axm.set_yticklabels([]);
+ #yticklabels = axp.get_yticklabels() + axm.get_yticklabels();
+ #plt.setp(yticklabels, visible=False);
+ #nbinsp = len(axp.get_yticklabels());
+ #nbinsm = len(axm.get_yticklabels());
+ #axp.yaxis.set_major_locator(MaxNLocator(nbins=nbinsp));
+ #axm.yaxis.set_major_locator(MaxNLocator(nbins=nbinsm));
+ ## --
+ fit_func = create_fit_func(models,fit,len(tslc));
+ tfit = range(tfit[0],tfit[0]+len(tfit)*2-1);
+ t_all = np.linspace(0.,len(tslc),49);
+ gvfit_all = models[0].s[0]*fit_func(t_all);
+ fit_mean = gv.mean(gvfit_all);
+ fit_sdev = gv.sdev(gvfit_all);
+ fitp_mean = ut.pos_arr(fit_mean,yplim[0]/100);
+ fitm_mean = ut.neg_arr(fit_mean,ymlim[0]/100);
+ axp.plot(t_all,fitp_mean,color=color2);
+ axm.plot(t_all,fitm_mean,color=color2);
+ try:
+  erbaroff;
+ except:
+  fitp_up = ut.pos_arr(fit_mean+fit_sdev,yplim[0]/100);
+  fitm_up = ut.neg_arr(fit_mean+fit_sdev,ymlim[0]/100);
+  fitp_lo = ut.pos_arr(fit_mean-fit_sdev,yplim[0]/100);
+  fitm_lo = ut.neg_arr(fit_mean-fit_sdev,ymlim[0]/100);
+  axp.plot(t_all,fitp_up,color=color2,ls=ls2);
+  axm.plot(t_all,fitm_up,color=color2,ls=ls2);
+  axp.plot(t_all,fitp_lo,color=color2,ls=ls2);
+  axm.plot(t_all,fitm_lo,color=color2,ls=ls2);
+ ## -- see what the fit function would look like from 1+1 analysis
+ ##if not (fake_func is None):
+ ## gvfake_all = models[0].s[0]*fake_func(t_all);
+ ## fake_mean = gv.mean(gvfake_all);
+ ## fake_sdev = gv.sdev(gvfake_all);
+ ## ax.plot(t_all,fake_mean,color=color3);
+ ## try:
+ ##  erbaroff;
+ ## except:
+ ##  ax.plot(t_all,fake_mean+fit_sdev,color=color3,ls=ls2);
+ ##  ax.plot(t_all,fake_mean-fit_sdev,color=color3,ls=ls2);
+ #
+ ## -- data
+ dmean = models[0].s[0]*gv.mean(data[key]);
+ dsdev = gv.sdev(data[key]);
+ dp_mean = ut.pos_arr(dmean);
+ dm_mean = ut.neg_arr(dmean);
+ dp_sdev = [ dsdev[i] if dmean[i]+dsdev[i] > 0 else 0 for i in range(len(dsdev))];
+ dm_sdev = [ dsdev[i] if dmean[i]-dsdev[i] < 0 else 0 for i in range(len(dsdev))];
+ axp.errorbar(tslc,dp_mean,yerr=(dsdev,dp_sdev),ls=ls,mfc=mfc,mec=mec,\
+  color=color,marker=marker,ms=ms);
+ axm.errorbar(tslc,dm_mean,yerr=(dsdev,dm_sdev),ls=ls,mfc=mfc,mec=mec,\
+  color=color,marker=marker,ms=ms);
+ axp.scatter(tfit,dp_mean[tfit[0]:tfit[-1]+1],color=color,marker=marker,s=ms*ms);
+ axm.scatter(tfit,dm_mean[tfit[0]:tfit[-1]+1],color=color,marker=marker,s=ms*ms);
+ #
+ ## -- axis modifications
+ kwargs2={};
+ #try:
+ # kwargs2['ylim']=ylim;
+ #except NameError:
+ # pass;
+ axis_mods_correlator(fig,key,len(tslc),**kwargs2);
+ plt.show();
+
 def make_plot_1plus1(models,data,fit):
  key=models[0].datatag;
  kwargs={};
- kwargs['pfit']=range(10,19);
  #del kwargs['ylim'];
+ kwargs['ylim']=[-0.5,1.5];
+ kwargs['pfit']=range(13,19);
 
  fig1 = plt.figure();
  plot_correlator(models,data,fit,fig1,key,"log_ratio2",**kwargs);
  ## --
- kwargs['ylim']=[-0.5,1];
+ kwargs['ylim']=[0.0,0.4];
  kwargs['pfit']=range(6,19);
  fig2 = plt.figure();
  plot_correlator(models,data,fit,fig2,key,"log_ratio123",**kwargs);
  ## --
  kwargs['ylim']=[1e-1,1e1];
- kwargs['pfit']=range(10,21);
+ kwargs['pfit']=range(12,18);
  fig3 = plt.figure();
  plot_correlator(models,data,fit,fig3,key,"simple_sum_even",**kwargs);
  ## --
- kwargs['pfit']=range(10,21);
+ kwargs['pfit']=range(10,18);
  kwargs['ylim']=[5e-2,5e0];
  fig4 = plt.figure();
  plot_correlator(models,data,fit,fig4,key,"simple_sum_odd",**kwargs);
  ## --
  kwargs['ylim']=[1e-1,1e1];
- kwargs['pfit']=range(10,21);
+ kwargs['pfit']=range(12,18);
  fig5 = plt.figure();
  plot_correlator(models,data,fit,fig5,key,"sum_even",**kwargs);
  ## --
@@ -89,6 +191,7 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
  testan=None; # test fit function for 1+1 - an
  testEo=None; # test fit function for 1+1 - Eo
  testEn=None; # test fit function for 1+1 - En
+
  if not (kwargs is None):
   for akey,value in kwargs.iteritems():
    if   akey == "tslc":
@@ -172,7 +275,6 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
   dmean = models[0].s[0]*gv.mean(data[key]);
   dsdev = gv.sdev(data[key]);
   ax.errorbar(tslc,dmean,yerr=dsdev,ls=ls,mfc=mfc,mec=mec,color=color,marker=marker,ms=ms);
-  ax.scatter(tfit,dmean[tfit[0:len(tfit)]],color=color,marker=marker,s=ms*ms);
   ax.scatter(tfit,dmean[tfit[0:len(tfit)]],color=color,marker=marker,s=ms*ms);
   #
   ## -- axis modifications
@@ -294,7 +396,10 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
    pmean= pavg.mean*np.ones(len(pfit));
    psdev= pavg.sdev*np.ones(len(pfit));
    print "              Fit value for ",plot_type," plot: ",fit.transformed_p['En'][0];
-   print "Wghtd avg plateau value for ",plot_type," plot: ",pavg;
+   try:
+    print "Wghtd avg plateau value for ",plot_type," plot: ",pavg;
+   except:
+    print;
    ax.scatter(pfit,dmean[pfit],color=color3,marker=marker,s=ms*ms);
    ax.plot(pfit,pmean,color=color3);
    ax.plot(pfit,pmean+psdev,color=color3,ls=ls2);

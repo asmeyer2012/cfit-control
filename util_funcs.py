@@ -56,3 +56,15 @@ def sqr_arr(arr):
 def sum_dE(arr):
  return [sum(arr[:i+1]) for i in range(len(arr))];
 
+def pos_arr(arr,val=None):
+ if val is None:
+  return [  arr[i] if arr[i] > 0 else 1e-20 for i in range(len(arr)) ];
+ else:
+  return [  arr[i] if arr[i] > 0 else val   for i in range(len(arr)) ];
+
+def neg_arr(arr,val=None):
+ if val is None:
+  return [ -arr[i] if arr[i] < 0 else 1e-20 for i in range(len(arr)) ];
+ else:
+  return [ -arr[i] if arr[i] < 0 else val   for i in range(len(arr)) ];
+
