@@ -31,6 +31,7 @@ def make_data_db():
   #
   # should make a better version of construct_key using source types
   key = construct_key(corr.name,"2pt"); 
+  print key;
   gdat [key]=[];
   gckey[key]=str(corr.name);
   #

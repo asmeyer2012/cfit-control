@@ -17,14 +17,50 @@ def make_plot(models,data,fit):
  #kwargs['testao']=gv.gvar(0.441,0.032); #actual
  #kwargs['erbaroff']=True;
 
- #kwargs['ylim']=[1e-5,1e1];
+ kwargs['ylim']=[1e-5,1e1];
  fig1 = plt.figure();
  plot_correlator(models,data,fit,fig1,key,"correlator",**kwargs);
  #kwargs['ylim']=[-3,5];
- kwargs['ylim']=[-1,2];
- fig3 = plt.figure();
- plot_correlator(models,data,fit,fig3,key,"fit_normalized",**kwargs);
+ #kwargs['ylim']=[-1,2];
+ #fig3 = plt.figure();
+ #plot_correlator(models,data,fit,fig3,key,"fit_normalized",**kwargs);
  ## --
+ plt.show();
+
+def make_plot_1plus1(models,data,fit):
+ key=models[0].datatag;
+ kwargs={};
+ #del kwargs['ylim'];
+ kwargs['ylim']=[-0.5,1.5];
+ kwargs['pfit']=range(13,19);
+
+ fig1 = plt.figure();
+ plot_correlator(models,data,fit,fig1,key,"log_ratio2",**kwargs);
+ ## --
+ kwargs['ylim']=[0.0,0.4];
+ kwargs['pfit']=range(6,19);
+ fig2 = plt.figure();
+ plot_correlator(models,data,fit,fig2,key,"log_ratio123",**kwargs);
+ ## --
+ kwargs['ylim']=[1e-1,1e1];
+ kwargs['pfit']=range(12,18);
+ fig3 = plt.figure();
+ plot_correlator(models,data,fit,fig3,key,"simple_sum_even",**kwargs);
+ ## --
+ kwargs['pfit']=range(10,18);
+ kwargs['ylim']=[5e-2,5e0];
+ fig4 = plt.figure();
+ plot_correlator(models,data,fit,fig4,key,"simple_sum_odd",**kwargs);
+ ## --
+ kwargs['ylim']=[1e-1,1e1];
+ kwargs['pfit']=range(12,18);
+ fig5 = plt.figure();
+ plot_correlator(models,data,fit,fig5,key,"sum_even",**kwargs);
+ ## --
+ kwargs['pfit']=range(10,21);
+ kwargs['ylim']=[5e-2,5e0];
+ fig6 = plt.figure();
+ plot_correlator(models,data,fit,fig6,key,"sum_odd",**kwargs);
  plt.show();
 
 def make_plot_corr_neg(models,data,fit):
@@ -32,6 +68,16 @@ def make_plot_corr_neg(models,data,fit):
  key=models[0].datatag;
  curr_mod=models[models[0].all_datatags.index(key)];
 
+ ## -- show the fit normalized plot as well
+ kwargs={};
+ kwargs['ylim']=[-1,2];
+ #kwargs['ylim']=[0.,2.];
+ kwargs['ylim']=[0.5,1.5];
+ fig3 = plt.figure();
+ plot_correlator(models,data,fit,fig3,key,"fit_normalized",**kwargs);
+ #plt.show();
+
+ #if False:
  ## -- use models to determine fit ranges, etc
  tslc = curr_mod.tdata;
  tfit = curr_mod.tfit;
@@ -49,9 +95,9 @@ def make_plot_corr_neg(models,data,fit):
  #testEo=None; # test fit function for 1+1 - Eo
  #testEn=None; # test fit function for 1+1 - En
 
- yplim=[1e-4,1e1];
- ymlim=[1e-4,1e1];
- fig,(axp,axm) = plt.subplots(2,sharex=True);
+ yplim=[1e-12,1e-5];
+ ymlim=[1e-12,1e-5];
+ fig,(axp,axm) = plt.subplots(2,sharex=True,figsize=(8,16));
  fig.subplots_adjust(hspace=0);
  
  axp.set_yscale('log');
@@ -122,42 +168,6 @@ def make_plot_corr_neg(models,data,fit):
  #except NameError:
  # pass;
  axis_mods_correlator(fig,key,len(tslc),**kwargs2);
- plt.show();
-
-def make_plot_1plus1(models,data,fit):
- key=models[0].datatag;
- kwargs={};
- #del kwargs['ylim'];
- kwargs['ylim']=[-0.5,1.5];
- kwargs['pfit']=range(13,19);
-
- fig1 = plt.figure();
- plot_correlator(models,data,fit,fig1,key,"log_ratio2",**kwargs);
- ## --
- kwargs['ylim']=[0.0,0.4];
- kwargs['pfit']=range(6,19);
- fig2 = plt.figure();
- plot_correlator(models,data,fit,fig2,key,"log_ratio123",**kwargs);
- ## --
- kwargs['ylim']=[1e-1,1e1];
- kwargs['pfit']=range(12,18);
- fig3 = plt.figure();
- plot_correlator(models,data,fit,fig3,key,"simple_sum_even",**kwargs);
- ## --
- kwargs['pfit']=range(10,18);
- kwargs['ylim']=[5e-2,5e0];
- fig4 = plt.figure();
- plot_correlator(models,data,fit,fig4,key,"simple_sum_odd",**kwargs);
- ## --
- kwargs['ylim']=[1e-1,1e1];
- kwargs['pfit']=range(12,18);
- fig5 = plt.figure();
- plot_correlator(models,data,fit,fig5,key,"sum_even",**kwargs);
- ## --
- kwargs['pfit']=range(10,21);
- kwargs['ylim']=[5e-2,5e0];
- fig6 = plt.figure();
- plot_correlator(models,data,fit,fig6,key,"sum_odd",**kwargs);
  plt.show();
 
 def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
@@ -329,11 +339,11 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
  ##
  elif plot_type is "fit_normalized":
   ## -- fit
-  t_all = np.linspace(0.5,len(tslc)/2-0.5,100);
+  t_all = np.linspace(1,len(tslc)/2,len(tslc)/2);
   gvfit_all = fit_func(t_all);
   fit_norm = np.ones(len(t_all));
   fit_mean = gv.mean(gvfit_all);
-  fit_sdev = gv.sdev(gvfit_all)/fit_mean;
+  fit_sdev = gv.sdev(gvfit_all)/np.abs(fit_mean);
   ax.plot(t_all,fit_norm,color=color2);
   ax.plot(t_all,fit_norm+fit_sdev,color=color2,ls=ls2);
   ax.plot(t_all,fit_norm-fit_sdev,color=color2,ls=ls2);
@@ -855,54 +865,140 @@ def axis_mods_simple_sum(fig,key,tmax=None,sep=1,sgn=1,**kwargs):
  rect.set_facecolor('white');
 ## ------
 
-def create_fit_func(models,fit,tmax=0):
+def create_fit_func(models,fit,tmax=0,prekey=None):
  ## -- get a/b key information from models[index].a, etc...
  #
- lparm=fit.transformed_p;
+ tfp=fit.transformed_p;
  #
- try: # vanilla
-  a =gv.mean(ut.sqr_arr(lparm['a']));
-  E =gv.mean(ut.sum_dE(lparm['E']));
-  def new_func(t):
-   return models[0].s*np.dot(a,[gv.exp(-E[i]*t)+gv.exp(-E[i]*(tmax-t)) for i in range(len(E))]);
-  return new_func;
- #
- except KeyError:
+ la={}
+ lb={}
+ lE={}
+ if prekey is None:
+  for akey in ['a','an','ao']:
+   try:
+    la[akey]=tfp[akey];
+   except KeyError:
+    continue;
+  for bkey in ['b','bn','bo']:
+   try:
+    lb[bkey]=tfp[bkey];
+   except KeyError:
+    continue;
   pass;
- #
- try: # even
-  an =ut.sqr_arr(lparm['an']);
-  En =ut.sum_dE(lparm['En']);
-  #
-  try: # even+odd
-   ao =ut.sqr_arr(lparm['ao']);
-   Eo =ut.sum_dE(lparm['Eo']);
+  if lb is {}:
+   lb = la;
+  elif len(lb) < len(la):
+   for akey in la:
+    try:
+     lb['b'+akey[-1]];
+    except KeyError:
+     lb['b'+akey[-1]]=la[akey];
+  for ekey in ['dE','dEn','dEo','E','En','Eo']:
+   try:
+    lE[ekey]=tfp[ekey];
+   except KeyError:
+    continue;
+  pass;
+  ## --
+  if not (len(la) == len(lb) == len(lE)):
+   print "Error: unmatched energies/amplitudes";
+   return None;
+  if (len(la) == 1):
+   do_odd = False;
+   for key in la:
+    la=la[key];
+   for key in lb:
+    lb=lb[key];
+   for key in lE:
+    lE=lE[key];
+    if key[-1] is 'o':
+     do_odd = True;
+   lc = la*lb;
+   lE = ut.sum_dE(lE);
+   #lE = ut.sum_dE(lE[0]);
+   #print models[0].s[0]
+   if do_odd:
+    def new_func(t):
+     return models[0].s[1]*np.dot(lc,\
+      [gv.cos(t*np.pi)*(gv.exp(-lE[i]*t)+gv.exp(-lE[i]*(tmax-t))) for i in range(len(lE))]);
+   else:
+    def new_func(t):
+     return models[0].s[0]*np.dot(lc,\
+      [gv.exp(-lE[i]*t)+gv.exp(-lE[i]*(tmax-t)) for i in range(len(lE))]);
+   return new_func;
+   ## --
+  elif (len(la) == 2):
+   lcn=la['an']*lb['bn'];
+   lco=la['ao']*lb['bo'];
+   for key in lE:
+    if key[-1] is 'n':
+     lEn = ut.sum_dE(lE[key]);
+    elif key[-1] is 'o':
+     lEo = ut.sum_dE(lE[key]);
    def new_func(t):
     return models[0].s[0]*\
-           np.dot(an,[gv.exp(-En[i]*t)+gv.exp(-En[i]*(tmax-t)) for i in range(len(En))])\
-         + models[0].s[1]* np.dot(ao,[gv.cos(t*np.pi)*\
-          (gv.exp(-Eo[i]*t)+gv.exp(-Eo[i]*(tmax-t)))\
-           for i in range(len(Eo))]);
+           np.dot(lcn,[gv.exp(-lEn[i]*t)+gv.exp(-lEn[i]*(tmax-t)) for i in range(len(lEn))])\
+         + models[0].s[1]* np.dot(lco,\
+         [ gv.cos(t*np.pi)*(gv.exp(-lEo[i]*t)+gv.exp(-lEo[i]*(tmax-t)))\
+           for i in range(len(lEo))]);
    return new_func;
-  #
-  except KeyError: # even only
-   def new_func(t):
-    return models[0].s[0]*\
-           np.dot(an,[gv.exp(-En[i]*t)+gv.exp(-En[i]*(tmax-t)) for i in range(len(En))]);
-   return new_func;
- #
- except KeyError: # even did not work
-  #
-  try: # odd only
-   ao =gv.mean(ut.sqr_arr(lparm['ao']));
-   Eo =gv.mean(ut.sum_dE(lparm['Eo']));
-   def new_func(t):
-    return models[0].s*np.dot(ao,[gv.cos(t*np.pi)*\
-          (gv.exp(-Eo[i]*t)+gv.exp(-Eo[i]*(tmax-t)))\
-           for i in range(len(Eo))]);
-   return new_func;
-  #
-  except KeyError: # nothing worked
-   pass;
- print "No fit function generated";
- return None;
+  else:
+   print "Error: too many energies/amplitudes; N = ",str(len(la));
+   return None;
+  pass;
+  ## --
+ else:
+  return None;
+ pass;
+
+#def create_fit_func(models,fit,tmax=0):
+# ## -- get a/b key information from models[index].a, etc...
+# #
+# lparm=fit.transformed_p;
+# #
+# try: # vanilla
+#  a =gv.mean(ut.sqr_arr(lparm['a']));
+#  E =gv.mean(ut.sum_dE(lparm['E']));
+#  def new_func(t):
+#   return models[0].s*np.dot(a,[gv.exp(-E[i]*t)+gv.exp(-E[i]*(tmax-t)) for i in range(len(E))]);
+#  return new_func;
+# #
+# except KeyError:
+#  pass;
+# #
+# try: # even
+#  an =ut.sqr_arr(lparm['an']);
+#  En =ut.sum_dE(lparm['En']);
+#  #
+#  try: # even+odd
+#   ao =ut.sqr_arr(lparm['ao']);
+#   Eo =ut.sum_dE(lparm['Eo']);
+#   def new_func(t):
+#    return models[0].s[0]*\
+#           np.dot(an,[gv.exp(-En[i]*t)+gv.exp(-En[i]*(tmax-t)) for i in range(len(En))])\
+#         + models[0].s[1]* np.dot(ao,[gv.cos(t*np.pi)*\
+#          (gv.exp(-Eo[i]*t)+gv.exp(-Eo[i]*(tmax-t)))\
+#           for i in range(len(Eo))]);
+#   return new_func;
+#  #
+#  except KeyError: # even only
+#   def new_func(t):
+#    return models[0].s[0]*\
+#           np.dot(an,[gv.exp(-En[i]*t)+gv.exp(-En[i]*(tmax-t)) for i in range(len(En))]);
+#   return new_func;
+# #
+# except KeyError: # even did not work
+#  #
+#  try: # odd only
+#   ao =gv.mean(ut.sqr_arr(lparm['ao']));
+#   Eo =gv.mean(ut.sum_dE(lparm['Eo']));
+#   def new_func(t):
+#    return models[0].s*np.dot(ao,[gv.cos(t*np.pi)*\
+#          (gv.exp(-Eo[i]*t)+gv.exp(-Eo[i]*(tmax-t)))\
+#           for i in range(len(Eo))]);
+#   return new_func;
+#  #
+#  except KeyError: # nothing worked
+#   pass;
+# print "No fit function generated";
+# return None;

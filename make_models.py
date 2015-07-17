@@ -25,7 +25,7 @@ def mdp_default_model(mdp):
  tslice=mdp.corr_len;
  tdata=range(tslice);
  if mdp.t_min == 0:
-  mdp.t_fit   = range(mdp.corr_len);
+  mdp.t_fit   = df.define_model[mdp.key]['tfit'];
  else:
   mdp.t_fit   = range(mdp.t_min,mdp.corr_len+1-mdp.t_min);
  if mdp.n_nfit > 0:

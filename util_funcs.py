@@ -54,7 +54,10 @@ def sqr_arr(arr):
  return [arr[i]*arr[i] for i in range(len(arr))];
 
 def sum_dE(arr):
- return [sum(arr[:i+1]) for i in range(len(arr))];
+ try:
+  return [sum(arr[:i+1]) for i in range(len(arr))];
+ except:
+  return [arr]
 
 def pos_arr(arr,val=None):
  if val is None:

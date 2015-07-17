@@ -18,6 +18,7 @@ def make_data (mdp,do_makedata,do_db=True,filename=""):
    make_data_db();
  ## -- for raw fnal-type correlators
  else:
+  print "Making data from raw correlators";
   import_file = filename;
   make_data_raw(mdp,do_makedata,import_file);
  #

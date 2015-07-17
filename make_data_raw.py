@@ -136,7 +136,7 @@ def save_data (mdp):
   if lnum > -1:
    cdat = extract_data(mdp,lnum);  # found the correlator, save to array
    try:                            # write it to file
-    lsec = find_data_section(mdp);
+    lsec = uf.find_data_section(mdp.save_file,mdp.key);
     #mdp.save_file.write( mdp.key + '  ' + '  '.\
     uf.ins_line(mdp.save_file, mdp.key + '  ' + '  '.\
       join('{:e}'.format(cdat[x]) for x in range(0,mdp.corr_len))\
@@ -185,21 +185,21 @@ def find_corr (mdp,num):
 ## ------
 ##
 
-def find_data_section(mdp):
- ## -- returns the first and last line number of the data section
- ## -- first line is a line break: "## -- 'key'"
- ## -- last line is the last correlator data listed in file
- #
- if mdp.key in uf.get_str_key(mdp.save_file,"## --"):
-  ## -- key exists
-  lnum = uf.find_str_key(mdp.save_file,mdp.key)[0];
-  return [lnum[0],lnum[len(lnum)-1]];
- else:
-  ## -- key does not exist yet, add section to end of file
-  lnum = uf.write_section(mdp.save_file,mdp.key);
-  return [lnum,lnum];
-## ------
-##
+#def find_data_section(save_file,key):
+# ## -- returns the first and last line number of the data section
+# ## -- first line is a line break: "## -- 'key'"
+# ## -- last line is the last correlator data listed in file
+# #
+# if key in uf.get_str_key(save_file,"## --"):
+#  ## -- key exists
+#  lnum = uf.find_str_key(save_file,key)[0];
+#  return [lnum[0],lnum[len(lnum)-1]];
+# else:
+#  ## -- key does not exist yet, add section to end of file
+#  lnum = uf.write_section(save_file,key);
+#  return [lnum,lnum];
+### ------
+###
 
 def test_line_type (line,num):
  lsp = line.split('\t');
