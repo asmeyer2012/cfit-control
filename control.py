@@ -19,32 +19,32 @@ import gvar.dataset as gvd
 if df.do_db:
  ## -- for database input
  ##    - (database file name defined in make_data_db.py)
- data,dset = make_data(df.mdp,do_makedata=df.do_makedata,do_db=True);
- models = make_models(data=data,lkey=df.lkey);
- prior = make_prior(models);
+ data,dset = make_data(df.mdp,do_makedata=df.do_makedata,do_db=True)
+ models = make_models(data=data,lkey=df.lkey)
+ prior = make_prior(models)
 else:
  ## -- for raw correlator file input
  data,dset = make_data(df.mdp,do_makedata=df.do_makedata,\
-                       do_db=False,filename="./import-correlators");
- models = make_models(mdp=df.mdp);
- prior = make_prior(models);
+                       do_db=False,filename="./import-correlators")
+ models = make_models(mdp=df.mdp)
+ prior = make_prior(models)
 ## --
 
-fitter = CorrFitter(models=models,maxit=df.maxit);
-#fit = fitter.chained_lsqfit(data=data, prior=prior);
-#fit = fitter.lsqfit(data=data, prior=fit.p);
-fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut);
-#bs_avg = make_bootstrap(fitter,dset,df.mdp.n_bs);
-print_fit(fit,prior);
-print_error_budget(fit);
-#save_data(mdp.output_path +'/'+ mdp.fit_fname,fit,data);
-save_data('./test-fit.out',fit,data);
+fitter = CorrFitter(models=models,maxit=df.maxit)
+#fit = fitter.chained_lsqfit(data=data, prior=prior)
+#fit = fitter.lsqfit(data=data, prior=fit.p)
+fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut)
+#bs_avg = make_bootstrap(fitter,dset,df.mdp.n_bs)
+print_fit(fit,prior)
+print_error_budget(fit)
+#save_data(mdp.output_path +'/'+ mdp.fit_fname,fit,data)
+save_data('./test-fit.out',fit,data)
 
 if df.do_plot:
  if df.do_default_plot:
-  fitter.display_plots();
- make_plot_corr_neg(models,data,fit);
- make_plot(models,data,fit);
+  fitter.display_plots()
+ make_plot_corr_neg(models,data,fit)
+ #make_plot(models,data,fit)
  if df.do_effmass:
-  make_plot_1plus1(models,data,fit);
+  make_plot_1plus1(models,data,fit)
 
