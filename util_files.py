@@ -67,7 +67,7 @@ def get_str_key (file,skey,cnum=None):
 ## ------
 ##
 
-def find_str_key (file,skey):
+def find_str_key (file,skey,exclusive=False):
  file.seek(0); # go to beginning to read entire file
  try:
   rval = [None]*2;
@@ -78,14 +78,53 @@ def find_str_key (file,skey):
   for lnum in range(0,len(lfsp)):
    if skey in lfsp[lnum]:
     # if skey found, add line number to array rval
-    rval[0].append(lnum);
-    rval[1].append(lfsp[lnum]);
+    if exclusive==False or check_exclusive(lfsp[lnum],skey):
+     rval[0].append(lnum);
+     rval[1].append(lfsp[lnum]);
   # return array of line numbers
   return rval;
  except (IOError,AttributeError):
   print "-- In file",file.name;
   print "Could not search file for string",skey;
   return [];
+## ------
+##
+
+def check_exclusive(line,key):
+ lsp = line.split(key);
+ for i in range(len(lsp)-1):
+  if lsp[i] is '':
+   if lsp[i+1] is '':
+    return True;
+   else:
+    if lsp[i+1][0] is ' ':
+     return True;
+    continue;
+  elif lsp[i+1] is '':
+   if lsp[i][-1] is ' ':
+    return True;
+   continue;
+  else:
+   if lsp[i][-1] is ' ' and lsp[i+1][0] is ' ':
+    return True;
+   continue;
+ return False;
+## ------
+##
+
+def find_data_section(save_file,key):
+ ## -- returns the first and last line number of the data section
+ ## -- first line is a line break: "## -- 'key'"
+ ## -- last line is the last correlator data listed in file
+ #
+ if key in get_str_key(save_file,"## --"):
+  ## -- key exists
+  lnum = find_str_key(save_file,key,True)[0];
+  return [lnum[0],lnum[len(lnum)-1]];
+ else:
+  ## -- key does not exist yet, add section to end of file
+  lnum = write_section(save_file,key);
+  return [lnum,lnum];
 ## ------
 ##
 
