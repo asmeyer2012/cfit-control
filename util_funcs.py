@@ -6,68 +6,68 @@ def sig_digits(gval,do_unicode=False):
  ## -- print both mean and sdev if gvar
  ## -- pad with spaces so printout is always same length
  try: ## -- gvars
-  smean = sig_digits(gval.mean);
-  ssdev = sig_digits(gval.sdev);
+  smean = sig_digits(gval.mean)
+  ssdev = sig_digits(gval.sdev)
   if do_unicode:
-   return smean +' '+ u'\u00B1' +' '+ ssdev;
+   return smean +' '+ u'\u00B1' +' '+ ssdev
   else:
-   return smean + ' +-' + ssdev;
+   return smean + ' +-' + ssdev
  except AttributeError:
   ## -- floats
-  sval = str(gval);
+  sval = str(gval)
   if gval > 0:
-   sval = ' '+sval;
+   sval = ' '+sval
   if sval[1] == '0':
-   sval = sval[0]+'o'+sval[2:];
+   sval = sval[0]+'o'+sval[2:]
    for i in range(3,len(sval)):
     if sval[i] == '0':
-     sval=sval[:i]+'o'+sval[i+1:];
+     sval=sval[:i]+'o'+sval[i+1:]
     else:
-     break;
-  return str('{:<10.10}'.format(sval));
+     break
+  return str('{:<10.10}'.format(sval))
 ## ------
 ##
 
 def fmt_num(num,do_sigdigit=True,do_unicode=True):
  if do_sigdigit:
-  return sig_digits(num,do_unicode);
+  return sig_digits(num,do_unicode)
  else:
   try:
-   smean = fmt_num(num.mean,do_sigdigit,do_unicode);
-   ssdev = fmt_num(num.sdev,do_sigdigit,do_unicode);
+   smean = fmt_num(num.mean,do_sigdigit,do_unicode)
+   ssdev = fmt_num(num.sdev,do_sigdigit,do_unicode)
    ## -- pad with space
    if do_unicode:
-    return smean+' '+u'\u00B1'+ssdev;
+    return smean+' '+u'\u00B1'+ssdev
    else:
-    return smean+' +-'+ssdev;
+    return smean+' +-'+ssdev
   except AttributeError:
    if num > 0:
-    sval = ' '+str(num);
+    sval = ' '+str(num)
    else:
-    sval = str(num);
-   return '{:<10.10}'.format(sval);
+    sval = str(num)
+   return '{:<10.10}'.format(sval)
 ## ------
 ##
 
 def sqr_arr(arr):
  ## -- square all elements of the array
- return [arr[i]*arr[i] for i in range(len(arr))];
+ return [arr[i]*arr[i] for i in range(len(arr))]
 
 def sum_dE(arr):
  try:
-  return [sum(arr[:i+1]) for i in range(len(arr))];
+  return [sum(arr[:i+1]) for i in range(len(arr))]
  except:
   return [arr]
 
 def pos_arr(arr,val=None):
  if val is None:
-  return [  arr[i] if arr[i] > 0 else 1e-20 for i in range(len(arr)) ];
+  return [  arr[i] if arr[i] > 0 else 1e-20 for i in range(len(arr)) ]
  else:
-  return [  arr[i] if arr[i] > 0 else val   for i in range(len(arr)) ];
+  return [  arr[i] if arr[i] > 0 else val   for i in range(len(arr)) ]
 
 def neg_arr(arr,val=None):
  if val is None:
-  return [ -arr[i] if arr[i] < 0 else 1e-20 for i in range(len(arr)) ];
+  return [ -arr[i] if arr[i] < 0 else 1e-20 for i in range(len(arr)) ]
  else:
-  return [ -arr[i] if arr[i] < 0 else val   for i in range(len(arr)) ];
+  return [ -arr[i] if arr[i] < 0 else val   for i in range(len(arr)) ]
 

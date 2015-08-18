@@ -14,16 +14,17 @@ def make_data (mdp,do_makedata,do_db=True,filename=""):
  ## -- for database objects (missing)
  if do_db:
   if do_makedata:
-   print "Making data from database";
-   make_data_db();
+   print "Making data from database"
+   make_data_db()
  ## -- for raw fnal-type correlators
  else:
-  import_file = filename;
-  make_data_raw(mdp,do_makedata,import_file);
+  print "Making data from raw correlators"
+  import_file = filename
+  make_data_raw(mdp,do_makedata,import_file)
  #
- data_file_out = mdp.output_path + '/' + mdp.output_fname;
- print "Output data file : "+data_file_out;
- dset = gv.dataset.Dataset(data_file_out);
- return gv.dataset.avg_data(dset),dset;
+ data_file_out = mdp.output_path + '/' + mdp.output_fname
+ print "Output data file : "+data_file_out
+ dset = gv.dataset.Dataset(data_file_out)
+ return gv.dataset.avg_data(dset),dset
 ## ------
 ##
