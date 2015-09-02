@@ -32,55 +32,61 @@ def make_plot_1plus1(models,data,fit):
  kwargs={}
  #del kwargs['ylim']
  kwargs['ylim']=[-0.5,1.5]
- kwargs['pfit']=range(13,19)
+ kwargs['pfit']=range(5,19)
 
  fig1 = plt.figure()
  plot_correlator(models,data,fit,fig1,key,"log_ratio2",**kwargs)
  ## --
- kwargs['ylim']=[0.0,0.4]
- kwargs['pfit']=range(6,19)
+ kwargs['ylim']=[0.0,3.0]
+ #kwargs['pfit']=range(6,19)
  fig2 = plt.figure()
  plot_correlator(models,data,fit,fig2,key,"log_ratio123",**kwargs)
  ## --
- kwargs['ylim']=[1e-1,1e1]
- kwargs['pfit']=range(12,18)
+ kwargs['ylim']=[1e-3,1e1]
+ #kwargs['pfit']=range(12,18)
  fig3 = plt.figure()
  plot_correlator(models,data,fit,fig3,key,"simple_sum_even",**kwargs)
  ## --
- kwargs['pfit']=range(10,18)
- kwargs['ylim']=[5e-2,5e0]
+ #kwargs['pfit']=range(10,18)
+ kwargs['ylim']=[5e-4,5e0]
  fig4 = plt.figure()
  plot_correlator(models,data,fit,fig4,key,"simple_sum_odd",**kwargs)
  ## --
- kwargs['ylim']=[1e-1,1e1]
+ kwargs['ylim']=[1e-4,1e1]
  kwargs['pfit']=range(12,18)
  fig5 = plt.figure()
  plot_correlator(models,data,fit,fig5,key,"sum_even",**kwargs)
  ## --
- kwargs['pfit']=range(10,21)
- kwargs['ylim']=[5e-2,5e0]
+ #kwargs['pfit']=range(10,21)
+ kwargs['ylim']=[5e-4,5e0]
  fig6 = plt.figure()
  plot_correlator(models,data,fit,fig6,key,"sum_odd",**kwargs)
  plt.show()
 
-def make_plot_corr_neg(models,data,fit):
+def make_plot_corr_neg(models,data,fit,prior):
  ## -- determine index of models to use
  key=models[0].datatag
  curr_mod=models[models[0].all_datatags.index(key)]
 
  ## -- show the fit normalized plot as well
  kwargs={}
- kwargs['ylim']=[-1,2]
- #kwargs['ylim']=[0.,2.]
+ kwargs['plotTitle']="Normalized Class 7 MILC (sss) Correlator"
+ kwargs['yaxisTitle']=r'$C(t)/C_{prior}(t)$'
+ #kwargs['ylim']=[0.8,1.2]
  kwargs['ylim']=[0.5,1.5]
+ #kwargs['ylim']=[-1.0,3.0]
+ fig4 = plt.figure()
+ plot_correlator(models,data,prior,fig4,key,"prior_normalized",**kwargs)
+ kwargs['yaxisTitle']=r'$C(t)/C_{fit}(t)$'
  fig3 = plt.figure()
  plot_correlator(models,data,fit,fig3,key,"fit_normalized",**kwargs)
+ #plt.show()
  #plt.show()
 
  #if False:
  ## -- use models to determine fit ranges, etc
  tslc = curr_mod.tdata
- tfit = curr_mod.tfit
+ tfit = list(curr_mod.tfit)
  ls='None'   # linestyle
  ls2='--'
  mfc='None'  # marker face color (errorbar plot)
@@ -115,8 +121,9 @@ def make_plot_corr_neg(models,data,fit):
  #axm.yaxis.set_major_locator(MaxNLocator(nbins=nbinsm))
  ## --
  fit_func = create_fit_func(models,fit,len(tslc))
- tfit = range(tfit[0],tfit[0]+len(tfit)*2-1)
- t_all = np.linspace(0.,len(tslc),49)
+ tfit.extend(list(sorted([len(tslc) - x for x in tfit])))
+ #tfit = range(tfit[0],tfit[0]+len(tfit)*2-1)
+ t_all = np.linspace(0.,len(tslc),len(tslc)+1)
  gvfit_all = models[0].s[0]*fit_func(t_all)
  fit_mean = gv.mean(gvfit_all)
  fit_sdev = gv.sdev(gvfit_all)
@@ -158,11 +165,13 @@ def make_plot_corr_neg(models,data,fit):
   color=color,marker=marker,ms=ms)
  axm.errorbar(tslc,dm_mean,yerr=(dsdev,dm_sdev),ls=ls,mfc=mfc,mec=mec,\
   color=color,marker=marker,ms=ms)
- axp.scatter(tfit,dp_mean[tfit[0]:tfit[-1]+1],color=color,marker=marker,s=ms*ms)
- axm.scatter(tfit,dm_mean[tfit[0]:tfit[-1]+1],color=color,marker=marker,s=ms*ms)
+ axp.scatter(tfit,[dp_mean[i] for i in tfit],color=color,marker=marker,s=ms*ms)
+ axm.scatter(tfit,[dm_mean[i] for i in tfit],color=color,marker=marker,s=ms*ms)
  #
  ## -- axis modifications
  kwargs2={}
+ kwargs2['plotTitle']="Class 7 MILC (sss) Correlator"
+ kwargs2['yaxisTitle']="C(t)"
  #try:
  # kwargs2['ylim']=ylim
  #except NameError:
@@ -243,6 +252,10 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
    elif akey == "erbaroff":
     ## -- turn errors off for fit functions in pure correlator plot
     erbaroff = True
+   elif akey == "plotTitle":
+    plottitle = value
+   elif akey == "yaxisTitle":
+    yaxistitle = value
  ##endif kwargs
 
  ## -- set up fit 
@@ -293,6 +306,14 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
    kwargs2['ylim']=ylim
   except NameError:
    pass
+  try:
+   kwargs2['plotTitle']=plottitle
+  except NameError:
+   kwargs2['plotTitle']="default title"
+  try:
+   kwargs2['yaxisTitle']=yaxistitle
+  except NameError:
+   kwargs2['yaxisTitle']="default y-axis title"
   axis_mods_correlator(fig,key,len(tslc),**kwargs2)
   #
  ## ------
@@ -383,6 +404,66 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
    kwargs2['ylim']=ylim
   except NameError:
    pass
+  try:
+   kwargs2['plotTitle']=plottitle
+  except NameError:
+   kwargs2['plotTitle']="default title"
+  try:
+   kwargs2['yaxisTitle']=yaxistitle
+  except NameError:
+   kwargs2['yaxisTitle']="default y-axis title"
+  axis_mods_fit_normalized(fig,key,len(tslc),**kwargs2)
+  #
+ elif plot_type is "prior_normalized":
+  ## -- fit
+  if df.do_baryon:
+   tlen = len(tslc)/2-1
+  else:
+   tlen = len(tslc)/2
+  t_all = np.linspace(1,tlen,tlen)
+  gvfit_all = fit_func(t_all)
+  fit_norm = np.ones(len(t_all))
+  fit_mean = gv.mean(gvfit_all)
+  fit_sdev = gv.sdev(gvfit_all)/np.abs(fit_mean)
+  ax.plot(t_all,fit_norm,color=color3)
+  ax.plot(t_all,fit_norm+fit_sdev,color=color3,ls=ls2)
+  ax.plot(t_all,fit_norm-fit_sdev,color=color3,ls=ls2)
+  #
+  ## -- data
+  tps = (1 if models[0].tp > 0 else -1)
+  avdat = np.concatenate(([data[key][0]],\
+   [lsf.wavg([data[key][i],tps*data[key][len(data[key])-i]])\
+   for i in range(1,len(data[key])/2)],[data[key][len(data[key])/2]]))
+  tav = np.array(range(len(avdat)))
+  tav =[t for t in tav if abs(gv.mean(fit_func(t))) > 0]
+  trem =[(0 if abs(gv.mean(fit_func(t))) > 0 else 1) for t in range(len(tslc)/2)]
+  tslc2 =[t for t in range(len(tslc)/2) if abs(gv.mean(fit_func(t))) > 0]
+  trem2 = [sum(trem[:i+1]) for i in range(len(trem))]
+  tfit2 = [t for t in tav if t in tfit]
+  ndat=[avdat[t]/gv.mean(fit_func(t)) for t in tav]
+  #
+  dmean = gv.mean(ndat)
+  dsdev = gv.sdev(ndat)
+  #
+  ax.errorbar(tslc2,dmean[range(len(tslc2))],yerr=dsdev,ls=ls,mfc=mfc,\
+   mec=mec,color=color,marker=marker,ms=ms)
+  ax.scatter(tfit2,dmean[[x-y for x,y in zip(tfit2,[trem2[t] for t in tfit2])]],\
+   color=color,marker=marker,s=ms*ms)
+  #
+  ### -- axis modifications
+  kwargs2={}
+  try:
+   kwargs2['ylim']=ylim
+  except NameError:
+   pass
+  try:
+   kwargs2['plotTitle']=plottitle
+  except NameError:
+   kwargs2['plotTitle']="default title"
+  try:
+   kwargs2['yaxisTitle']=yaxistitle
+  except NameError:
+   kwargs2['yaxisTitle']="default y-axis title"
   axis_mods_fit_normalized(fig,key,len(tslc),**kwargs2)
   #
  elif plot_type is "log_ratio2":
@@ -397,11 +478,13 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
   ax.plot(t_all,fit_mean-fit_sdev,color=color2,ls=ls2)
   #
   ## -- data
+  tps=(1 if models[0].tp > 0 else -1)
   avdat = np.concatenate(([data[key][0]],\
-   [lsf.wavg([data[key][i],data[key][len(data[key])-i]])\
+   [lsf.wavg([data[key][i],tps*data[key][len(data[key])-i]])\
    for i in range(1,len(data[key])/2)],[data[key][len(data[key])/2]]))
   ## --
-  rdat = gv.log([avdat[i]/avdat[i+2] for i in range(len(avdat)-2)])/2
+  rdat = gv.log([avdat[i]/avdat[i+2] if avdat[i]/avdat[i+2] > 0 else gv.gvar(1,1)
+   for i in range(len(avdat)-2)]) / 2
   dmean = gv.mean(rdat)
   dsdev = gv.sdev(rdat)
   #
@@ -428,6 +511,14 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
    kwargs2['ylim']=ylim
   except NameError:
    pass
+  try:
+   kwargs2['plotTitle']=plottitle
+  except NameError:
+   kwargs2['plotTitle']="default title"
+  try:
+   kwargs2['yaxisTitle']=yaxistitle
+  except NameError:
+   kwargs2['yaxisTitle']="default y-axis title"
   axis_mods_log_ratio(fig,key,len(tslc),sep=2,**kwargs2)
   #
  ## ------
@@ -457,7 +548,8 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
          -gv.exp(entmp)*(avdat[i+sep+1]+sgn*avdat[i+1]))
          for i in range(len(avdat)-sep-1)],
          models[0].s[1])
-  rpdat=np.divide(gv.log([rdat[i]/rdat[i+sep2] for i in range(len(rdat)-sep2)]),sep2)
+  rpdat=np.divide(gv.log([rdat[i]/rdat[i+sep2] if rdat[i]/rdat[i+sep2] > 0 else gv.gvar(1,1)
+   for i in range(len(rdat)-sep2)]),sep2)
   dmean = gv.mean(rpdat)
   dsdev = gv.sdev(rpdat)
   #
@@ -482,6 +574,14 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
    kwargs2['ylim']=ylim
   except NameError:
    pass
+  try:
+   kwargs2['plotTitle']=plottitle
+  except NameError:
+   kwargs2['plotTitle']="default title"
+  try:
+   kwargs2['yaxisTitle']=yaxistitle
+  except NameError:
+   kwargs2['yaxisTitle']="default y-axis title"
   axis_mods_log_ratio123(fig,key,len(tslc),**kwargs2)
   #
  ## ------
@@ -554,7 +654,8 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
     color=color,marker=marker,s=ms*ms)
   #
   if not(pfit is None):
-   pavg = lsf.wavg(rdat[pfit])
+   pavg = lsf.wavg([rdat[i] if rdat[i] > 0 else gv.gvar(0,1) for i in pfit])
+   #pavg = lsf.wavg(rdat[pfit])
    pmean= pavg.mean*np.ones(len(pfit))
    psdev= pavg.sdev*np.ones(len(pfit))
    print "              Fit value for ",plot_type," plot: ",fit.transformed_p[atag][0]
@@ -571,6 +672,14 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
    kwargs2['ylim']=ylim
   except NameError:
    pass
+  try:
+   kwargs2['plotTitle']=plottitle
+  except NameError:
+   kwargs2['plotTitle']="default title"
+  try:
+   kwargs2['yaxisTitle']=yaxistitle
+  except NameError:
+   kwargs2['yaxisTitle']="default y-axis title"
   axis_mods_sum(fig,key,len(tslc),sep=sep,sgn=sgn,**kwargs2)
   #
  ## ------
@@ -629,7 +738,7 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
    ax.scatter(tfit[0:len(tfit)-sep],dmean[tfit[0:len(tfit)-sep]],\
     color=color,marker=marker,s=ms*ms)
   if not(pfit is None):
-   pavg = lsf.wavg(rdat[pfit])
+   pavg = lsf.wavg([rdat[i] if rdat[i] > 0 else gv.gvar(0,1) for i in pfit])
    pmean= pavg.mean*np.ones(len(pfit))
    psdev= pavg.sdev*np.ones(len(pfit))
    print "              Fit value for ",plot_type," plot: ",fit.transformed_p[atag][0]
@@ -646,6 +755,14 @@ def plot_correlator(models,data,fit,fig,key,plot_type,**kwargs):
    kwargs2['ylim']=ylim
   except NameError:
    pass
+  try:
+   kwargs2['plotTitle']=plottitle
+  except NameError:
+   kwargs2['plotTitle']="default title"
+  try:
+   kwargs2['yaxisTitle']=yaxistitle
+  except NameError:
+   kwargs2['yaxisTitle']="default y-axis title"
   axis_mods_simple_sum(fig,key,len(tslc),sep=sep,sgn=sgn,**kwargs2)
   #
  else:
@@ -666,13 +783,17 @@ def axis_mods_correlator(fig,key,tmax=None,**kwargs):
     ylim = value
    elif akey == "fontsize":
     fontsize = value
+   elif akey == "plotTitle":
+    plottitle = value
+   elif akey == "yaxisTitle":
+    yaxistitle = value
  ##endif kwargs
  #
  ax   =fig.gca()
  rect =fig.patch
- fig.suptitle(key+r' $\pi$ 2-pt Function',fontsize=fontsize)
+ fig.suptitle(plottitle,fontsize=fontsize)
  ax.set_xlabel(r'$t$ slice')
- ax.set_ylabel(r'$C_\pi(t)$')
+ ax.set_ylabel(yaxistitle)
  if not tmax is None:
   ax.set_xlim(xlim)
  try:
@@ -697,16 +818,21 @@ def axis_mods_log_ratio(fig,key,tmax=None,sep=1,**kwargs):
     ylim = value
    elif akey == "fontsize":
     fontsize = value
+   elif akey == "plotTitle":
+    plottitle = value
+   elif akey == "yaxisTitle":
+    yaxistitle = value
  ##endif kwargs
  #
  ax   =fig.gca()
  rect =fig.patch
- fig.suptitle(key+r' $\pi$ 2-pt Log Ratio',fontsize=fontsize)
+ fig.suptitle(plottitle,fontsize=fontsize)
  ax.set_xlabel(r'$t$ slice')
- if sep > 1:
-  ax.set_ylabel(r'$-log(C_\pi(t+'+str(sep)+r'a) / C_\pi(t))$')
- else:
-  ax.set_ylabel(r'$-log(C_\pi(t+a) / C_\pi(t))$')
+ #if sep > 1:
+ # ax.set_ylabel(r'$-log(C_\pi(t+'+str(sep)+r'a) / C_\pi(t))$')
+ #else:
+ # ax.set_ylabel(r'$-log(C_\pi(t+a) / C_\pi(t))$')
+ ax.set_ylabel(yaxistitle)
  if not tmax is None:
   ax.set_xlim(xlim)
  try:
@@ -730,13 +856,17 @@ def axis_mods_fit_normalized(fig,key,tmax=None,**kwargs):
     ylim = value
    elif akey == "fontsize":
     fontsize = value
+   elif akey == "plotTitle":
+    plottitle = value
+   elif akey == "yaxisTitle":
+    yaxistitle = value
  ##endif kwargs
  #
  ax   =fig.gca()
  rect =fig.patch
- fig.suptitle(key+r' $\pi$ 2-pt Fit-Normalized',fontsize=fontsize)
+ fig.suptitle(plottitle,fontsize=fontsize)
  ax.set_xlabel(r'$t$ slice')
- ax.set_ylabel(r'$C_\pi(t)/C_\pi$ fit')
+ ax.set_ylabel(yaxistitle)
  if not tmax is None:
   ax.set_xlim(xlim)
  try:
@@ -760,6 +890,10 @@ def axis_mods_log_ratio123(fig,key,tmax=None,sep=1,**kwargs):
     ylim = value
    elif akey == "fontsize":
     fontsize = value
+   elif akey == "plotTitle":
+    plottitle = value
+   elif akey == "yaxisTitle":
+    yaxistitle = value
  ##endif kwargs
  #
  ax   =fig.gca()
@@ -798,6 +932,10 @@ def axis_mods_sum(fig,key,tmax=None,sep=1,sgn=1,**kwargs):
     fontsize = value
    elif akey == "plot_type":
     plot_type = value
+   elif akey == "plotTitle":
+    plottitle = value
+   elif akey == "yaxisTitle":
+    yaxistitle = value
  ##endif kwargs
  #
  ax   =fig.gca()
@@ -839,6 +977,10 @@ def axis_mods_simple_sum(fig,key,tmax=None,sep=1,sgn=1,**kwargs):
     fontsize = value
    elif akey == "plot_type":
     plot_type = value
+   elif akey == "plotTitle":
+    plottitle = value
+   elif akey == "yaxisTitle":
+    yaxistitle = value
  ##endif kwargs
  #
  ax   =fig.gca()
@@ -875,7 +1017,15 @@ def axis_mods_simple_sum(fig,key,tmax=None,sep=1,sgn=1,**kwargs):
 def create_fit_func(models,fit,modeln=0):
  ## -- get a/b key information from models[index].a, etc...
  #
- tfp=fit.transformed_p
+ try:
+  tfp=fit.transformed_p
+ except AttributeError:
+  # prior was input instead
+  tfp=fit
+  for key in fit.keys():
+   if key[:3] == 'log':
+    tfp[key[3:]] = gv.exp(fit[key])
+ pass
  tfk=tfp.keys()
  tps=(1 if models[0].tp > 0 else -1)
  tpa=abs(models[0].tp)
@@ -900,13 +1050,36 @@ def create_fit_func(models,fit,modeln=0):
   do_evn = abs(models[0].s[0]) > 0
  except TypeError:
   do_evn = True
+ if do_odd and do_evn:
+  if len(la['an']) == 0:
+   #print "even priors not available"
+   do_evn = False
+  if len(la['ao']) == 0:
+   #print "odd priors not available"
+   do_odd = False
+ pass
  ## --
  if bool(do_odd) ^ bool(do_evn): # xor
-  if len(lb.keys()) > 0:
-   lc = la[la.keys()[0]]*lb[lb.keys()[0]]
+  if len(lE.keys()) > 1:
+   if len(lE[lE.keys()[0]]) == 0:
+    lE = ut.sum_dE(lE[lE.keys()[1]])
+    if len(lb.keys()) > 0:
+     lc = la[la.keys()[1]]*lb[lb.keys()[1]]
+    else:
+     lc = la[la.keys()[1]]*la[la.keys()[1]]
+   else:
+    lE = ut.sum_dE(lE[lE.keys()[0]])
+    if len(lb.keys()) > 0:
+     lc = la[la.keys()[0]]*lb[lb.keys()[0]]
+    else:
+     lc = la[la.keys()[0]]*la[la.keys()[0]]
   else:
-   lc = la[la.keys()[0]]*la[la.keys()[0]]
-  lE = ut.sum_dE(lE[lE.keys()[0]])
+   lE = ut.sum_dE(lE[lE.keys()[0]])
+   if len(lb.keys()) > 0:
+    lc = la[la.keys()[0]]*lb[lb.keys()[0]]
+   else:
+    lc = la[la.keys()[0]]*la[la.keys()[0]]
+  pass
   if do_odd:
    def new_func(t):
     return models[0].s[1]*np.dot(lc,

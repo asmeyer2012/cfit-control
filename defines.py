@@ -14,6 +14,7 @@ do_default_plot=False
 do_plot=False
 do_effmass=False
 do_baryon=False
+do_uncorr=False
 
 ## -- switches
 #do_makedata=True
@@ -22,14 +23,15 @@ do_baryon=False
 do_plot=True
 #do_effmass=True
 do_baryon=True
+#do_uncorr=True
 
 ## -- other parameters
 lkey=['Gaa'] # keys to process
 maxit      =5000   # maximum iterations
-#svdcut     =1e-2  # svd cut
-#svdcut     =3e-3
-#svdcut     =1e-6
 svdcut     =None
+#svdcut     =3e-3
+#svdcut     =3e-2
+#svdcut     =1e-1  # svd cut
 ## -- tolerance check does not work if lots of variation from + to -
 ## -- need to fix
 ctol       =None # tolerance for consecutive correlator points
@@ -42,12 +44,11 @@ ctol       =None # tolerance for consecutive correlator points
 ## -- trying to eliminate need for meta_data
 mdp = meta_data.md_params()
 mdp.corr_len=-64
-mdp.t_min   =4
-#mdp.n_nfit = 1
-#mdp.n_ofit = 0
+mdp.t_min   = 2
+mdp.t_max   = 13
 mdp.n_nfit = 1
 mdp.n_ofit = 1
-mdp.n_bs   = 10
+mdp.n_bs   = 1
 mdp.output_path="/project/axial/data/dbfile/"
 mdp.output_fname="gb2pt_l2064f21b676m010m050_db"
 
@@ -69,14 +70,14 @@ out_fname='gb2pt_l2064f21b676m010m050_db'
 ## ------
 ## FROM MAKE_MODELS.PY
 ## ------
-tmin=4
+tmin=15
 trang=64
 define_model={}
 ## --
 define_model['Gaa']=\
 {
  'tdata':range(trang), 'tfit':range(tmin,trang-tmin+1), 'tp':-trang,\
- 'akey':('an','ao'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
+ 'akey':('an','ao'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
 ## --
 #define_model['pion5RWRW']=\
 #{#'n_nfit':1, 'n_ofit':0,\
@@ -99,19 +100,17 @@ define_model['Gaa']=\
 #define_model['pioni5RWRW']=define_model['pion5RWRW' ]
 #define_model['pionijRWRW']=define_model['pion5RWRW' ]
 ## -- more specific assignments
-tmin=4 #3+1
-#tmin=9 #1+1
+#tmin=20 #1+1
 #define_model['pion05RWRW']['tfit']=range(tmin,trang-tmin+1)
 
 ## ------
 ## FROM MAKE_PRIOR.PY
 ## ------
+#do_plot=True
 define_prior={}
 define_prior['Gaa']=\
-{'an':gv.gvar([3.2,2.0],[0.4,0.5]),'ao':gv.gvar([0.001],[0.001]),\
- 'En':gv.gvar([0.930,0.2],[0.05,0.1]),'Eo':gv.gvar([0.95],[0.1])}
-#{'an':gv.gvar([3.2,0.1],[0.4,0.3]),'ao':gv.gvar([0.004],[0.01]),\
-# 'En':gv.gvar([0.930,0.2],[0.05,0.1]),'Eo':gv.gvar([0.43],[0.1])}
+{'logan':gv.gvar([0.008],[100]),'logao':gv.gvar([0.008],[100]),\
+ 'logEn':gv.gvar([0.869],[100]),'logEo':gv.gvar([0.878],[100])}
 
 #define_prior['pion05RWRW']=\
 #{'an':gv.gvar([0.60,2.70,6.75],[0.15,0.3,0.5]),'ao':gv.gvar([0.54],[0.06]),\

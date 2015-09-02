@@ -11,13 +11,9 @@ corr_len 64
 flag_overwrite True
 
 #corr_num 1,2
-corr_num 1
+corr_num 2
 #for input_fname example.cor
 key Gaa
-for input_fname l2064_m050_r0204_c116214_cw_coul2pt.cor
-for input_fname l2064_m050_r0204_c116252_cw_coul2pt.cor
-for input_fname l2064_m050_r0204_c116311_cw_coul2pt.cor
-for input_fname l2064_m050_r0204_c116318_cw_coul2pt.cor
 for input_fname l2064_m050_r0204_c116332_cw_coul2pt.cor
 for input_fname l2064_m050_r0210_c116366_cw_coul2pt.cor
 for input_fname l2064_m050_r0216_c116429_cw_coul2pt.cor

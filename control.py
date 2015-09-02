@@ -15,6 +15,7 @@ from meta_data      import *
 import defines      as df
 import gvar         as gv
 import gvar.dataset as gvd
+import numpy        as np
 
 if df.do_db:
  ## -- for database input
@@ -30,6 +31,17 @@ else:
  prior = make_prior(models)
 ## --
 
+if df.do_uncorr:
+ ## -- remove the correlations from the data
+ datlen = len(gv.evalcov(data)['Gaa','Gaa'])
+ fakecov = np.zeros((datlen,datlen))
+ for i in range(datlen):
+  fakecov[i,i] = np.diag(gv.evalcov(data)['Gaa','Gaa'])[i]
+ data['Gaa'] = gv.gvar([data['Gaa'][i].mean for i in range(datlen)],np.array(fakecov))
+## --
+
+#print data.cov
+
 fitter = CorrFitter(models=models,maxit=df.maxit)
 #fit = fitter.chained_lsqfit(data=data, prior=prior)
 #fit = fitter.lsqfit(data=data, prior=fit.p)
@@ -43,7 +55,7 @@ save_data('./test-fit.out',fit,data)
 if df.do_plot:
  if df.do_default_plot:
   fitter.display_plots()
- make_plot_corr_neg(models,data,fit)
+ make_plot_corr_neg(models,data,fit,prior)
  #make_plot(models,data,fit)
  if df.do_effmass:
   make_plot_1plus1(models,data,fit)
