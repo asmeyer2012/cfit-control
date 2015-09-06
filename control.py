@@ -27,7 +27,9 @@ else:
  ## -- for raw correlator file input
  data,dset = make_data(df.mdp,do_makedata=df.do_makedata,\
                        do_db=False,filename="./import-correlators")
- models = make_models(mdp=df.mdp)
+ #models = make_models(mdp=df.mdp)
+ models = make_models(data=data,lkey=df.lkey)
+ print models
  prior = make_prior(models)
 ## --
 

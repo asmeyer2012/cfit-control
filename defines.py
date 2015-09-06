@@ -26,10 +26,10 @@ do_baryon=True
 #do_uncorr=True
 
 ## -- other parameters
-lkey=['Gaa'] # keys to process
+lkey=['Gaa','Gab'] # keys to process
 maxit      =5000   # maximum iterations
-svdcut     =None
-#svdcut     =3e-3
+#svdcut     =None
+svdcut     =3e-3
 #svdcut     =3e-2
 #svdcut     =1e-1  # svd cut
 ## -- tolerance check does not work if lots of variation from + to -
@@ -43,12 +43,12 @@ ctol       =None # tolerance for consecutive correlator points
 ## -- create meta_data, initial setup
 ## -- trying to eliminate need for meta_data
 mdp = meta_data.md_params()
-mdp.corr_len=-64
-mdp.t_min   = 2
-mdp.t_max   = 13
-mdp.n_nfit = 1
-mdp.n_ofit = 1
-mdp.n_bs   = 1
+mdp.corr_len=-64 #only for make_data_raw
+mdp.t_min   = 2 #unused
+mdp.t_max   = 23 #unused
+mdp.n_nfit = 1 #unused 
+mdp.n_ofit = 1 #unused 
+mdp.n_bs   = 1 #disabled
 mdp.output_path="/project/axial/data/dbfile/"
 mdp.output_fname="gb2pt_l2064f21b676m010m050_db"
 
@@ -70,24 +70,27 @@ out_fname='gb2pt_l2064f21b676m010m050_db'
 ## ------
 ## FROM MAKE_MODELS.PY
 ## ------
-tmin=15
-trang=64
+cor_len=64
 define_model={}
 ## --
 define_model['Gaa']=\
 {
- 'tdata':range(trang), 'tfit':range(tmin,trang-tmin+1), 'tp':-trang,\
+ 'tdata':range(cor_len), 'tfit':range(2,23), 'tp':-cor_len,\
  'akey':('an','ao'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['Gab']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(2,23), 'tp':-cor_len,\
+ 'akey':('an','ao'), 'bkey':('bn','bo'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
 ## --
 #define_model['pion5RWRW']=\
 #{#'n_nfit':1, 'n_ofit':0,\
-# 'tdata':range(trang), 'tfit':range(tmin,trang-tmin+1), 'tp':trang,\
+# 'tdata':range(cor_len), 'tfit':range(tmin,cor_len-tmin+1), 'tp':cor_len,\
 # 'akey':'an', 'bkey':'an', 'ekey':'En', 'skey':1. }
 ## 'akey':('an','ao'), 'bkey':('an','ao'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
 ### --
 #define_model['pion05RWRW']=\
 #{#'n_nfit':1, 'n_ofit':1,\
-# 'tdata':range(trang), 'tfit':range(tmin,trang-tmin+1), 'tp':trang,\
+# 'tdata':range(cor_len), 'tfit':range(tmin,cor_len-tmin+1), 'tp':cor_len,\
 # 'akey':('an','ao'), 'bkey':('an','ao'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
 #define_model['pioni0RWRW']=define_model['pion05RWRW']
 #define_model['pioniRWRW' ]=define_model['pion05RWRW']
@@ -101,7 +104,7 @@ define_model['Gaa']=\
 #define_model['pionijRWRW']=define_model['pion5RWRW' ]
 ## -- more specific assignments
 #tmin=20 #1+1
-#define_model['pion05RWRW']['tfit']=range(tmin,trang-tmin+1)
+#define_model['pion05RWRW']['tfit']=range(tmin,cor_len-tmin+1)
 
 ## ------
 ## FROM MAKE_PRIOR.PY
@@ -109,8 +112,12 @@ define_model['Gaa']=\
 #do_plot=True
 define_prior={}
 define_prior['Gaa']=\
-{'logan':gv.gvar([0.008],[100]),'logao':gv.gvar([0.008],[100]),\
- 'logEn':gv.gvar([0.869],[100]),'logEo':gv.gvar([0.878],[100])}
+{'logan':gv.gvar([3.6],[100]),'logao':gv.gvar([0.01,3.3],[100,100]),\
+ 'logEn':gv.gvar([0.5],[100]),'logEo':gv.gvar([0.75,0.3],[100,100])} # s8 c1_1
+define_prior['Gab']=\
+{'logan':gv.gvar([3.6],[100]),'logao':gv.gvar([0.01,3.3],[100,100]),\
+ 'logbn':gv.gvar([3.6],[100]),'logbo':gv.gvar([0.01,3.3],[100,100]),\
+ 'logEn':gv.gvar([0.5],[100]),'logEo':gv.gvar([0.75,0.3],[100,100])} # s8 c1_1
 
 #define_prior['pion05RWRW']=\
 #{'an':gv.gvar([0.60,2.70,6.75],[0.15,0.3,0.5]),'ao':gv.gvar([0.54],[0.06]),\

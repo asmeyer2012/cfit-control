@@ -8,16 +8,17 @@ def make_prior(models=None,priorkey=None):
  if models is None:
   pass
  else:
-  if priorkey is None:
-   skey=models[0].all_datatags[0]
-  else:
-   skey=priorkey ## -- fix later
+  for model in models:
+   if priorkey is None:
+    skey=model.all_datatags[0]
+   else:
+    skey=priorkey ## -- fix later
 
-  for pkey in df.define_prior[skey]:
-   prior[pkey]=df.define_prior[skey][pkey]
+   for pkey in df.define_prior[skey]:
+    prior[pkey]=df.define_prior[skey][pkey]
 
-  for pkey in prior: # logarithmize the logarithmic coefficients
-   if pkey[:3] == 'log':
-    prior[pkey] = gv.log(prior[pkey])
+   for pkey in prior: # logarithmize the logarithmic coefficients
+    if pkey[:3] == 'log':
+     prior[pkey] = gv.log(prior[pkey])
 
  return prior

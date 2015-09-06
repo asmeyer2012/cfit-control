@@ -43,20 +43,28 @@ def make_data_raw (mdp,do_makedata,filename):
          mdp.save_file = open(mdp.output_path + '/' + mdp.output_fname,'r+')
         mdp.flag_out_open = True
         # write first header
-        corr_key=uf.get_str_key(mdp.corr_file,"correlator_key",\
-                            int(mdp.corr_num.strip("[]").split(',')[0]))
-        uf.write_header(mdp.save_file,corr_key,mdp.corr_len)
-        uf.write_section(mdp.save_file,mdp.key)
-        mdp.flag_overwrite= False
+        #corr_key=uf.get_str_key(mdp.corr_file,"correlator_key",\
+        #                    int(mdp.corr_num.strip("[]").split(',')[0]))
+        #uf.write_header(mdp.save_file,corr_key,mdp.corr_len)
+        #uf.write_section(mdp.save_file,mdp.key)
+        for num,key in zip(mdp.corr_num,mdp.key):
+         corr_key=uf.get_str_key(mdp.corr_file,"correlator_key",num)
+         uf.write_header(mdp.save_file,corr_key,mdp.corr_len)
+         uf.write_section(mdp.save_file,key)
+         mdp.flag_overwrite= False
        else:
         mdp.save_file = open(mdp.output_path + '/' + mdp.output_fname,'r+')
         mdp.save_file.seek(0,2)  # seek the end of file
         mdp.flag_out_open = True
         # write another header
-        corr_key=uf.get_str_key(mdp.corr_file,"correlator_key",\
-                            int(mdp.corr_num.strip("[]").split(',')[0]))
-        uf.write_header(mdp.save_file,corr_key,mdp.corr_len)
-        uf.write_section(mdp.save_file,mdp.key)
+        #corr_key=uf.get_str_key(mdp.corr_file,"correlator_key",\
+        #                    int(mdp.corr_num.strip("[]").split(',')[0]))
+        #uf.write_header(mdp.save_file,corr_key,mdp.corr_len)
+        #uf.write_section(mdp.save_file,mdp.key)
+        for num,key in zip(mdp.corr_num,mdp.key):
+         corr_key=uf.get_str_key(mdp.corr_file,"correlator_key",num)
+         uf.write_header(mdp.save_file,corr_key,mdp.corr_len)
+         uf.write_section(mdp.save_file,key)
       #except (IOError):
       # pass
       except (AttributeError):
@@ -120,9 +128,11 @@ def update_params (mdp,lsp):
   elif lsp[0] == "input_type":
    mdp.input_type = lsp[1].replace("\n","")
   elif lsp[0] == "key":
-   mdp.key = lsp[1].replace("\n","")
+   #mdp.key = lsp[1].replace("\n","")
+   mdp.key = lsp[1].replace("\n","").strip("[]").split(',')
   elif lsp[0] == "corr_num":
-   mdp.corr_num = lsp[1].replace("\n","")
+   #mdp.corr_num = lsp[1].replace("\n","")
+   mdp.corr_num = lsp[1].replace("\n","").strip("[]").split(',')
   elif lsp[0] == "corr_len":
    mdp.corr_len = int(lsp[1].replace("\n",""))
   elif lsp[0] == "flag_overwrite":
@@ -137,14 +147,15 @@ def save_data (mdp):
  -- acutally write data to save file in correct format
  -- triggered by keyword "for" at beginning of line
  """
- for i in mdp.corr_num.split(','):
-  lnum = find_corr(mdp,int(i))    # get the line number of the correlator, if possible
+ for num,key in zip(mdp.corr_num,mdp.key):
+  lnum = find_corr(mdp,int(num))    # get the line number of the correlator, if possible
   if lnum > -1:
    cdat = extract_data(mdp,lnum)  # found the correlator, save to array
    try:                           # write it to file
-    lsec = uf.find_data_section(mdp.save_file,mdp.key)
+    lsec = uf.find_data_section(mdp.save_file,key)
+    #lsec = uf.find_data_section(mdp.save_file,mdp.key)
     #mdp.save_file.write( mdp.key + '  ' + '  '.\
-    uf.ins_line(mdp.save_file, mdp.key + '  ' + '  '.\
+    uf.ins_line(mdp.save_file, key + '  ' + '  '.\
       join('{:e}'.format(cdat[x]) for x in range(0,mdp.corr_len))\
       , lsec[1]+1\
      )
@@ -154,9 +165,35 @@ def save_data (mdp):
     print "Could not extract data from file"
   else:
    print "-- In file",mdp.corr_file.name
-   print "Failed to find correlator #",i
+   print "Failed to find correlator #",num
 ## ------
 ##
+
+#def save_data (mdp):
+# """
+# -- acutally write data to save file in correct format
+# -- triggered by keyword "for" at beginning of line
+# """
+# for i in mdp.corr_num.split(','):
+#  lnum = find_corr(mdp,int(i))    # get the line number of the correlator, if possible
+#  if lnum > -1:
+#   cdat = extract_data(mdp,lnum)  # found the correlator, save to array
+#   try:                           # write it to file
+#    lsec = uf.find_data_section(mdp.save_file,mdp.key)
+#    #mdp.save_file.write( mdp.key + '  ' + '  '.\
+#    uf.ins_line(mdp.save_file, mdp.key + '  ' + '  '.\
+#      join('{:e}'.format(cdat[x]) for x in range(0,mdp.corr_len))\
+#      , lsec[1]+1\
+#     )
+#    write_fname(mdp,lsec[0])
+#   except IndexError:
+#    print "-- In file",mdp.corr_file.name
+#    print "Could not extract data from file"
+#  else:
+#   print "-- In file",mdp.corr_file.name
+#   print "Failed to find correlator #",i
+### ------
+###
 
 def find_corr (mdp,num):
  """

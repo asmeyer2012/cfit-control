@@ -1022,8 +1022,8 @@ def axis_mods_simple_sum(fig,key,tmax=None,sep=1,sgn=1,**kwargs):
  rect.set_facecolor('white')
 ## ------
 
-def create_fit_func(models,fit,modeln=0):
- ## -- get a/b key information from models[index].a, etc...
+def create_fit_func(model,fit):
+ ## -- get a/b key information from model.a, etc...
  #
  try:
   tfp=fit.transformed_p
@@ -1035,8 +1035,8 @@ def create_fit_func(models,fit,modeln=0):
     tfp[key[3:]] = gv.exp(fit[key])
  pass
  tfk=tfp.keys()
- tps=(1 if models[0].tp > 0 else -1)
- tpa=abs(models[0].tp)
+ tps=(1 if model.tp > 0 else -1)
+ tpa=abs(model.tp)
  #
  la={}
  lb={}
@@ -1051,11 +1051,11 @@ def create_fit_func(models,fit,modeln=0):
   if any([tfk[i][-len(ekey):]==ekey for i in range(len(tfk))]):
    lE[ekey]=tfp[ekey]
  try:
-  do_odd = abs(models[0].s[1]) > 0
+  do_odd = abs(model.s[1]) > 0
  except TypeError:
   do_odd = False
  try:
-  do_evn = abs(models[0].s[0]) > 0
+  do_evn = abs(model.s[0]) > 0
  except TypeError:
   do_evn = True
  if do_odd and do_evn:
@@ -1090,17 +1090,17 @@ def create_fit_func(models,fit,modeln=0):
   pass
   if do_odd:
    def new_func(t):
-    return models[0].s[1]*np.dot(lc,
+    return model.s[1]*np.dot(lc,
      [gv.cos(t*np.pi)*(gv.exp(-lE[i]*t)+tps*gv.exp(-lE[i]*(tpa-t)))
      for i in range(len(lE))])
   else:
    try:
     def new_func(t):
-     return models[0].s[0]*np.dot(lc,
+     return model.s[0]*np.dot(lc,
       [gv.exp(-lE[i]*t)+tps*gv.exp(-lE[i]*(tpa-t)) for i in range(len(lE))])
    except TypeError:
     def new_func(t):
-     return models[0].s*np.dot(lc,
+     return model.s*np.dot(lc,
       [gv.exp(-lE[i]*t)+tps*gv.exp(-lE[i]*(tpa-t)) for i in range(len(lE))])
   return new_func
  ## --
@@ -1117,150 +1117,12 @@ def create_fit_func(models,fit,modeln=0):
    elif key[-1] is 'o':
     lEo = ut.sum_dE(lE[key])
   def new_func(t):
-   return models[0].s[0]*np.dot(lcn,
+   return model.s[0]*np.dot(lcn,
         [ gv.exp(-lEn[i]*t)+tps*gv.exp(-lEn[i]*(tpa-t))
           for i in range(len(lEn)) ]) +\
-          models[0].s[1]*np.dot(lco,
+          model.s[1]*np.dot(lco,
         [ gv.cos(t*np.pi)*(gv.exp(-lEo[i]*t)+tps*gv.exp(-lEo[i]*(tpa-t)))
           for i in range(len(lEo)) ])
   return new_func
  ## --
 pass
-
-#def create_fit_func(models,fit,tmax=0,prekey=None):
-# ## -- get a/b key information from models[index].a, etc...
-# #
-# tfp=fit.transformed_p
-# #
-# la={}
-# lb={}
-# lE={}
-# if prekey is None:
-#  for akey in ['a','an','ao']:
-#   try:
-#    la[akey]=tfp[akey]
-#   except KeyError:
-#    continue
-#  for bkey in ['b','bn','bo']:
-#   try:
-#    lb[bkey]=tfp[bkey]
-#   except KeyError:
-#    continue
-#  pass
-#  if lb is {}:
-#   lb = la
-#  elif len(lb) < len(la):
-#   for akey in la:
-#    try:
-#     lb['b'+akey[-1]]
-#    except KeyError:
-#     lb['b'+akey[-1]]=la[akey]
-#  for ekey in ['dE','dEn','dEo','E','En','Eo']:
-#   try:
-#    lE[ekey]=tfp[ekey]
-#   except KeyError:
-#    continue
-#  pass
-#  ## --
-#  if not (len(la) == len(lb) == len(lE)):
-#   print "Error: unmatched energies/amplitudes"
-#   return None
-#  if (len(la) == 1):
-#   do_odd = False
-#   for key in la:
-#    la=la[key]
-#   for key in lb:
-#    lb=lb[key]
-#   for key in lE:
-#    lE=lE[key]
-#    if key[-1] is 'o':
-#     do_odd = True
-#   lc = la*lb
-#   lE = ut.sum_dE(lE)
-#   #lE = ut.sum_dE(lE[0])
-#   #print models[0].s[0]
-#   if do_odd:
-#    def new_func(t):
-#     return models[0].s[1]*np.dot(lc,\
-#      [gv.cos(t*np.pi)*(gv.exp(-lE[i]*t)+gv.exp(-lE[i]*(tmax-t))) for i in range(len(lE))])
-#   else:
-#    def new_func(t):
-#     return models[0].s[0]*np.dot(lc,\
-#      [gv.exp(-lE[i]*t)+gv.exp(-lE[i]*(tmax-t)) for i in range(len(lE))])
-#   return new_func
-#   ## --
-#  elif (len(la) == 2):
-#   lcn=la['an']*lb['bn']
-#   lco=la['ao']*lb['bo']
-#   for key in lE:
-#    if key[-1] is 'n':
-#     lEn = ut.sum_dE(lE[key])
-#    elif key[-1] is 'o':
-#     lEo = ut.sum_dE(lE[key])
-#   def new_func(t):
-#    return models[0].s[0]*\
-#           np.dot(lcn,[gv.exp(-lEn[i]*t)+gv.exp(-lEn[i]*(tmax-t)) for i in range(len(lEn))])\
-#         + models[0].s[1]* np.dot(lco,\
-#         [ gv.cos(t*np.pi)*(gv.exp(-lEo[i]*t)+gv.exp(-lEo[i]*(tmax-t)))\
-#           for i in range(len(lEo))])
-#   return new_func
-#  else:
-#   print "Error: too many energies/amplitudes N = ",str(len(la))
-#   return None
-#  pass
-#  ## --
-# else:
-#  return None
-# pass
-
-#def create_fit_func(models,fit,tmax=0):
-# ## -- get a/b key information from models[index].a, etc...
-# #
-# lparm=fit.transformed_p
-# #
-# try: # vanilla
-#  a =gv.mean(ut.sqr_arr(lparm['a']))
-#  E =gv.mean(ut.sum_dE(lparm['E']))
-#  def new_func(t):
-#   return models[0].s*np.dot(a,[gv.exp(-E[i]*t)+gv.exp(-E[i]*(tmax-t)) for i in range(len(E))])
-#  return new_func
-# #
-# except KeyError:
-#  pass
-# #
-# try: # even
-#  an =ut.sqr_arr(lparm['an'])
-#  En =ut.sum_dE(lparm['En'])
-#  #
-#  try: # even+odd
-#   ao =ut.sqr_arr(lparm['ao'])
-#   Eo =ut.sum_dE(lparm['Eo'])
-#   def new_func(t):
-#    return models[0].s[0]*\
-#           np.dot(an,[gv.exp(-En[i]*t)+gv.exp(-En[i]*(tmax-t)) for i in range(len(En))])\
-#         + models[0].s[1]* np.dot(ao,[gv.cos(t*np.pi)*\
-#          (gv.exp(-Eo[i]*t)+gv.exp(-Eo[i]*(tmax-t)))\
-#           for i in range(len(Eo))])
-#   return new_func
-#  #
-#  except KeyError: # even only
-#   def new_func(t):
-#    return models[0].s[0]*\
-#           np.dot(an,[gv.exp(-En[i]*t)+gv.exp(-En[i]*(tmax-t)) for i in range(len(En))])
-#   return new_func
-# #
-# except KeyError: # even did not work
-#  #
-#  try: # odd only
-#   ao =gv.mean(ut.sqr_arr(lparm['ao']))
-#   Eo =gv.mean(ut.sum_dE(lparm['Eo']))
-#   def new_func(t):
-#    return models[0].s*np.dot(ao,[gv.cos(t*np.pi)*\
-#          (gv.exp(-Eo[i]*t)+gv.exp(-Eo[i]*(tmax-t)))\
-#           for i in range(len(Eo))])
-#   return new_func
-#  #
-#  except KeyError: # nothing worked
-#   pass
-# print "No fit function generated"
-# return None
