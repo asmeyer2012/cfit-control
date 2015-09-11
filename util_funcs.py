@@ -71,3 +71,30 @@ def neg_arr(arr,val=None):
  else:
   return [ -arr[i] if arr[i] < 0 else val   for i in range(len(arr)) ]
 
+def pos_err(dmean,dsdev,val=None):
+ if val is None:
+   dpp_sdev = [ dsdev[i] if dmean[i]+dsdev[i] > 0 else 1e-20 for i in range(len(dsdev))]
+   dpm_sdev = [ dsdev[i] if (dmean[i]-dsdev[i] > 0 and dmean[i] > 0) else 
+    (max(dmean[i]-1e-20,1e-20) if dmean[i] > 0 else -1e-20)
+    for i in range(len(dsdev))]
+   return [dpm_sdev,dpp_sdev]
+ else:
+   dpp_sdev = [ dsdev[i] if dmean[i]+dsdev[i] > 0 else val for i in range(len(dsdev))]
+   dpm_sdev = [ dsdev[i] if (dmean[i]-dsdev[i] > 0 and dmean[i] > 0) else 
+    (max(dmean[i]-val,val) if dmean[i] > 0 else -val)
+    for i in range(len(dsdev))]
+   return [dpm_sdev,dpp_sdev]
+
+def neg_err(dmean,dsdev,val=None):
+ if val is None:
+   dmm_sdev = [ dsdev[i] if dmean[i]-dsdev[i] < 0 else 1e-20 for i in range(len(dsdev))]
+   dmp_sdev = [ dsdev[i] if (dmean[i]+dsdev[i] < 0 and dmean[i] < 0) else 
+    (max(-dmean[i]-1e-20,1e-20) if dmean[i] < 0 else -1e-20)
+    for i in range(len(dsdev))]
+   return [dmp_sdev,dmm_sdev]
+ else:
+   dmm_sdev = [ dsdev[i] if dmean[i]-dsdev[i] < 0 else val for i in range(len(dsdev))]
+   dmp_sdev = [ dsdev[i] if (dmean[i]+dsdev[i] < 0 and dmean[i] < 0) else 
+    (max(-dmean[i]-val,val) if dmean[i] < 0 else -val)
+    for i in range(len(dsdev))]
+   return [dmp_sdev,dmm_sdev]

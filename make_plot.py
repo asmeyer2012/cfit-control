@@ -159,12 +159,19 @@ def make_plot_corr_neg(models,data,fit,prior):
  dsdev = gv.sdev(data[key])
  dp_mean = ut.pos_arr(dmean)
  dm_mean = ut.neg_arr(dmean)
- dp_sdev = [ dsdev[i] if dmean[i]+dsdev[i] > 0 else 0 for i in range(len(dsdev))]
- dm_sdev = [ dsdev[i] if dmean[i]-dsdev[i] < 0 else 0 for i in range(len(dsdev))]
- axp.errorbar(tslc,dp_mean,yerr=(dsdev,dp_sdev),ls=ls,mfc=mfc,mec=mec,\
-  color=color,marker=marker,ms=ms)
- axm.errorbar(tslc,dm_mean,yerr=(dsdev,dm_sdev),ls=ls,mfc=mfc,mec=mec,\
-  color=color,marker=marker,ms=ms)
+ minval = 1e-15
+ dpp_sdev = [ dsdev[i] if dmean[i]+dsdev[i] > 0 else minval for i in range(len(dsdev))]
+ dpm_sdev = [ dsdev[i] if (dmean[i]-dsdev[i] > 0 and dmean[i] > 0) else 
+  (max(dmean[i]-minval,minval) if dmean[i] > 0 else -minval)
+  for i in range(len(dsdev))]
+ dmm_sdev = [ dsdev[i] if dmean[i]-dsdev[i] < 0 else minval for i in range(len(dsdev))]
+ dmp_sdev = [ dsdev[i] if (dmean[i]+dsdev[i] < 0 and dmean[i] < 0) else 
+  (max(-dmean[i]-minval,minval) if dmean[i] < 0 else -minval)
+  for i in range(len(dsdev))]
+ axp.errorbar(tslc,dp_mean,yerr=(dpm_sdev,dpp_sdev),ls=ls,mfc=mfc,mec=mec,\
+  color=mec,marker=marker,ms=ms)
+ axm.errorbar(tslc,dm_mean,yerr=(dmp_sdev,dmm_sdev),ls=ls,mfc=mfc,mec=mec,\
+  color=mec,marker=marker,ms=ms)
  axp.scatter(tfit,[dp_mean[i] for i in tfit],color=color,marker=marker,s=ms*ms)
  axm.scatter(tfit,[dm_mean[i] for i in tfit],color=color,marker=marker,s=ms*ms)
  #

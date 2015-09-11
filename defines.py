@@ -26,7 +26,8 @@ do_baryon=True
 #do_uncorr=True
 
 ## -- other parameters
-lkey=['Gaa','Gab'] # keys to process
+lkey=['Gaa'] # keys to process
+#lkey=['Gaa','Gab'] # keys to process
 maxit      =5000   # maximum iterations
 #svdcut     =None
 svdcut     =3e-3
@@ -127,4 +128,12 @@ define_prior['Gab']=\
 ## FROM MAKE_PLOT.PY
 ## ------
 sep=2 ## -- timeslice separation for log ratio
+
+fitargs={}
+for key in lkey:
+ fitargs[key]={}
+fitargs['Gaa']['y_pos_limit']=[1e-10,1e2]
+fitargs['Gaa']['y_neg_limit']=[1e-10,1e2]
+#fitargs['Gab']['y_pos_limit']=[1e-10,1e2]
+#fitargs['Gab']['y_neg_limit']=[1e-10,1e2]
 
