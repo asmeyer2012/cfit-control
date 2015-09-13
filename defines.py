@@ -26,11 +26,12 @@ do_baryon=True
 #do_uncorr=True
 
 ## -- other parameters
-lkey=['Gaa'] # keys to process
-#lkey=['Gaa','Gab'] # keys to process
-maxit      =5000   # maximum iterations
-#svdcut     =None
-svdcut     =3e-3
+#lkey=['G12'] # keys to process
+lkey=['G11','G12'] # keys to process
+#lkey=['G11','G12','G22'] # keys to process
+maxit      =10000   # maximum iterations
+svdcut     =None
+#svdcut     =3e-3
 #svdcut     =3e-2
 #svdcut     =1e-1  # svd cut
 ## -- tolerance check does not work if lots of variation from + to -
@@ -74,14 +75,18 @@ out_fname='gb2pt_l2064f21b676m010m050_db'
 cor_len=64
 define_model={}
 ## --
-define_model['Gaa']=\
+define_model['G11']=\
 {
- 'tdata':range(cor_len), 'tfit':range(2,23), 'tp':-cor_len,\
- 'akey':('an','ao'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['Gab']=\
+ 'tdata':range(cor_len), 'tfit':range(2,16), 'tp':-cor_len,\
+ 'akey':('c1n','c1o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G12']=\
 {
- 'tdata':range(cor_len), 'tfit':range(2,23), 'tp':-cor_len,\
- 'akey':('an','ao'), 'bkey':('bn','bo'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+ 'tdata':range(cor_len), 'tfit':range(2,18), 'tp':-cor_len,\
+ 'akey':('c1n','c1o'), 'bkey':('c2n','c2o'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
+define_model['G22']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(2,16), 'tp':-cor_len,\
+ 'akey':('c2n','c2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
 ## --
 #define_model['pion5RWRW']=\
 #{#'n_nfit':1, 'n_ofit':0,\
@@ -112,13 +117,31 @@ define_model['Gab']=\
 ## ------
 #do_plot=True
 define_prior={}
-define_prior['Gaa']=\
-{'logan':gv.gvar([3.6],[100]),'logao':gv.gvar([0.01,3.3],[100,100]),\
- 'logEn':gv.gvar([0.5],[100]),'logEo':gv.gvar([0.75,0.3],[100,100])} # s8 c1_1
-define_prior['Gab']=\
-{'logan':gv.gvar([3.6],[100]),'logao':gv.gvar([0.01,3.3],[100,100]),\
- 'logbn':gv.gvar([3.6],[100]),'logbo':gv.gvar([0.01,3.3],[100,100]),\
- 'logEn':gv.gvar([0.5],[100]),'logEo':gv.gvar([0.75,0.3],[100,100])} # s8 c1_1
+
+#define_prior['logEo']=gv.gvar([0.75,0.3],[100,100])
+#define_prior['logc1o']=gv.gvar([0.01,3.3],[100,100])
+#define_prior['logc2o']=gv.gvar([0.1,3.3],[100,100])
+define_prior['logEo']=gv.gvar([0.9,0.2],[10,10])
+define_prior['logc1o']=gv.gvar([0.8,3.3],[10,10])
+define_prior['logc2o']=gv.gvar([0.6,0.01],[10,10])
+
+#define_prior['logEn']=gv.gvar([0.5],[10])
+#define_prior['logc1n']=gv.gvar([3.6],[10])
+#define_prior['logc2n']=gv.gvar([3.6],[10])
+define_prior['logEn']=gv.gvar([0.7,0.2],[10,10])
+define_prior['logc1n']=gv.gvar([2.4,2.8],[10,10])
+define_prior['logc2n']=gv.gvar([1.0,0.01],[10,10])
+
+define_prior['G11']=\
+{'logc1n':define_prior['logc1n'], 'logc1o':define_prior['logc1o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] } # s8 c1_1
+define_prior['G22']=\
+{'logc2n':define_prior['logc2n'], 'logc2o':define_prior['logc2o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] } # s8 c2_2
+define_prior['G12']=\
+{'logc1n':define_prior['logc1n'], 'logc1o':define_prior['logc1o'],
+ 'logc2n':define_prior['logc2n'], 'logc2o':define_prior['logc2o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] } # s8 c1_2
 
 #define_prior['pion05RWRW']=\
 #{'an':gv.gvar([0.60,2.70,6.75],[0.15,0.3,0.5]),'ao':gv.gvar([0.54],[0.06]),\
@@ -132,8 +155,15 @@ sep=2 ## -- timeslice separation for log ratio
 fitargs={}
 for key in lkey:
  fitargs[key]={}
-fitargs['Gaa']['y_pos_limit']=[1e-10,1e2]
-fitargs['Gaa']['y_neg_limit']=[1e-10,1e2]
-#fitargs['Gab']['y_pos_limit']=[1e-10,1e2]
-#fitargs['Gab']['y_neg_limit']=[1e-10,1e2]
+def suppressKey(key,tag,line): ## -- ignore errors
+ try:
+  fitargs[key][tag]=line
+ except KeyError:
+  pass
+suppressKey('G11','y_pos_limit',[1e-10,1e2])
+suppressKey('G11','y_neg_limit',[1e-10,1e2])
+suppressKey('G12','y_pos_limit',[1e-10,1e2])
+suppressKey('G12','y_neg_limit',[1e-10,1e2])
+suppressKey('G22','y_pos_limit',[1e-10,1e2])
+suppressKey('G22','y_neg_limit',[1e-10,1e2])
 

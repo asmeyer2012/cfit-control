@@ -32,7 +32,7 @@ def plot_corr_normalized(models,data,fit,**kwargs):
  def do_plot_normalized(idx,fig=fig):
    fig.clear()
    ax = fig.add_subplot(111)
-   key = data.keys()[idx[0]]
+   key = models[idx[0]].datatag
 
    ax.set_ylim(utp.get_option("y_limit",[0.2,1.8],**kwargs[key]))
    #
@@ -97,7 +97,7 @@ def plot_corr_normalized(models,data,fit,**kwargs):
  fig.canvas.mpl_connect('key_press_event',press_normalized)
  ## -- save plot data
  for idx,model in zip(range(len(models)),models):
-   key = data.keys()[idx]
+   key = model.datatag
    _fnTData.append(model.tdata)
    _fnTFit.append(model.tfit)
    _fnTFit[-1] = np.append(_fnTFit[-1],list(sorted([len(_fnTData[-1]) - t for t in _fnTFit[-1]])))

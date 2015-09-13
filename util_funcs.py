@@ -24,6 +24,8 @@ def sig_digits(gval,do_unicode=False):
      sval=sval[:i]+'o'+sval[i+1:]
     else:
      break
+  if any(c == 'e' for c in sval):
+   sval=sval[:6]+sval[-4:]
   return str('{:<10.10}'.format(sval))
 ## ------
 ##

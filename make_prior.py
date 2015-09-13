@@ -18,6 +18,8 @@ def make_prior(models=None,priorkey=None):
     prior[pkey]=df.define_prior[skey][pkey]
 
    for pkey in prior: # logarithmize the logarithmic coefficients
+    if not(pkey[3:] in model.a+model.b+model.dE): # don't do logs unless they are in the model
+     continue
     if pkey[:3] == 'log':
      prior[pkey] = gv.log(prior[pkey])
 

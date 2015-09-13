@@ -37,7 +37,7 @@ def plot_corr_double_log(models,data,fit,**kwargs):
    axp = fig.add_subplot(211)
    axm = fig.add_subplot(212,sharex=axp)
    fig.subplots_adjust(hspace=0)
-   key = data.keys()[idx[0]]
+   key = models[idx[0]].datatag
 
    axp.set_yscale('log')
    axm.set_yscale('log')
@@ -100,7 +100,7 @@ def plot_corr_double_log(models,data,fit,**kwargs):
  #
  ## -- setup button press action function
  def press_double_log(event,idx=_dlIdx):
-   #print('press', event.key)
+   #print('press_double_log', event.key)
    try:
      ## -- manually indicate index
      idx[0] = int(event.key) + (idx[0])*10
@@ -123,7 +123,7 @@ def plot_corr_double_log(models,data,fit,**kwargs):
  fig.canvas.mpl_connect('key_press_event',press_double_log)
  ## -- save plot data
  for idx,model in zip(range(len(models)),models):
-   key = data.keys()[idx]
+   key = model.datatag
    _dlTData.append(model.tdata)
    _dlTFit.append(model.tfit)
    _dlTFit[-1] = np.append(_dlTFit[-1],list(sorted([len(_dlTData[-1]) - t for t in _dlTFit[-1]])))
