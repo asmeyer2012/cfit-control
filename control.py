@@ -12,6 +12,7 @@ from make_plot            import make_plot
 from make_plot            import make_plot_corr_neg
 from make_plot            import make_plot_1plus1
 from plot_corr_double_log import plot_corr_double_log
+from plot_corr_normalized import plot_corr_normalized
 from meta_data            import *
 import defines           as df
 import gvar              as gv
@@ -58,6 +59,7 @@ if df.do_plot:
  if df.do_default_plot:
   fitter.display_plots()
  plot_corr_double_log(models,data,fit,**df.fitargs)
+ plot_corr_normalized(models,data,fit,**df.fitargs)
  plt.show()
  #make_plot_corr_neg(models,data,fit,prior)
  #make_plot(models,data,fit)
