@@ -8,6 +8,7 @@ from make_bootstrap       import make_bootstrap
 from print_results        import print_fit
 from print_results        import print_error_budget
 from save_data            import save_data
+from save_prior           import save_prior_from_fit
 from make_plot            import make_plot
 from make_plot            import make_plot_corr_neg
 from make_plot            import make_plot_1plus1
@@ -54,11 +55,13 @@ print_fit(fit,prior)
 print_error_budget(fit)
 #save_data(mdp.output_path +'/'+ mdp.fit_fname,fit,data)
 save_data('./test-fit.out',fit,data)
+save_prior_from_fit(df.define_prior,fit,"test.prior.py",
+  round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
 
 if df.do_plot:
  if df.do_default_plot:
   fitter.display_plots()
- plot_corr_double_log(models,data,fit,**df.fitargs)
+ #plot_corr_double_log(models,data,fit,**df.fitargs)
  plot_corr_normalized(models,data,fit,**df.fitargs)
  plt.show()
  #make_plot_corr_neg(models,data,fit,prior)

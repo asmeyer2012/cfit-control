@@ -1,7 +1,9 @@
 from sqlalchemy     import create_engine
 from sqlalchemy.orm import sessionmaker
 import meta_data
-import gvar as gv
+import gvar         as gv
+import util_funcs   as utf
+import define_prior as dfp
 
 ## ------
 ## FROM CONTROL.PY
@@ -20,15 +22,13 @@ do_uncorr=False
 #do_makedata=True
 #do_db=True
 #do_default_plot=True
-do_plot=True
+#do_plot=True
 #do_effmass=True
 do_baryon=True
 #do_uncorr=True
 
 ## -- other parameters
-#lkey=['G12'] # keys to process
-lkey=['G11','G12'] # keys to process
-#lkey=['G11','G12','G22'] # keys to process
+lkey=['G22','G23','G32','G33','G24','G34','G44']
 maxit      =10000   # maximum iterations
 svdcut     =None
 #svdcut     =3e-3
@@ -37,7 +37,6 @@ svdcut     =None
 ## -- tolerance check does not work if lots of variation from + to -
 ## -- need to fix
 ctol       =None # tolerance for consecutive correlator points
-#ctol       =1e2 
 
 ## ------
 ## FROM MAKE_DATA_RAW.PY
@@ -45,125 +44,195 @@ ctol       =None # tolerance for consecutive correlator points
 ## -- create meta_data, initial setup
 ## -- trying to eliminate need for meta_data
 mdp = meta_data.md_params()
-mdp.corr_len=-64 #only for make_data_raw
-mdp.t_min   = 2 #unused
-mdp.t_max   = 23 #unused
-mdp.n_nfit = 1 #unused 
-mdp.n_ofit = 1 #unused 
-mdp.n_bs   = 1 #disabled
-mdp.output_path="/project/axial/data/dbfile/"
-mdp.output_fname="gb2pt_l2064f21b676m010m050_db"
 
 ## ------
 ## FROM MAKE_DATA_DB.PY
 ## ------
 ## -- database defines
 dbpath   ='/project/axial/data/dbfile/'
-config   ='l2064f21b676m010m050'
-campaign ='gb2pt_l2064f21b676m010m050'
+config   ='l1648f211b580m013m065m838'
+campaign ='gb2pt_l1648f211b580m013m065m838'
+#config   ='l2064f21b676m010m050'
+#campaign ='gb2pt_l2064f21b676m010m050'
 DBEngine = create_engine('sqlite:///'+dbpath+config+campaign+'.sqlite')
 Session  = sessionmaker(bind=DBEngine)
 session  = Session()
 #
 ## -- output defines
 out_path ='/project/axial/data/fit-in/'
-out_fname='gb2pt_l2064f21b676m010m050_db'
+out_fname='gb2pt_l1648f211b580m013m065m838_s16p_db'
 
 ## ------
 ## FROM MAKE_MODELS.PY
 ## ------
-cor_len=64
+cor_len=48
 define_model={}
 ## --
-define_model['G11']=\
-{
- 'tdata':range(cor_len), 'tfit':range(2,16), 'tp':-cor_len,\
- 'akey':('c1n','c1o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G12']=\
-{
- 'tdata':range(cor_len), 'tfit':range(2,18), 'tp':-cor_len,\
- 'akey':('c1n','c1o'), 'bkey':('c2n','c2o'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
+
+rangeMin=2
 define_model['G22']=\
 {
- 'tdata':range(cor_len), 'tfit':range(2,16), 'tp':-cor_len,\
- 'akey':('c2n','c2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-## --
-#define_model['pion5RWRW']=\
-#{#'n_nfit':1, 'n_ofit':0,\
-# 'tdata':range(cor_len), 'tfit':range(tmin,cor_len-tmin+1), 'tp':cor_len,\
-# 'akey':'an', 'bkey':'an', 'ekey':'En', 'skey':1. }
-## 'akey':('an','ao'), 'bkey':('an','ao'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
-### --
-#define_model['pion05RWRW']=\
-#{#'n_nfit':1, 'n_ofit':1,\
-# 'tdata':range(cor_len), 'tfit':range(tmin,cor_len-tmin+1), 'tp':cor_len,\
-# 'akey':('an','ao'), 'bkey':('an','ao'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-#define_model['pioni0RWRW']=define_model['pion05RWRW']
-#define_model['pioniRWRW' ]=define_model['pion05RWRW']
-#define_model['pion0RWRW' ]=define_model['pion05RWRW']
-#define_model['pionsRWRW' ]=define_model['pion05RWRW']
-#define_model['rhoiRWRW'  ]=define_model['pion05RWRW']
-#define_model['rhoi0RWRW' ]=define_model['pion05RWRW']
-#define_model['rho0RWRW'  ]=define_model['pion05RWRW']
-#define_model['rhoisRWRW' ]=define_model['pion05RWRW']
-#define_model['pioni5RWRW']=define_model['pion5RWRW' ]
-#define_model['pionijRWRW']=define_model['pion5RWRW' ]
-## -- more specific assignments
-#tmin=20 #1+1
-#define_model['pion05RWRW']['tfit']=range(tmin,cor_len-tmin+1)
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,12), 'tp':-cor_len,\
+ 'akey':('c2n','c2o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G33']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,11), 'tp':-cor_len,\
+ 'akey':('c3n','c3o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G44']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,12), 'tp':-cor_len,\
+ 'akey':('c4n','c4o'), 'bkey':('k4n','k4o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G66']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,12), 'tp':-cor_len,\
+ 'akey':('c6n','c6o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+
+define_model['G23']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,8), 'tp':-cor_len,\
+ 'akey':('c2n','c2o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G24']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c2n','c2o'), 'bkey':('k4n','k4o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G26']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c2n','c2o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G34']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c3n','c3o'), 'bkey':('k4n','k4o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G36']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c3n','c3o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G46']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c4n','c4o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+
+define_model['G32']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,9), 'tp':-cor_len,\
+ 'akey':('c3n','c3o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G42']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c4n','c4o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G43']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c4n','c4o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G62']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c6n','c6o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G63']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c6n','c6o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G64']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c6n','c6o'), 'bkey':('k4n','k4o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
 
 ## ------
 ## FROM MAKE_PRIOR.PY
 ## ------
-#do_plot=True
-define_prior={}
+define_prior=dfp.define_prior
+## -- 
 
-#define_prior['logEo']=gv.gvar([0.75,0.3],[100,100])
-#define_prior['logc1o']=gv.gvar([0.01,3.3],[100,100])
-#define_prior['logc2o']=gv.gvar([0.1,3.3],[100,100])
-define_prior['logEo']=gv.gvar([0.9,0.2],[10,10])
-define_prior['logc1o']=gv.gvar([0.8,3.3],[10,10])
-define_prior['logc2o']=gv.gvar([0.6,0.01],[10,10])
-
-#define_prior['logEn']=gv.gvar([0.5],[10])
-#define_prior['logc1n']=gv.gvar([3.6],[10])
-#define_prior['logc2n']=gv.gvar([3.6],[10])
-define_prior['logEn']=gv.gvar([0.7,0.2],[10,10])
-define_prior['logc1n']=gv.gvar([2.4,2.8],[10,10])
-define_prior['logc2n']=gv.gvar([1.0,0.01],[10,10])
-
-define_prior['G11']=\
-{'logc1n':define_prior['logc1n'], 'logc1o':define_prior['logc1o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] } # s8 c1_1
 define_prior['G22']=\
-{'logc2n':define_prior['logc2n'], 'logc2o':define_prior['logc2o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] } # s8 c2_2
-define_prior['G12']=\
-{'logc1n':define_prior['logc1n'], 'logc1o':define_prior['logc1o'],
- 'logc2n':define_prior['logc2n'], 'logc2o':define_prior['logc2o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] } # s8 c1_2
+{'c2n':define_prior['c2n'], 'c2o':define_prior['c2o'],
+ 'k2n':define_prior['k2n'], 'k2o':define_prior['k2o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
+define_prior['G33']=\
+{'c3n':define_prior['c3n'], 'c3o':define_prior['c3o'],
+ 'k3n':define_prior['k3n'], 'k3o':define_prior['k3o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
+define_prior['G44']=\
+{'c4n':define_prior['c4n'], 'c4o':define_prior['c4o'],
+ 'k4n':define_prior['k4n'], 'k4o':define_prior['k4o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
+define_prior['G66']=\
+{'c6n':define_prior['c6n'], 'c6o':define_prior['c6o'],
+ 'k6n':define_prior['k6n'], 'k6o':define_prior['k6o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
 
-#define_prior['pion05RWRW']=\
-#{'an':gv.gvar([0.60,2.70,6.75],[0.15,0.3,0.5]),'ao':gv.gvar([0.54],[0.06]),\
-# 'En':gv.gvar([0.260,0.340,0.91],[0.02,0.05,0.08]),'Eo':gv.gvar([0.271],[0.04])}
+define_prior['G23']=\
+{'c2n':define_prior['c2n'], 'c2o':define_prior['c2o'],
+ 'k3n':define_prior['k3n'], 'k3o':define_prior['k3o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
+define_prior['G24']=\
+{'c2n':define_prior['c2n'], 'c2o':define_prior['c2o'],
+ 'k4n':define_prior['k4n'], 'k4o':define_prior['k4o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
+define_prior['G26']=\
+{'c2n':define_prior['c2n'], 'c2o':define_prior['c2o'],
+ 'k6n':define_prior['k6n'], 'k6o':define_prior['k6o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
+define_prior['G34']=\
+{'c3n':define_prior['c3n'], 'c3o':define_prior['c3o'],
+ 'k4n':define_prior['k4n'], 'k4o':define_prior['k4o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
+define_prior['G36']=\
+{'c3n':define_prior['c3n'], 'c3o':define_prior['c3o'],
+ 'k6n':define_prior['k6n'], 'k6o':define_prior['k6o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
+define_prior['G46']=\
+{'c4n':define_prior['c4n'], 'c4o':define_prior['c4o'],
+ 'k6n':define_prior['k6n'], 'k6o':define_prior['k6o'],
+ 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
 
-## ------
-## FROM MAKE_PLOT.PY
-## ------
-sep=2 ## -- timeslice separation for log ratio
+define_prior['G32']=define_prior['G23']
+define_prior['G42']=define_prior['G24']
+define_prior['G62']=define_prior['G26']
+define_prior['G43']=define_prior['G34']
+define_prior['G63']=define_prior['G36']
+define_prior['G64']=define_prior['G46']
 
 fitargs={}
 for key in lkey:
  fitargs[key]={}
+
 def suppressKey(key,tag,line): ## -- ignore errors
  try:
   fitargs[key][tag]=line
  except KeyError:
   pass
-suppressKey('G11','y_pos_limit',[1e-10,1e2])
-suppressKey('G11','y_neg_limit',[1e-10,1e2])
-suppressKey('G12','y_pos_limit',[1e-10,1e2])
-suppressKey('G12','y_neg_limit',[1e-10,1e2])
 suppressKey('G22','y_pos_limit',[1e-10,1e2])
 suppressKey('G22','y_neg_limit',[1e-10,1e2])
+suppressKey('G33','y_pos_limit',[1e-10,1e2])
+suppressKey('G33','y_neg_limit',[1e-10,1e2])
+suppressKey('G44','y_pos_limit',[1e-10,1e2])
+suppressKey('G44','y_neg_limit',[1e-10,1e2])
+suppressKey('G66','y_pos_limit',[1e-10,1e2])
+suppressKey('G66','y_neg_limit',[1e-10,1e2])
+
+suppressKey('G23','y_pos_limit',[1e-10,1e2])
+suppressKey('G23','y_neg_limit',[1e-10,1e2])
+suppressKey('G24','y_pos_limit',[1e-10,1e2])
+suppressKey('G24','y_neg_limit',[1e-10,1e2])
+suppressKey('G26','y_pos_limit',[1e-10,1e2])
+suppressKey('G26','y_neg_limit',[1e-10,1e2])
+suppressKey('G34','y_pos_limit',[1e-10,1e2])
+suppressKey('G34','y_neg_limit',[1e-10,1e2])
+suppressKey('G36','y_pos_limit',[1e-10,1e2])
+suppressKey('G36','y_neg_limit',[1e-10,1e2])
+suppressKey('G46','y_pos_limit',[1e-10,1e2])
+suppressKey('G46','y_neg_limit',[1e-10,1e2])
+
+suppressKey('G32','y_pos_limit',[1e-10,1e2])
+suppressKey('G32','y_neg_limit',[1e-10,1e2])
+suppressKey('G42','y_pos_limit',[1e-10,1e2])
+suppressKey('G42','y_neg_limit',[1e-10,1e2])
+suppressKey('G62','y_pos_limit',[1e-10,1e2])
+suppressKey('G62','y_neg_limit',[1e-10,1e2])
+suppressKey('G43','y_pos_limit',[1e-10,1e2])
+suppressKey('G43','y_neg_limit',[1e-10,1e2])
+suppressKey('G63','y_pos_limit',[1e-10,1e2])
+suppressKey('G63','y_neg_limit',[1e-10,1e2])
+suppressKey('G64','y_pos_limit',[1e-10,1e2])
+suppressKey('G64','y_neg_limit',[1e-10,1e2])
 

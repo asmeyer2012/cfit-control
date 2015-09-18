@@ -152,14 +152,17 @@ def save_data (mdp):
   if lnum > -1:
    cdat = extract_data(mdp,lnum)  # found the correlator, save to array
    try:                           # write it to file
-    lsec = uf.find_data_section(mdp.save_file,key)
-    #lsec = uf.find_data_section(mdp.save_file,mdp.key)
-    #mdp.save_file.write( mdp.key + '  ' + '  '.\
-    uf.ins_line(mdp.save_file, key + '  ' + '  '.\
-      join('{:e}'.format(cdat[x]) for x in range(0,mdp.corr_len))\
-      , lsec[1]+1\
-     )
-    write_fname(mdp,lsec[0])
+    ## -- organizing is too slow, just write to end of file
+    mdp.save_file.seek(0,2)  # seek the end of file
+    mdp.save_file.write( key + '  ' + \
+     '  '.join('{:e}'.format(cdat[x]) for x in range(0,mdp.corr_len))+'\n')
+    #lsec = uf.find_data_section(mdp.save_file,key)
+    #mdp.save_file.write( key + '  ' + '  '.\
+    #uf.ins_line(mdp.save_file, key + '  ' + '  '.\
+    #  join('{:e}'.format(cdat[x]) for x in range(0,mdp.corr_len))\
+    #  , lsec[1]+1\
+    # )
+    #write_fname(mdp,lsec[0])
    except IndexError:
     print "-- In file",mdp.corr_file.name
     print "Could not extract data from file"

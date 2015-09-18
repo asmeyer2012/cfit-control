@@ -1,5 +1,6 @@
 import gvar as gv
 import numpy as np
+import sys
 
 def sig_digits(gval,do_unicode=False):
  ## -- print either a gv.gvar or float with leading 0s replaced by os
@@ -100,3 +101,29 @@ def neg_err(dmean,dsdev,val=None):
     (max(-dmean[i]-val,val) if dmean[i] < 0 else -val)
     for i in range(len(dsdev))]
    return [dmp_sdev,dmm_sdev]
+
+def create_prior_dict(nkey,okey):
+ """
+ Create an empty prior dictionary for use
+ Even and odd keys are given in two separate lists/tuples
+ """
+ rprior = {} ## -- return value = prior dictionary
+ for key in nkey:
+  rprior[key] = []
+ for key in okey:
+  rprior[key] = []
+ return rprior
+
+def append_prior_state(prior,lkey,lgvar):
+ """
+ Fill a prior array with a state
+ State is appended to end of prior dictionary
+ All keys provided in lkey are also updated with their corresponding gvar
+ """
+ if len(lkey) != len(lgvar):
+  print "Key list is not the same size as prior value list"
+  sys.exit()
+ for key,val in zip(lkey,lgvar):
+  prior[key].append(val)
+ pass
+
