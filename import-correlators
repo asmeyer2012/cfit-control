@@ -10,9 +10,9 @@ input_type real
 corr_len 64
 flag_overwrite True
 
-corr_num 1,2,6
+corr_num 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+key G11,G12,G13,G15,G16,G22,G23,G25,G26,G33,G35,G36,G55,G56,G66
 #for input_fname example.cor
-key G11,G12,G22
 for input_fname l2064_m020_r0204_c122262_cw_coul2pt.cor
 for input_fname l2064_m020_r0210_c122262_cw_coul2pt.cor
 for input_fname l2064_m020_r0216_c122262_cw_coul2pt.cor

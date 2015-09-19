@@ -28,12 +28,9 @@ do_baryon=True
 #do_uncorr=True
 
 ## -- other parameters
-lkey=['G22','G23','G32','G33','G24','G34','G44']
-maxit      =10000   # maximum iterations
+lkey=['G11','G12','G22','G13','G23','G33','G15','G25','G35','G55','G16','G26','G36','G56','G66']
+maxit      =100   # maximum iterations
 svdcut     =None
-#svdcut     =3e-3
-#svdcut     =3e-2
-#svdcut     =1e-1  # svd cut
 ## -- tolerance check does not work if lots of variation from + to -
 ## -- need to fix
 ctol       =None # tolerance for consecutive correlator points
@@ -50,147 +47,94 @@ mdp = meta_data.md_params()
 ## ------
 ## -- database defines
 dbpath   ='/project/axial/data/dbfile/'
-config   ='l1648f211b580m013m065m838'
-campaign ='gb2pt_l1648f211b580m013m065m838'
-#config   ='l2064f21b676m010m050'
-#campaign ='gb2pt_l2064f21b676m010m050'
+#config   ='l1648f211b580m013m065m838'
+#campaign ='gb2pt_l1648f211b580m013m065m838'
+config   ='l2064f21b676m010m050'
+campaign ='gb2pt_l2064f21b676m010m050'
 DBEngine = create_engine('sqlite:///'+dbpath+config+campaign+'.sqlite')
 Session  = sessionmaker(bind=DBEngine)
 session  = Session()
 #
 ## -- output defines
 out_path ='/project/axial/data/fit-in/'
-out_fname='gb2pt_l1648f211b580m013m065m838_s16p_db'
+#out_fname='gb2pt_l1648f211b580m013m065m838_s16p_db'
+out_fname='gb2pt_l2064f21b676m010m050_db'
 
 ## ------
 ## FROM MAKE_MODELS.PY
 ## ------
-cor_len=48
+#cor_len=48
+cor_len=64 ## -- TODO: parse this number out of configuration?
 define_model={}
 ## --
 
 rangeMin=2
+define_model['G11']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,12), 'tp':-cor_len,\
+ 'akey':('c1n','c1o'), 'bkey':('c1n','c1o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
 define_model['G22']=\
 {
  'tdata':range(cor_len), 'tfit':range(rangeMin,12), 'tp':-cor_len,\
- 'akey':('c2n','c2o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+ 'akey':('c2n','c2o'), 'bkey':('c2n','c2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
 define_model['G33']=\
 {
- 'tdata':range(cor_len), 'tfit':range(rangeMin,11), 'tp':-cor_len,\
- 'akey':('c3n','c3o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G44']=\
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,12), 'tp':-cor_len,\
+ 'akey':('c3n','c3o'), 'bkey':('c3n','c3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G55']=\
 {
  'tdata':range(cor_len), 'tfit':range(rangeMin,12), 'tp':-cor_len,\
- 'akey':('c4n','c4o'), 'bkey':('k4n','k4o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+ 'akey':('c5n','c5o'), 'bkey':('c5n','c5o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
 define_model['G66']=\
 {
- 'tdata':range(cor_len), 'tfit':range(rangeMin,12), 'tp':-cor_len,\
- 'akey':('c6n','c6o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,11), 'tp':-cor_len,\
+ 'akey':('c6n','c6o'), 'bkey':('c6n','c6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
 
-define_model['G23']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,8), 'tp':-cor_len,\
- 'akey':('c2n','c2o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G24']=\
+define_model['G12']=\
 {
  'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
- 'akey':('c2n','c2o'), 'bkey':('k4n','k4o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+ 'akey':('c1n','c1o'), 'bkey':('c2n','c2o'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
+define_model['G13']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,11), 'tp':-cor_len,\
+ 'akey':('c1n','c1o'), 'bkey':('c3n','c3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G15']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c1n','c1o'), 'bkey':('c5n','c5o'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
+define_model['G16']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c1n','c1o'), 'bkey':('c6n','c6o'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
+define_model['G23']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
+ 'akey':('c2n','c2o'), 'bkey':('c3n','c3o'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
+define_model['G25']=\
+{
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,12), 'tp':-cor_len,\
+ 'akey':('c2n','c2o'), 'bkey':('c5n','c5o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
 define_model['G26']=\
 {
  'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
- 'akey':('c2n','c2o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G34']=\
+ 'akey':('c2n','c2o'), 'bkey':('c6n','c6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model['G35']=\
 {
- 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
- 'akey':('c3n','c3o'), 'bkey':('k4n','k4o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,11), 'tp':-cor_len,\
+ 'akey':('c3n','c3o'), 'bkey':('c5n','c5o'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
 define_model['G36']=\
 {
- 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
- 'akey':('c3n','c3o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G46']=\
+ 'tdata':range(cor_len), 'tfit':range(rangeMin,11), 'tp':-cor_len,\
+ 'akey':('c3n','c3o'), 'bkey':('c6n','c6o'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
+define_model['G56']=\
 {
  'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
- 'akey':('c4n','c4o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-
-define_model['G32']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,9), 'tp':-cor_len,\
- 'akey':('c3n','c3o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G42']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
- 'akey':('c4n','c4o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G43']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
- 'akey':('c4n','c4o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G62']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
- 'akey':('c6n','c6o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G63']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
- 'akey':('c6n','c6o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G64']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,10), 'tp':-cor_len,\
- 'akey':('c6n','c6o'), 'bkey':('k4n','k4o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+ 'akey':('c5n','c5o'), 'bkey':('c6n','c6o'), 'ekey':('En','Eo'), 'skey':(1.,1.) }
 
 ## ------
 ## FROM MAKE_PRIOR.PY
 ## ------
 define_prior=dfp.define_prior
-## -- 
-
-define_prior['G22']=\
-{'c2n':define_prior['c2n'], 'c2o':define_prior['c2o'],
- 'k2n':define_prior['k2n'], 'k2o':define_prior['k2o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
-define_prior['G33']=\
-{'c3n':define_prior['c3n'], 'c3o':define_prior['c3o'],
- 'k3n':define_prior['k3n'], 'k3o':define_prior['k3o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
-define_prior['G44']=\
-{'c4n':define_prior['c4n'], 'c4o':define_prior['c4o'],
- 'k4n':define_prior['k4n'], 'k4o':define_prior['k4o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
-define_prior['G66']=\
-{'c6n':define_prior['c6n'], 'c6o':define_prior['c6o'],
- 'k6n':define_prior['k6n'], 'k6o':define_prior['k6o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
-
-define_prior['G23']=\
-{'c2n':define_prior['c2n'], 'c2o':define_prior['c2o'],
- 'k3n':define_prior['k3n'], 'k3o':define_prior['k3o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
-define_prior['G24']=\
-{'c2n':define_prior['c2n'], 'c2o':define_prior['c2o'],
- 'k4n':define_prior['k4n'], 'k4o':define_prior['k4o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
-define_prior['G26']=\
-{'c2n':define_prior['c2n'], 'c2o':define_prior['c2o'],
- 'k6n':define_prior['k6n'], 'k6o':define_prior['k6o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
-define_prior['G34']=\
-{'c3n':define_prior['c3n'], 'c3o':define_prior['c3o'],
- 'k4n':define_prior['k4n'], 'k4o':define_prior['k4o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
-define_prior['G36']=\
-{'c3n':define_prior['c3n'], 'c3o':define_prior['c3o'],
- 'k6n':define_prior['k6n'], 'k6o':define_prior['k6o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
-define_prior['G46']=\
-{'c4n':define_prior['c4n'], 'c4o':define_prior['c4o'],
- 'k6n':define_prior['k6n'], 'k6o':define_prior['k6o'],
- 'logEn': define_prior['logEn'],  'logEo': define_prior['logEo'] }
-
-define_prior['G32']=define_prior['G23']
-define_prior['G42']=define_prior['G24']
-define_prior['G62']=define_prior['G26']
-define_prior['G43']=define_prior['G34']
-define_prior['G63']=define_prior['G36']
-define_prior['G64']=define_prior['G46']
 
 fitargs={}
 for key in lkey:

@@ -1,3 +1,5 @@
+import gvar  as gv
+import numpy as np
 import datetime
 
 def ins_line(file,line,lnum):
@@ -135,4 +137,35 @@ def find_data_section(save_file,key):
   return [lnum,lnum]
 ## ------
 ##
+
+def read_fit_file(fit_file):
+ """
+ Reads a fit file and returns the fit parameters as a dictionary
+ """
+ rdict = {} ## -- return dictionary
+ mdict = {} ## -- temporary dictionary (mean)
+ sdict = {} ## -- temporary dictionary (sdev)
+ fitin = open(fit_file,'r')
+ lread = fitin.read().split('\n')
+ for line in lread:
+  lspl = line.split(' ')
+  if lspl[0] == 'chi2/dof':
+   rdict['chi2'] = float(lspl[1])
+  elif lspl[0] == 'dof':
+   rdict['dof'] = int(lspl[1])
+  elif lspl[0] == 'Q':
+   rdict['Q'] = float(lspl[1])
+  elif lspl[0] == 'fit_mean':
+   key = lspl[1]
+   mdict[key] = []
+   for x in lspl[2:]:
+    mdict[key].append(x)
+  elif lspl[0] == 'fit_sdev':
+   key = lspl[1]
+   sdict[key] = []
+   for x in lspl[2:]:
+    sdict[key].append(x)
+ for key in mdict:
+  rdict[key] = gv.gvar(mdict[key],sdict[key])
+ return rdict
 

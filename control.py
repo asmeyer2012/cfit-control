@@ -15,6 +15,7 @@ from make_plot            import make_plot_1plus1
 from plot_corr_double_log import plot_corr_double_log
 from plot_corr_normalized import plot_corr_normalized
 from meta_data            import *
+from util_files           import read_fit_file
 import defines           as df
 import gvar              as gv
 import gvar.dataset      as gvd
@@ -54,8 +55,8 @@ fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut)
 print_fit(fit,prior)
 print_error_budget(fit)
 #save_data(mdp.output_path +'/'+ mdp.fit_fname,fit,data)
-save_data('./test-fit.out',fit,data)
-save_prior_from_fit(df.define_prior,fit,"test.prior.py",
+save_data('./test.fit.out',fit,data)
+save_prior_from_fit(df.define_prior,df.define_model,fit,"test.prior.out",
   round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
 
 if df.do_plot:
