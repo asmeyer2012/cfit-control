@@ -17,6 +17,7 @@ from plot_corr_normalized import plot_corr_normalized
 from meta_data            import *
 from util_files           import read_fit_file
 import defines           as df
+import define_prior      as dfp
 import gvar              as gv
 import gvar.dataset      as gvd
 import matplotlib.pyplot as plt
@@ -56,7 +57,7 @@ print_fit(fit,prior)
 print_error_budget(fit)
 #save_data(mdp.output_path +'/'+ mdp.fit_fname,fit,data)
 save_data('./test.fit.out',fit,data)
-save_prior_from_fit(df.define_prior,df.define_model,fit,"test.prior.out",
+save_prior_from_fit(dfp.define_prior,df.define_model,fit,"test.prior.out",
   round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
 
 if df.do_plot:

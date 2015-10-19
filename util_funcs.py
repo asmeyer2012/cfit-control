@@ -114,6 +114,29 @@ def create_prior_dict(nkey,okey):
   rprior[key] = []
  return rprior
 
+def get_prior_dict(prior,nkey,okey,nn,no):
+ """
+ Get a prior dictionary which has many states in it and extract only
+ the first nn+no states
+ """
+ rprior = {} ## -- return value = prior dictionary
+ rprior['nkey'] = prior['nkey']
+ rprior['okey'] = prior['okey']
+ for key in nkey:
+  rprior[key] = prior[key][:nn]
+ for key in okey:
+  rprior[key] = prior[key][:no]
+ for key in prior:
+  if key in nkey+okey+('nkey','okey'):
+   continue
+  rprior[key] = {}
+  for xkey in prior[key]:
+   if xkey in nkey:
+    rprior[key][xkey] = prior[key][xkey][:nn]
+   elif xkey in okey:
+    rprior[key][xkey] = prior[key][xkey][:no]
+ return rprior
+
 def append_prior_state(prior,lkey,lgvar):
  """
  Fill a prior array with a state
@@ -121,8 +144,7 @@ def append_prior_state(prior,lkey,lgvar):
  All keys provided in lkey are also updated with their corresponding gvar
  """
  if len(lkey) != len(lgvar):
-  print "Key list is not the same size as prior value list"
-  sys.exit()
+  raise TypeError("Key list is not the same size as prior value list")
  for key,val in zip(lkey,lgvar):
   prior[key].append(val)
  pass

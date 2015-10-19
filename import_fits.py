@@ -12,6 +12,8 @@ for file in fit_files:
   nst = int(file.split('_')[1])
   ost = int((file.split('_')[2]).split('.')[0])
   fit_collector[nst,ost,'fit'] = read_fit_file(file)
+ except IOError:
+  continue
  except IndexError:
   continue
 pstab(fit_collector)
