@@ -4,6 +4,7 @@ from make_data_db         import make_data_db
 from make_models          import make_models
 from make_prior           import make_prior
 from make_bootstrap       import make_bootstrap
+from multiprocessing      import Pool
 from print_results        import print_fit
 from print_results        import print_error_budget
 from save_data            import save_data
@@ -21,6 +22,9 @@ import numpy             as np
 #import shutil            as shil ## -- copy files
 import util_funcs        as utf
 
+doParallel=True
+maxProcesses=6
+
 if df.do_db:
  ## -- for database input
  ##    - (database file name defined in make_data_db.py)
@@ -33,30 +37,56 @@ else:
  models = make_models(data=data,lkey=df.lkey)
 ## --
 
-min_nst=3
-max_nst=10
-min_ost=3
-max_ost=10
-fit_collector = {}
-for ost in range(min_ost,max_ost):
- for nst in range(min_nst,max_nst):
-  #dfp = impl.import_module('prior_'+str(nst)+'_'+str(ost))
+def doProcess(nst,ost,data=data,models=models):
+  ## -- do a single fit ... set up for parallelizing
   pdict0 = utf.get_prior_dict(dfp.define_prior,
    dfp.define_prior['nkey'],dfp.define_prior['okey'],nst,ost)
   prior = make_prior(models,prior_dict=pdict0,nst=nst,ost=ost)
   fitter = CorrFitter(models=models,maxit=df.maxit)
-  try:
-   fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut) #p0 = initial values (dictionary)
-  except ValueError:
-   if ost < nst:
-    break ## -- go to next ost
+  try: ## -- if catching value error, just exit
+   ## -- p0 = initial values (dictionary)
+   if df.do_initial:
+    try:
+     p0={}
+     for key in dfp.define_init:
+      if key[-1] == 'o':
+       p0[key] = dfp.define_init[key][:df.num_ost]
+      else:
+       p0[key] = dfp.define_init[key][:df.num_nst]
+     fit = fitter.lsqfit(data=data,prior=prior,p0=p0,svdcut=df.svdcut)
+    except KeyError:
+     print "Could not use initial point definitions"
+     fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut)
    else:
-    continue
-  print_fit(fit,prior)
-  print_error_budget(fit)
-  save_data('fit/fit_'+str(nst)+'_'+str(ost)+'.out',fit,data)
-  #save_prior_from_fit(pdict0,df.define_model,fit,'prior/prior_'+str(nst)+'_'+str(ost)+'.out',
-  #  round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
-  fit_collector[nst,ost,'fit'] = fit
-  fit_collector[nst,ost,'prior'] = prior
+    fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut)
+   ## --
+   print_fit(fit,prior)
+   print_error_budget(fit)
+   save_data('fit/fit_'+str(nst)+'_'+str(ost)+'.out',fit,data)
+   #save_prior_from_fit(pdict0,df.define_model,fit,'prior/prior_'+str(nst)+'_'+str(ost)+'.out',
+   #  round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
+  except ValueError:
+   print "caught value error"
 
+min_nst=4
+mid_nst=-1
+max_nst=13
+min_ost=4
+mid_ost=-1
+max_ost=13
+
+if __name__ == '__main__' and doParallel:
+ pool= Pool(processes=maxProcesses)
+ for ost in range(min_ost,max_ost):
+  for nst in range(min_nst,max_nst):
+   if nst<mid_nst and ost<mid_ost:
+    continue
+   pool.apply_async(doProcess,args=(nst,ost))
+ pool.close()
+ pool.join()
+elif not(doParallel):
+ for ost in range(min_ost,max_ost):
+  for nst in range(min_nst,max_nst):
+   if nst<mid_nst and ost<mid_ost:
+    continue
+   doProcess(nst,ost)

@@ -42,16 +42,22 @@ def create_fit_func(model,fit):
  for key in akey:
   if key[:3] == 'log':
    la[key[3:]] = gv.exp(tfp[key])
+  elif key[:4] == 'sqrt':
+   la[key[4:]] = [x*x for x in tfp[key]]
   else:
    la[key] = tfp[key]
  for key in bkey:
   if key[:3] == 'log':
    lb[key[3:]] = gv.exp(tfp[key])
+  elif key[:4] == 'sqrt':
+   lb[key[4:]] = [x*x for x in tfp[key]]
   else:
    lb[key] = tfp[key]
  for key in Ekey:
   if key[:3] == 'log':
    lE[key[3:]] = gv.exp(tfp[key])
+  elif key[:4] == 'sqrt':
+   lE[key[4:]] = [x*x for x in tfp[key]]
   else:
    lE[key] = tfp[key]
  ## -- sort out odd/even function to create

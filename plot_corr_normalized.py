@@ -92,6 +92,15 @@ def plot_corr_normalized(models,data,fit,**kwargs):
      elif event.key=='backspace':
        ## -- reset index so can manually flip through using number keys
        idx[0] = 0
+     elif event.key=='d':
+       ## -- dump plots into ./plotdump directory
+       for ix,model in zip(range(len(models)),models):
+         key = model.datatag
+         save_dir  = utp.get_option("fn_save_dir","./plotdump",**kwargs[key])
+         save_name = utp.get_option("fn_save_name","fnplot-"+key+".png",**kwargs[key])
+         do_plot_normalized([ix])
+         plt.savefig(save_dir+'/'+save_name)
+       do_plot_normalized(idx)
  #
  ## -- 
  fig.canvas.mpl_connect('key_press_event',press_normalized)

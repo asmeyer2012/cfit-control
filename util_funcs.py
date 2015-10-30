@@ -124,8 +124,12 @@ def get_prior_dict(prior,nkey,okey,nn,no):
  rprior['okey'] = prior['okey']
  for key in nkey:
   rprior[key] = prior[key][:nn]
+  if len(rprior[key]) < nn:
+   raise InputError("Not enough prior states to fill prior dictionary")
  for key in okey:
   rprior[key] = prior[key][:no]
+  if len(rprior[key]) < no:
+   raise InputError("Not enough prior states to fill prior dictionary")
  for key in prior:
   if key in nkey+okey+('nkey','okey'):
    continue

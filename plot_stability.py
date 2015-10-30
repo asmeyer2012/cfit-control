@@ -3,7 +3,8 @@ import numpy as np
 import gvar as gv
 import util_funcs as utf
 import util_plots as utp
-import defines as df
+import defines      as df
+import define_prior as dfp
 
 def plot_stability(fit_collector,**kwargs):
  """
@@ -19,18 +20,21 @@ def plot_stability(fit_collector,**kwargs):
  enError = []
  eoError = []
  ## -- tkey should be tuple: nst,ost, and 'fit' or 'prior' or other descriptor
- for tkey in fit_collector:
-  if not(tkey[2] == 'fit'):
-   continue
-  else:
+ for nst in range(1,15):
+  for ost in range(1,15):
+   tkey=(nst,ost,'fit')
    ## -- ignore fits with large chi2
-   if fit_collector[tkey]['chi2'] > 3:
-    continue 
-   nst = tkey[0]
-   ost = tkey[1]
+   try:
+    dof = float(fit_collector[tkey]['dof'])
+    npr = float(len(dfp.define_prior['nkey']))
+    if dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] > 3 or (dof-npr*(nst+ost)) < 0:
+     continue 
+   except KeyError:
+    continue
    ## -- collect only important info
    hVal.append(fitCount+0.5)
-   hName.append(str(nst) +'+'+ str(ost))
+   hName.append(str(nst) +'+'+ str(ost) +' ('+
+    str(round(dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'],2))+')')
    hChi2.append(fit_collector[tkey]['chi2'])
    for key in fit_collector[tkey]:
     sum=0
@@ -51,7 +55,7 @@ def plot_stability(fit_collector,**kwargs):
  ax = fig.add_subplot(111)
  plt.xticks(hVal,hName,rotation='vertical')
  ax.set_xlim([0,fitCount])
- ax.set_ylim([0.6,1.3])
+ ax.set_ylim([1.1,1.8])
  ax.errorbar(hValDatn,enCentral,enError,
   color='r',marker='o',linestyle='')
  ax.errorbar(hValDato,eoCentral,eoError,

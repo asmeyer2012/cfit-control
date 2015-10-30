@@ -7,7 +7,7 @@ def print_fit(fit, prior):
  ## -- give both summed and differential energies
  ## -- if variables fit as logs, give both log and linear
  ## --
- do_unicode=True
+ do_unicode=False
  do_sigdigit=True
  #
  print gv.fmt_chi2(fit)
@@ -15,7 +15,7 @@ def print_fit(fit, prior):
  print "Printing best fit parameters : "
  #
  for skey in fit.p:
-  ## -- if variable was fit as a log, print linear first
+  ## -- if variable was fit as a log, print log first
   if skey[:3] == 'log':
    print "------"
    efirst=0.
@@ -41,6 +41,31 @@ def print_fit(fit, prior):
             +ut.fmt_num(fit.transformed_p[lkey][j],do_sigdigit,do_unicode)\
             +'  '+sigstr
   ##endif log
+  elif skey[:4] == 'sqrt':
+   print "------"
+   efirst=0.
+   lkey=skey[4:]
+   for j in range(len(fit.transformed_p[lkey])):
+    sigstr=get_sigma_str(lkey,fit,prior,j,do_unicode)
+    if (lkey[len(lkey)-2:] == 'En' or \
+        lkey[len(lkey)-2:] == 'Eo' or \
+        lkey[len(lkey)-1 ] == 'E'):
+     if j > 0:
+      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']  :  '\
+            +ut.fmt_num(sum(fit.transformed_p[lkey][:j+1]),do_sigdigit,do_unicode)\
+            +'  '+sigstr+' |    delE'+'['+'{:>2}'.format(j)+']  :  '\
+            +ut.fmt_num(fit.transformed_p[lkey][j],do_sigdigit,do_unicode)
+    ##else j==0 for energy
+     else:
+      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']  :  '\
+            +ut.fmt_num(sum(fit.transformed_p[lkey][:j+1]),do_sigdigit,do_unicode)\
+            +'  '+sigstr
+    ##else not energy
+    else:
+      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']  :  '\
+            +ut.fmt_num(fit.transformed_p[lkey][j],do_sigdigit,do_unicode)\
+            +'  '+sigstr
+  ##endif sqrt
   print "------"
   efirst=0.
   for j in range(len(fit.transformed_p[skey])):
@@ -91,10 +116,15 @@ def get_sigma_str(key,fit,prior,j,do_unicode=True):
       (fit.p[key][j].mean-prior[key][j].mean)\
        /(prior[key][j]).sdev)))
  except KeyError:
-  ## -- requesting linear, log prior
-  sig=int(np.abs(np.trunc(\
-      (gv.log(fit.transformed_p[key][j].mean)-prior['log'+key][j].mean)\
-       /(prior['log'+key][j]).sdev)))
+  ## -- requested linear, have log or sqrt prior
+  try:
+   sig=int(np.abs(np.trunc(\
+       (gv.log(fit.transformed_p[key][j].mean)-prior['log'+key][j].mean)\
+        /(prior['log'+key][j]).sdev)))
+  except KeyError:
+   sig=int(np.abs(np.trunc(\
+       (gv.sqrt(fit.transformed_p[key][j].mean)-prior['sqrt'+key][j].mean)\
+        /(prior['sqrt'+key][j]).sdev)))
  if do_unicode:
   if sig > 0:
    sigstr=str(sig)+u'\u03C3' # unicode for sigma (cannot be saved to string)

@@ -118,6 +118,15 @@ def plot_corr_double_log(models,data,fit,**kwargs):
      elif event.key=='backspace':
        ## -- reset index so can manually flip through using number keys
        idx[0] = 0
+     elif event.key=='d':
+       ## -- dump plots into ./plotdump directory
+       for ix,model in zip(range(len(models)),models):
+         key = model.datatag
+         save_dir  = utp.get_option("dl_save_dir","./plotdump",**kwargs[key])
+         save_name = utp.get_option("dl_save_name","dlplot-"+key+".png",**kwargs[key])
+         do_plot_double_log([ix])
+         plt.savefig(save_dir+'/'+save_name)
+       do_plot_double_log(idx)
  #
  ## -- 
  fig.canvas.mpl_connect('key_press_event',press_double_log)

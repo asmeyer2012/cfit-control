@@ -19,8 +19,6 @@ def make_prior(models,prior_dict=None,nst=-1,ost=-1):
      dfp.define_prior['nkey'],dfp.define_prior['okey'],df.num_nst,df.num_ost)
    for pkey in dprior[skey]:
     prior[pkey]=dprior[skey][pkey]
-   #for pkey in dfp.define_prior[skey]:
-   # prior[pkey]=dfp.define_prior[skey][pkey]
 
    ## -- logarithmize the logarithmic coefficients
    for pkey in prior:
@@ -41,8 +39,6 @@ def make_prior(models,prior_dict=None,nst=-1,ost=-1):
      prior_dict['nkey'],prior_dict['okey'],df.num_nst,df.num_ost)
    for pkey in dprior[skey]:
     prior[pkey]=dprior[skey][pkey]
-   #for pkey in prior_dict[skey]:
-   # prior[pkey]=prior_dict[skey][pkey]
 
    for pkey in prior:
     if not(pkey[3:] in model.a+model.b+model.dE) and\
