@@ -12,11 +12,11 @@ def make_prior(models,prior_dict=None,nst=-1,ost=-1):
 
   if prior_dict is None: ## -- take default from defines
    if (nst > -1 and ost > -1):
-    dprior = utf.get_prior_dict(dfp.define_prior,
-     dfp.define_prior['nkey'],dfp.define_prior['okey'],nst,ost)
+    dprior = utf.get_prior_dict(df.define_prior,
+     df.define_prior['nkey'],df.define_prior['okey'],nst,ost)
    else:
-    dprior = utf.get_prior_dict(dfp.define_prior,
-     dfp.define_prior['nkey'],dfp.define_prior['okey'],df.num_nst,df.num_ost)
+    dprior = utf.get_prior_dict(df.define_prior,
+     df.define_prior['nkey'],df.define_prior['okey'],df.num_nst,df.num_ost)
    for pkey in dprior[skey]:
     prior[pkey]=dprior[skey][pkey]
 

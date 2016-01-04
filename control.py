@@ -62,11 +62,11 @@ fitter = CorrFitter(models=models,maxit=df.maxit)
 if df.do_initial:
  try:
   p0={}
-  for key in dfp.define_init:
+  for key in df.define_init:
    if key[-1] == 'o':
-    p0[key] = dfp.define_init[key][:df.num_ost]
+    p0[key] = df.define_init[key][:df.num_ost]
    else:
-    p0[key] = dfp.define_init[key][:df.num_nst]
+    p0[key] = df.define_init[key][:df.num_nst]
   fit = fitter.lsqfit(data=data,prior=prior,p0=p0,svdcut=df.svdcut)
  except KeyError:
   print "Could not use initial point definitions"
@@ -78,7 +78,7 @@ print_fit(fit,prior)
 print_error_budget(fit)
 #save_data(mdp.output_path +'/'+ mdp.fit_fname,fit,data)
 save_data('./test.fit.out',fit,data)
-save_prior_from_fit(dfp.define_prior,df.define_model,fit,"test.prior.out",
+save_prior_from_fit(df.define_prior,df.define_model,fit,"test.prior.out",
   round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
 
 if df.do_plot:

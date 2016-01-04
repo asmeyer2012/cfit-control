@@ -1,110 +1,16 @@
-output_fname gb2pt_l1648f211b580m013m065m838_s8_l1648
-#output_fname pi2pt-corr
-#input_path ../correlators-mes
-#input_path ../master-cor-mes
-input_path /project/axial/data/corr/test/gb2pt_l1648f211b580m013m065m838
-#output_path ./data-files
+output_fname gb3pt_rndm
+input_path /project/axial/data/corr/test/gb3pt_rndm
 output_path /project/axial/data/fit-in
 input_type real
+#input_type imag
 #input_type mod
 corr_len 48
-#corr_len 64
 flag_overwrite True
 
-corr_num 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
-key G11,G12,G13,G15,G16,G21,G22,G23,G25,G26,G31,G32,G33,G35,G36,G51,G52,G53,G55,G56,G61,G62,G63,G65,G66
+corr_num 1,2,3,4
+key G77,G74,G47,G44
+#corr_num 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+#key G22,G23,G24,G26,G32,G33,G34,G36,G42,G43,G44,G46,G62,G63,G64,G66
+#corr_num 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
+#key G11,G12,G13,G15,G16,G21,G22,G23,G25,G26,G31,G32,G33,G35,G36,G51,G52,G53,G55,G56,G61,G62,G63,G65,G66
 #for input_fname example.cor
-for input_fname l1648_m065_r0200_c132668_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0205_c132668_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0210_c132668_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0220_c132668_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0225_c132669_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0230_c132669_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0235_c132669_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0250_c132670_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0255_c132670_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0260_c132670_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0265_c132670_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0270_c132670_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0275_c132671_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0280_c132671_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0285_c132671_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0295_c132671_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0300_c132672_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0305_c132672_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0310_c132672_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0315_c132672_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0320_c132672_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0325_c132673_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0330_c132673_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0335_c132673_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0340_c132673_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0345_c132673_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0350_c132674_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0355_c132674_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0360_c132674_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0365_c132674_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0370_c132674_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0375_c132675_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0380_c132675_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0385_c132675_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0390_c132675_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0395_c132675_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0400_c132676_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0405_c132676_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0410_c132676_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0415_c132676_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0420_c132676_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0425_c132677_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0430_c132677_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0435_c132677_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0440_c132677_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0445_c132677_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0450_c132678_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0455_c132678_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0460_c132678_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0465_c132678_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0470_c132678_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0475_c132679_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0480_c132679_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0485_c132679_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0490_c132679_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0500_c132680_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0505_c132680_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0510_c132680_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0515_c132680_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0520_c132680_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0525_c132681_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0530_c132681_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0535_c132681_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0540_c132681_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0545_c132681_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0550_c132682_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0555_c132682_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0560_c132682_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0570_c132682_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0575_c132683_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0580_c132683_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0585_c132683_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0590_c132683_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0595_c132683_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0600_c132684_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0605_c132684_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0610_c132684_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0615_c132684_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0620_c132684_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0625_c132685_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0630_c132685_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0635_c132685_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0640_c132685_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0645_c132685_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0650_c132686_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0655_c132686_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0660_c132686_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0665_c132686_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0670_c132686_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0675_c132667_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0680_c132667_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0685_c132667_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0690_c132667_S8_sw_coul2pt.cor
-for input_fname l1648_m065_r0695_c132667_S8_sw_coul2pt.cor

@@ -18,10 +18,11 @@ do_uncorr=False
 do_initial=True
 
 ## -- other parameters
-lkey=[
- 'G11','G12','G13','G15','G16','G21','G22','G23','G25','G26',
- 'G31','G32','G33','G35','G36','G51','G52','G53','G55','G56',
- 'G61','G62','G63','G65','G66']
+lkey=['G44']
+#lkey=[
+# 'G11','G12','G13','G15','G16','G21','G22','G23','G25','G26',
+# 'G31','G32','G33','G35','G36','G51','G52','G53','G55','G56',
+# 'G61','G62','G63','G65','G66']
 maxit      =10000   # maximum iterations
 svdcut     =None
 svdcut     =1e-3
@@ -59,122 +60,68 @@ out_fname='gb2pt_l1648f211b580m013m065m838_s8_l1648'
 ## ------
 cor_len=48
 #cor_len=64 ## -- TODO: parse this number out of configuration?
-define_model={}
 ## --
-num_nst=8
-num_ost=6
+num_nst_s8=8
+num_ost_s8=6
+num_nst_s8p=2
+num_ost_s8p=1
+num_nst_s16=8
+num_ost_s16=6
 
 rangeMin=2
 rangeMaxDiag=12
 rangeMaxOffD=10
 max_chi2=3
 
-define_model['G11']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxDiag), 'tp':-cor_len,\
- 'akey':('c1n','c1o'), 'bkey':('k1n','k1o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G22']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxDiag), 'tp':-cor_len,\
- 'akey':('c2n','c2o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G33']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxDiag), 'tp':-cor_len,\
- 'akey':('c3n','c3o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G55']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxDiag), 'tp':-cor_len,\
- 'akey':('c5n','c5o'), 'bkey':('k5n','k5o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G66']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxDiag), 'tp':-cor_len,\
- 'akey':('c6n','c6o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-
-define_model['G12']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c1n','c1o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G21']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c2n','c2o'), 'bkey':('k1n','k1o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G13']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c1n','c1o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G31']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c3n','c3o'), 'bkey':('k1n','k1o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G15']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c1n','c1o'), 'bkey':('k5n','k5o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G51']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c5n','c5o'), 'bkey':('k1n','k1o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G16']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c1n','c1o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G61']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c6n','c6o'), 'bkey':('k1n','k1o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G23']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c2n','c2o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G32']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c3n','c3o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G25']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c2n','c2o'), 'bkey':('k5n','k5o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G52']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c5n','c5o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G26']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c2n','c2o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G62']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c6n','c6o'), 'bkey':('k2n','k2o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G35']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c3n','c3o'), 'bkey':('k5n','k5o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G53']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c5n','c5o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G36']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c3n','c3o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G63']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c6n','c6o'), 'bkey':('k3n','k3o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G56']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c5n','c5o'), 'bkey':('k6n','k6o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
-define_model['G65']=\
-{
- 'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxOffD), 'tp':-cor_len,\
- 'akey':('c6n','c6o'), 'bkey':('k5n','k5o'), 'ekey':('En','Eo'), 'skey':(1.,-1.) }
+define_model_s8={}
+define_model_s8p={}
+define_model_s16={}
+## -- construct models quickly using loops
+key_list_s8 = list()
+key_list_s8p = list()
+key_list_s16 = list()
+for sc in ['1','2','3','5','6']:
+ for sk in ['1','2','3','5','6']:
+  key_list_s8.append(('G'+sc+sk,sc,sk))
+  key_list_s8.append(('G'+sc+sk+'s',sc,'s'+sk))
+pass
+for sc in ['4','7']:
+ for sk in ['4','7']:
+  key_list_s8p.append(('G'+sc+sk,sc,sk))
+  key_list_s8p.append(('G'+sc+sk+'s',sc,'s'+sk))
+pass
+for sc in ['2','3','4','6']:
+ for sk in ['2','3','4','6']:
+  key_list_s16.append(('G'+sc+sk,sc,sk))
+  key_list_s16.append(('G'+sc+sk+'s',sc,'s'+sk))
+pass
+for key in key_list_s8:
+  define_model_s8[key[0]]={\
+   'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxDiag), 'tp':-cor_len,\
+   'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),\
+   'ekey':('En','Eo'), 'skey':(1.,-1.) }
+pass
+for key in key_list_s8p:
+  define_model_s8p[key[0]]={\
+   'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxDiag), 'tp':-cor_len,\
+   'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),\
+   'ekey':('En','Eo'), 'skey':(1.,-1.) }
+pass
+for key in key_list_s16:
+  define_model_s16[key[0]]={\
+   'tdata':range(cor_len), 'tfit':range(rangeMin,rangeMaxDiag), 'tp':-cor_len,\
+   'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),\
+   'ekey':('En','Eo'), 'skey':(1.,-1.) }
+pass
 
 ## ------
 ## FROM MAKE_PRIOR.PY
 ## ------
-define_prior=dfp.define_prior
+num_nst=num_nst_s8p
+num_ost=num_ost_s8p
+define_prior=dfp.define_prior_s8p
+define_init =dfp.define_init_s8p
+define_model=define_model_s8p
 
 fitargs={}
 for key in lkey:
