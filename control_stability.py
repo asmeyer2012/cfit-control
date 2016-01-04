@@ -43,42 +43,44 @@ def doProcess(nst,ost,data=data,models=models):
    dfp.define_prior['nkey'],dfp.define_prior['okey'],nst,ost)
   prior = make_prior(models,prior_dict=pdict0,nst=nst,ost=ost)
   fitter = CorrFitter(models=models,maxit=df.maxit)
-  try: ## -- if catching value error, just exit
-   ## -- p0 = initial values (dictionary)
-   if df.do_initial:
-    try:
-     p0={}
-     for key in dfp.define_init:
-      if key[-1] == 'o':
-       p0[key] = dfp.define_init[key][:df.num_ost]
-      else:
-       p0[key] = dfp.define_init[key][:df.num_nst]
-     fit = fitter.lsqfit(data=data,prior=prior,p0=p0,svdcut=df.svdcut)
-    except KeyError:
-     print "Could not use initial point definitions"
-     fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut)
-   else:
+  #try: ## -- if catching value error, just exit
+  ## -- p0 = initial values (dictionary)
+  if df.do_initial:
+   try:
+    p0={}
+    for key in dfp.define_init:
+     if key[-1] == 'o':
+      p0[key] = dfp.define_init[key][:df.num_ost]
+     else:
+      p0[key] = dfp.define_init[key][:df.num_nst]
+    fit = fitter.lsqfit(data=data,prior=prior,p0=p0,svdcut=df.svdcut)
+   except KeyError:
+    print "Could not use initial point definitions"
     fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut)
-   ## --
-   print_fit(fit,prior)
-   print_error_budget(fit)
-   save_data('fit/fit_'+str(nst)+'_'+str(ost)+'.out',fit,data)
-   #save_prior_from_fit(pdict0,df.define_model,fit,'prior/prior_'+str(nst)+'_'+str(ost)+'.out',
-   #  round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
-  except ValueError:
-   print "caught value error"
+  else:
+   fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut)
+  ## --
+  print_fit(fit,prior)
+  print_error_budget(fit)
+  save_data('fit/fit_'+str(nst)+'_'+str(ost)+'.out',fit,data)
+  #save_prior_from_fit(pdict0,df.define_model,fit,'prior/prior_'+str(nst)+'_'+str(ost)+'.out',
+  #  round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
+  #except ValueError:
+  # print "Caught value error for ",nst," ",ost
 
-min_nst=4
-mid_nst=-1
-max_nst=13
-min_ost=4
-mid_ost=-1
-max_ost=13
+min_nst=df.stab_min_nst
+mid_nst=df.stab_mid_nst
+max_nst=df.stab_max_nst
+min_ost=df.stab_min_ost
+mid_ost=df.stab_mid_ost
+max_ost=df.stab_max_ost
 
 if __name__ == '__main__' and doParallel:
  pool= Pool(processes=maxProcesses)
  for ost in range(min_ost,max_ost):
   for nst in range(min_nst,max_nst):
+   if nst+ost>df.stab_max_states:
+    continue
    if nst<mid_nst and ost<mid_ost:
     continue
    pool.apply_async(doProcess,args=(nst,ost))
@@ -87,6 +89,8 @@ if __name__ == '__main__' and doParallel:
 elif not(doParallel):
  for ost in range(min_ost,max_ost):
   for nst in range(min_nst,max_nst):
+   if nst+ost>df.stab_max_states:
+    continue
    if nst<mid_nst and ost<mid_ost:
     continue
    doProcess(nst,ost)

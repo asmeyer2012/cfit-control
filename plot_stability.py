@@ -27,9 +27,11 @@ def plot_stability(fit_collector,**kwargs):
    try:
     dof = float(fit_collector[tkey]['dof'])
     npr = float(len(dfp.define_prior['nkey']))
-    if dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] > 3 or (dof-npr*(nst+ost)) < 0:
+    if dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] > df.max_chi2 or (dof-npr*(nst+ost)) < 0:
      continue 
    except KeyError:
+    continue
+   except ZeroDivisionError:
     continue
    ## -- collect only important info
    hVal.append(fitCount+0.5)
@@ -55,7 +57,7 @@ def plot_stability(fit_collector,**kwargs):
  ax = fig.add_subplot(111)
  plt.xticks(hVal,hName,rotation='vertical')
  ax.set_xlim([0,fitCount])
- ax.set_ylim([1.1,1.8])
+ ax.set_ylim([0.8,1.8])
  ax.errorbar(hValDatn,enCentral,enError,
   color='r',marker='o',linestyle='')
  ax.errorbar(hValDato,eoCentral,eoError,

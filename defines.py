@@ -67,6 +67,7 @@ num_ost=6
 rangeMin=2
 rangeMaxDiag=12
 rangeMaxOffD=10
+max_chi2=3
 
 define_model['G11']=\
 {
