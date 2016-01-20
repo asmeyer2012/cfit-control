@@ -6,7 +6,7 @@ import util_plots as utp
 import defines      as df
 import define_prior as dfp
 
-def plot_stability(fit_collector,**kwargs):
+def plot_timevary(fit_collector,**kwargs):
  """
  """
  fitCount  = 0
@@ -19,28 +19,30 @@ def plot_stability(fit_collector,**kwargs):
  eoCentral = []
  enError = []
  eoError = []
+ nst = df.num_nst
+ ost = df.num_ost
  ## -- tkey should be tuple: nst,ost, and 'fit' or 'prior' or other descriptor
- for nst in range(1,15):
-  for ost in range(1,15):
-   tkey=(nst,ost,'fit')
+ for tmax in df.tmvr_tmax:
+  for tmin in range(1,tmax):
+   tkey=(tmin,tmax,'fit')
    ## -- ignore fits with large chi2
    try:
     dof = float(fit_collector[tkey]['dof'])
     npr = float(len(df.define_prior['nkey']))
-    if (dof-npr*(nst+ost))*fit_collector[tkey]['chi2']/dof > df.max_chi2\
-       or (dof-npr*(nst+ost))*fit_collector[tkey]['chi2']/dof < df.min_chi2:
-     print (dof-npr*(nst+ost))*fit_collector[tkey]['chi2']/dof 
+    if dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] > df.max_chi2\
+       or dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] < df.min_chi2:
+     print dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] 
      continue 
    except KeyError:
-    print "KeyError"
+    "KeyError"
     continue
    except ZeroDivisionError:
-    print "ZeroDivisionError"
+    "ZeroDivisionError"
     continue
    ## -- collect only important info
    hVal.append(fitCount+0.5)
-   hName.append(str(nst) +'+'+ str(ost) +' ('+
-    str(round((dof-npr*(nst+ost))*fit_collector[tkey]['chi2']/dof,2))+')')
+   hName.append(str(tmin) +'-'+ str(tmax) +' ('+
+    str(round(dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'],2))+')')
    hChi2.append(fit_collector[tkey]['chi2'])
    for key in fit_collector[tkey]:
     sum=0
@@ -61,7 +63,7 @@ def plot_stability(fit_collector,**kwargs):
  ax = fig.add_subplot(111)
  plt.xticks(hVal,hName,rotation='vertical')
  ax.set_xlim([0,fitCount])
- ax.set_ylim([0.6,1.8])
+ ax.set_ylim([0.9,1.8])
  ax.errorbar(hValDatn,enCentral,enError,
   color='r',marker='o',linestyle='')
  ax.errorbar(hValDato,eoCentral,eoError,

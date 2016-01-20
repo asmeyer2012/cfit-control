@@ -29,19 +29,22 @@ if df.do_db:
  ## -- for database input
  ##    - (database file name defined in make_data_db.py)
  data,dset = make_data(df.mdp,do_makedata=df.do_makedata,do_db=True)
- models = make_models(data=data,lkey=df.lkey)
+ #models = make_models(data=data,lkey=df.lkey) ## -- make models in loop
 else:
  ## -- for raw correlator file input
  data,dset = make_data(df.mdp,do_makedata=df.do_makedata,\
                        do_db=False,filename="./import-correlators")
- models = make_models(data=data,lkey=df.lkey)
 ## --
+mdef = df.define_model
 
-def doProcess(nst,ost,data=data,models=models):
+def doProcess(tmin,tmax,data=data,mdef=mdef):
   ## -- do a single fit ... set up for parallelizing
+  for key in data:
+    mdef[key]['tfit'] = range(tmin,tmax)
+  models = make_models(data=data,lkey=df.lkey,mdef=mdef)
   pdict0 = utf.get_prior_dict(df.define_prior,
-   df.define_prior['nkey'],df.define_prior['okey'],nst,ost)
-  prior = make_prior(models,prior_dict=pdict0,nst=nst,ost=ost)
+   df.define_prior['nkey'],df.define_prior['okey'],df.num_nst,df.num_ost)
+  prior = make_prior(models,prior_dict=pdict0,nst=df.num_nst,ost=df.num_ost)
   fitter = CorrFitter(models=models,maxit=df.maxit)
   #try: ## -- if catching value error, just exit
   ## -- p0 = initial values (dictionary)
@@ -62,35 +65,20 @@ def doProcess(nst,ost,data=data,models=models):
   ## --
   print_fit(fit,prior)
   print_error_budget(fit)
-  save_data('fit/fit_'+str(nst)+'_'+str(ost)+'.out',fit,data)
+  save_data('fittmvr/fit_'+str(tmin)+'_'+str(tmax)+'.out',fit,data)
   #save_prior_from_fit(pdict0,df.define_model,fit,'prior/prior_'+str(nst)+'_'+str(ost)+'.out',
   #  round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
   #except ValueError:
   # print "Caught value error for ",nst," ",ost
 
-min_nst=df.stab_min_nst
-mid_nst=df.stab_mid_nst
-max_nst=df.stab_max_nst
-min_ost=df.stab_min_ost
-mid_ost=df.stab_mid_ost
-max_ost=df.stab_max_ost
-
 if __name__ == '__main__' and doParallel:
  pool= Pool(processes=maxProcesses)
- for ost in range(min_ost,max_ost):
-  for nst in range(min_nst,max_nst):
-   if nst+ost>df.stab_max_states:
-    continue
-   if nst<mid_nst and ost<mid_ost:
-    continue
-   pool.apply_async(doProcess,args=(nst,ost))
+ for tmax in df.tmvr_tmax:
+  for tmin in range(1,tmax):
+   pool.apply_async(doProcess,args=(tmin,tmax))
  pool.close()
  pool.join()
 elif not(doParallel):
- for ost in range(min_ost,max_ost):
-  for nst in range(min_nst,max_nst):
-   if nst+ost>df.stab_max_states:
-    continue
-   if nst<mid_nst and ost<mid_ost:
-    continue
+ for tmax in df.tmvr_tmax:
+  for tmin in range(1,tmax):
    doProcess(nst,ost)

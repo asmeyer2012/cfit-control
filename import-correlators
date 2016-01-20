@@ -1,4 +1,6 @@
-output_fname gb3pt_rndm
+output_fname gb3pt_rndm_s8_coul
+#output_fname gb3pt_rndm_s8p_coul
+#output_fname gb3pt_rndm_s16_coul
 input_path /project/axial/data/corr/test/gb3pt_rndm
 output_path /project/axial/data/fit-in
 input_type real
@@ -7,10 +9,11 @@ input_type real
 corr_len 48
 flag_overwrite True
 
-corr_num 1,2,3,4
-key G77,G74,G47,G44
-#corr_num 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
-#key G22,G23,G24,G26,G32,G33,G34,G36,G42,G43,G44,G46,G62,G63,G64,G66
-#corr_num 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
-#key G11,G12,G13,G15,G16,G21,G22,G23,G25,G26,G31,G32,G33,G35,G36,G51,G52,G53,G55,G56,G61,G62,G63,G65,G66
+#corr_num 26,27,28,29,71,72,73,74
+#key G77,G74,G47,G44,G77s,G74s,G47s,G44s
+corr_num 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70
+key G11,G12,G13,G15,G16,G21,G22,G23,G25,G26,G31,G32,G33,G35,G36,G51,G52,G53,G55,G56,G61,G62,G63,G65,G66,G11s,G12s,G13s,G15s,G16s,G21s,G22s,G23s,G25s,G26s,G31s,G32s,G33s,G35s,G36s,G51s,G52s,G53s,G55s,G56s,G61s,G62s,G63s,G65s,G66s
+#corr_num 30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90
+#key G22,G23,G24,G26,G32,G33,G34,G36,G42,G43,G44,G46,G62,G63,G64,G66,G22s,G23s,G24s,G26s,G32s,G33s,G34s,G36s,G42s,G43s,G44s,G46s,G62s,G63s,G64s,G66s
+
 #for input_fname example.cor

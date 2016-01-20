@@ -40,46 +40,6 @@ else:
  prior = make_prior(models)
 ## --
 
-if df.do_uncorr:
- ## -- remove the correlations from the data
- dataCorr = data
- datlen = len(gv.evalcov(data)['Gaa','Gaa'])
- fakecov = np.zeros((datlen,datlen))
- for i in range(datlen):
-  fakecov[i,i] = np.diag(gv.evalcov(data)['Gaa','Gaa'])[i]
- data['Gaa'] = gv.gvar([data['Gaa'][i].mean for i in range(datlen)],np.array(fakecov))
-## --
-
-fitter = CorrFitter(models=models,maxit=df.maxit)
-#fit = fitter.chained_lsqfit(data=data, prior=prior)
-#fit = fitter.lsqfit(data=data, prior=fit.p)
-#fit = fitter.lsqfit(data=data,prior=prior,p0="test.init.out",svdcut=df.svdcut)
-if df.do_initial:
- try:
-  p0={}
-  for key in df.define_init:
-   if key[-1] == 'o':
-    p0[key] = df.define_init[key][:df.num_ost]
-   else:
-    p0[key] = df.define_init[key][:df.num_nst]
-  fit = fitter.lsqfit(data=data,prior=prior,p0=p0,svdcut=df.svdcut)
- except KeyError:
-  print "Could not use initial point definitions"
-  fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut)
-else:
- fit = fitter.lsqfit(data=data,prior=prior,svdcut=df.svdcut)
-#bs_avg = make_bootstrap(fitter,dset,df.mdp.n_bs)
-print_fit(fit,prior)
-print_error_budget(fit)
-#save_data(mdp.output_path +'/'+ mdp.fit_fname,fit,data)
-save_data('./test.fit.out',fit,data)
-save_prior_from_fit(df.define_prior,df.define_model,fit,"test.prior.out",
-  round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
-
-if df.do_plot:
- if df.do_default_plot:
-  fitter.display_plots()
- plot_corr_double_log(models,data,fit,**df.fitargs)
- plot_corr_normalized(models,data,fit,**df.fitargs)
- plt.show()
-
+plot_corr_effective_mass(models,data,None,**df.fitargs)
+plt.show()
+sys.exit()

@@ -3,537 +3,549 @@ import util_funcs as utf
 
 ## -- prior mass splittings
 ## -- S8
-ngrd_s8=gv.gvar(1.0,0.5) ## -- even ground state
-ogrd_s8=gv.gvar(ngrd_s8.mean+0.3,0.5) ## -- odd ground state
-ovrs_s8=gv.gvar(1.25,0.2)  ## -- for overriding prior for first delta state
-delr_s8=gv.gvar(0.45,0.45) ## -- radial splitting
-dels_s8=gv.gvar(0.22,0.22) ## -- \Delta-N splitting
-delt_s8=gv.gvar(4e-2,8e-2) ## -- taste splitting
+ngrd_s8=gv.gvar(1.08,0.04) ## -- even ground state (effective mass)
+ogrd_s8=gv.gvar(1.58-0.23,0.20) ## -- odd ground state (8' fit (\Delta orbital))
+#ogrd_s8=gv.gvar(ngrd_s8.mean+0.26,0.25) ## -- odd ground state (8' fit (\Delta orbital))
+ovrs_s8=gv.gvar(1.32,0.02) ## -- for overriding prior for first delta state (8' fit)
+delp_s8=gv.gvar(0.38,0.30) ## -- N-roper splitting (PDG)
+delr_s8=gv.gvar(0.26,0.25) ## -- radial splitting (8' fit)
+dels_s8=gv.gvar(0.23,0.20) ## -- \Delta-N splitting (PDG)
+delt_s8=gv.gvar(0.02,0.04) ## -- taste splitting (8' fit)
 delu_s8=dels_s8            ## -- splitting for states with unknown continuum limit
-delx_s8=gv.gvar(1e0,1e0)   ## -- extra (hopefully unconstrained) states
+delx_s8=gv.gvar(1e0,5e-1)   ## -- extra (hopefully unconstrained) states
+
 ## -- S8'
-ngrd_s8p=gv.gvar(0.85,0.5) ## -- even ground state
-ogrd_s8p=gv.gvar(ngrd_s8p.mean+0.3,0.5) ## -- odd ground state
+ngrd_s8p=gv.gvar(1.39,0.1) ## -- even ground state
+ogrd_s8p=gv.gvar(ngrd_s8p.mean+0.3,0.2) ## -- odd ground state (grd + radial)
 delr_s8p=gv.gvar(0.30,0.30) ## -- radial splitting
 #dels_s8p=gv.gvar() ## -- \Delta-N splitting
-delt_s8p=gv.gvar(4e-2,8e-2) ## -- taste splitting
-delx_s8p=gv.gvar(1e0,1e0)  ## -- extra (hopefully unconstrained) states
+delt_s8p=gv.gvar(4e-2,8e-2) ## -- taste splitting (HISQ \pi taste splittings)
+delx_s8p=delx_s8            ## -- extra (hopefully unconstrained) states
+
 ## -- S16
-ngrd_s16=gv.gvar(0.989,0.5) ## -- even ground state (effective mass)
-ogrd_s16=gv.gvar(ngrd_s16.mean+0.45,0.45) ## -- odd ground state (N-N*(1535) mass splitting, PDG)
-ovrs_s16=gv.gvar(1.299,0.1) ## -- for overriding prior for first delta state (S8' fit)
-delr_s16=gv.gvar(0.6,0.6)   ## -- radial splitting (N-N*(1710) mass splitting, PDG)
-dels_s16=gv.gvar(0.22,0.22) ## -- N-\Del splitting (PDG)
-delt_s16=gv.gvar(4e-2,8e-2) ## -- taste splitting (HISQ \pi taste splittings)
-delu_s16=dels_s16           ## -- splitting for states with unknown continuum limit
-delx_s16=gv.gvar(1e0,1e0)   ## -- extra (hopefully unconstrained) states
+ngrd_s16=gv.gvar(1.112,0.05) ## -- even ground state (effective mass)
+ogrd_s16=gv.gvar(1.444,0.03) ## -- odd ground state (8 fit)
+ovrs_s16=ogrd_s8  ## -- for overriding prior for first delta state (S8' fit)
+delr_s16=delr_s8  ## -- radial splitting (8' fit)
+dels_s16=gv.gvar(0.16,0.02)   ## -- N-\Del splitting (8 fit)
+delt_s16=delt_s8  ## -- taste splitting (8' fit)
+delu_s16=dels_s16 ## -- splitting for states with unknown continuum limit
+delx_s16=delx_s8  ## -- extra (hopefully unconstrained) states
 
 ## -- used if do_init is defined in defines.py
 define_init_s8={}
 define_init_s8p={}
 define_init_s16={}
-num_nreal_s8=8 #3N+2D +1radial
-num_oreal_s8=6 #4N+1D+1?
-num_nreal_s8p=3 #0N+2D +1radial
+num_nreal_s8=5 #3N+2D +1radial
+num_oreal_s8=3 #4N+1D+1?
+num_nreal_s8p=2 #0N+2D +1radial
 num_oreal_s8p=1 #0N+1D+0?
 num_nreal_s16=4 #1N+3D
 num_oreal_s16=5 #3N+4D+1?
+Alog  = 2     # amplitude guess for actual log states
+xAlog = 1e-2  # amplitude guess for possibly unconstrained log states
+Anom  = 1     # amplitude guess for actual states (unknown sign)
+xAnom = 1e-3  # amplitude guess for possibly unconstrained states
 
 ## -- S8
-define_init_s8['logEn']=list(gv.exp([1.13,.006,.03,.128,.005,1.48,.20,.07] + [1]*10))
-define_init_s8['logEo']=list(gv.exp([1.42,.036,.015,.141,.054,2.2,.20] + [1]*10))
-define_init_s8['logc1n']=list(gv.exp([2]*num_nreal_s8 + [1e-6]*10))
-define_init_s8['logc1o']=list(gv.exp([2]*num_oreal_s8 + [1e-6]*10))
-define_init_s8['logk1n']=list(gv.exp([2]*num_nreal_s8 + [1e-6]*10))
-define_init_s8['logk1o']=list(gv.exp([2]*num_oreal_s8 + [1e-6]*10))
-define_init_s8['c2n']=[1]*num_nreal_s8 + [1e-6]*10
-define_init_s8['c3n']=[1]*num_nreal_s8 + [1e-6]*10
-define_init_s8['c5n']=[1]*num_nreal_s8 + [1e-6]*10
-define_init_s8['c6n']=[1]*num_nreal_s8 + [1e-6]*10
-define_init_s8['c2o']=[1]*num_oreal_s8 + [1e-6]*10
-define_init_s8['c3o']=[1]*num_oreal_s8 + [1e-6]*10
-define_init_s8['c5o']=[1]*num_oreal_s8 + [1e-6]*10
-define_init_s8['c6o']=[1]*num_oreal_s8 + [1e-6]*10
-define_init_s8['k2n']=[1]*num_nreal_s8 + [1e-6]*10
-define_init_s8['k3n']=[1]*num_nreal_s8 + [1e-6]*10
-define_init_s8['k5n']=[1]*num_nreal_s8 + [1e-6]*10
-define_init_s8['k6n']=[1]*num_nreal_s8 + [1e-6]*10
-define_init_s8['k2o']=[1]*num_oreal_s8 + [1e-6]*10
-define_init_s8['k3o']=[1]*num_oreal_s8 + [1e-6]*10
-define_init_s8['k5o']=[1]*num_oreal_s8 + [1e-6]*10
-define_init_s8['k6o']=[1]*num_oreal_s8 + [1e-6]*10
+define_init_s8['logEn']=list(gv.exp([1.084,.035,.029,.201,.025,.364,.027,.028] + [1]*10))
+define_init_s8['logEo']=list(gv.exp([1.427,.045,.041,.026,.147,.172,.260,.367] + [1]*10))
+define_init_s8['logc1n']=list(gv.exp([Alog]*num_nreal_s8 + [xAlog]*10))
+define_init_s8['logc1o']=list(gv.exp([Alog]*num_oreal_s8 + [xAlog]*10))
+#define_init_s8['logk1n']=list(gv.exp([Alog]*num_nreal_s8 + [xAlog]*10))
+#define_init_s8['logk1o']=list(gv.exp([Alog]*num_oreal_s8 + [xAlog]*10))
+define_init_s8['c2n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['c3n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['c5n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['c6n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['c2o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['c3o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['c5o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['c6o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['k1n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['k2n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['k3n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['k5n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['k6n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['k1o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['k2o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['k3o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['k5o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['k6o']=[Anom]*num_oreal_s8 + [xAnom]*10
+#
+define_init_s8['ks1n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['ks2n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['ks3n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['ks5n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['ks6n']=[Anom]*num_nreal_s8 + [xAnom]*10
+define_init_s8['ks1o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['ks2o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['ks3o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['ks5o']=[Anom]*num_oreal_s8 + [xAnom]*10
+define_init_s8['ks6o']=[Anom]*num_oreal_s8 + [xAnom]*10
+
 ## -- S8'
-define_init_s8p['logEn']=list(gv.exp([1.30,.01,.50] + [1]*10))
-define_init_s8p['logEo']=list(gv.exp([1.50] + [1]*10))
-define_init_s8p['logc4n']=list(gv.exp([2]*num_nreal_s8p + [1e-6]*10))
-define_init_s8p['logk4n']=list(gv.exp([2]*num_nreal_s8p + [1e-6]*10))
-define_init_s8p['logc4o']=list(gv.exp([2]*num_oreal_s8p + [1e-6]*10))
-define_init_s8p['logk4o']=list(gv.exp([2]*num_oreal_s8p + [1e-6]*10))
-define_init_s8p['c7n']=[1]*num_nreal_s8p + [1e-6]*10
-define_init_s8p['k7n']=[1]*num_nreal_s8p + [1e-6]*10
-define_init_s8p['c7o']=[1]*num_oreal_s8p + [1e-6]*10
-define_init_s8p['k7o']=[1]*num_oreal_s8p + [1e-6]*10
+#define_init_s8p['logEn']=list(gv.exp([1.28,.025,.29] + [1]*10))
+#define_init_s8p['logEo']=list(gv.exp([1.54,.03] + [1]*10))
+define_init_s8p['logEn']=list(gv.exp([1.326,.018,.176,.422] + [1]*10))
+define_init_s8p['logEo']=list(gv.exp([1.433,.072,.348,.672] + [1]*10))
+define_init_s8p['logc4n']=list(gv.exp([Alog]*num_nreal_s8p + [xAlog]*10))
+define_init_s8p['logc4o']=list(gv.exp([Alog]*num_oreal_s8p + [xAlog]*10))
+define_init_s8p['c7n']=[Anom]*num_nreal_s8p + [xAnom]*10
+define_init_s8p['c7o']=[Anom]*num_oreal_s8p + [xAnom]*10
+define_init_s8p['k4n']=[Anom]*num_nreal_s8p + [xAnom]*10
+define_init_s8p['k4o']=[Anom]*num_oreal_s8p + [xAnom]*10
+define_init_s8p['k7n']=[Anom]*num_nreal_s8p + [xAnom]*10
+define_init_s8p['k7o']=[Anom]*num_oreal_s8p + [xAnom]*10
+define_init_s8p['ks4n']=[Anom]*num_nreal_s8p + [xAnom]*10
+define_init_s8p['ks4o']=[Anom]*num_oreal_s8p + [xAnom]*10
+define_init_s8p['ks7n']=[Anom]*num_nreal_s8p + [xAnom]*10
+define_init_s8p['ks7o']=[Anom]*num_oreal_s8p + [xAnom]*10
+
 ## -- S16
-define_init_s16['logEn']=list(gv.exp([1.143,.135,.001,.002] + [1]*10))
-define_init_s16['logEo']=list(gv.exp([1.478,.025,.078,.035,1.805] + [1]*10))
-define_init_s16['logc2n']=list(gv.exp([2]*num_nreal_s16 + [1e-6]*10))
-define_init_s16['logk2n']=list(gv.exp([2]*num_nreal_s16 + [1e-6]*10))
-define_init_s16['logc2o']=list(gv.exp([2]*num_oreal_s16 + [1e-6]*10))
-define_init_s16['logk2o']=list(gv.exp([2]*num_oreal_s16 + [1e-6]*10))
-define_init_s16['c3n']=[1]*num_nreal_s16 + [1e-6]*10
-define_init_s16['c4n']=[1]*num_nreal_s16 + [1e-6]*10
-define_init_s16['c6n']=[1]*num_nreal_s16 + [1e-6]*10
-define_init_s16['k3n']=[1]*num_nreal_s16 + [1e-6]*10
-define_init_s16['k4n']=[1]*num_nreal_s16 + [1e-6]*10
-define_init_s16['k6n']=[1]*num_nreal_s16 + [1e-6]*10
-define_init_s16['c3o']=[1]*num_oreal_s16 + [1e-6]*10
-define_init_s16['c4o']=[1]*num_oreal_s16 + [1e-6]*10
-define_init_s16['c6o']=[1]*num_oreal_s16 + [1e-6]*10
-define_init_s16['k3o']=[1]*num_oreal_s16 + [1e-6]*10
-define_init_s16['k4o']=[1]*num_oreal_s16 + [1e-6]*10
-define_init_s16['k6o']=[1]*num_oreal_s16 + [1e-6]*10
+define_init_s16['logEn']=list(gv.exp([1.111,.23,.018,.02] + [1]*10))
+define_init_s16['logEo']=list(gv.exp([1.478,.06,.01,.1,1.805] + [1]*10))
+define_init_s16['logc2n']=list(gv.exp([Alog]*num_nreal_s16 + [xAlog]*10))
+define_init_s16['logc2o']=list(gv.exp([Alog]*num_oreal_s16 + [xAlog]*10))
+define_init_s16['c3n']=[Anom]*num_nreal_s16 + [xAnom]*10
+define_init_s16['c4n']=[Anom]*num_nreal_s16 + [xAnom]*10
+define_init_s16['c6n']=[Anom]*num_nreal_s16 + [xAnom]*10
+define_init_s16['c3o']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['c4o']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['c6o']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['k2n']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['k3n']=[Anom]*num_nreal_s16 + [xAnom]*10
+define_init_s16['k4n']=[Anom]*num_nreal_s16 + [xAnom]*10
+define_init_s16['k6n']=[Anom]*num_nreal_s16 + [xAnom]*10
+define_init_s16['k2o']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['k3o']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['k4o']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['k6o']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['ks2n']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['ks3n']=[Anom]*num_nreal_s16 + [xAnom]*10
+define_init_s16['ks4n']=[Anom]*num_nreal_s16 + [xAnom]*10
+define_init_s16['ks6n']=[Anom]*num_nreal_s16 + [xAnom]*10
+define_init_s16['ks2o']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['ks3o']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['ks4o']=[Anom]*num_oreal_s16 + [xAnom]*10
+define_init_s16['ks6o']=[Anom]*num_oreal_s16 + [xAnom]*10
 
 ## -- define prior objects to pass to defines.py if requested
 define_prior_s8={}
 define_prior_s8p={}
 define_prior_s16={}
 
-nkey_s8 = ('logEn','logc1n','logk1n','c2n','c3n','c5n','c6n','k2n','k3n','k5n','k6n')
-okey_s8 = ('logEo','logc1o','logk1o','c2o','c3o','c5o','c6o','k2o','k3o','k5o','k6o')
-nkey_s8p = ('logEn','logc4n','logk4n','c7n','k7n')
-okey_s8p = ('logEo','logc4o','logk4o','c7o','k7o')
-nkey_s16 = ('logEn','logc2n','logk2n','c3n','c4n','c6n','k3n','k4n','k6n')
-okey_s16 = ('logEo','logc2o','logk2o','c3o','c4o','c6o','k3o','k4o','k6o')
+nkey_s8 = ('logEn' ,'logc1n','c2n','c3n','c5n','c6n','k1n','k2n','k3n','k5n','k6n',
+ 'ks1n','ks2n','ks3n','ks5n','ks6n')
+okey_s8 = ('logEo' ,'logc1o','c2o','c3o','c5o','c6o','k1o','k2o','k3o','k5o','k6o',
+ 'ks1o','ks2o','ks3o','ks5o','ks6o')
+nkey_s8p = ('logEn','logc4n','c7n','k4n','k7n','ks4n','ks7n')
+okey_s8p = ('logEo','logc4o','c7o','k4o','k7o','ks4o','ks7o')
+nkey_s16 = ('logEn','logc2n','c3n','c4n','c6n','k2n','k3n','k4n','k6n','ks2n','ks3n','ks4n','ks6n')
+okey_s16 = ('logEo','logc2o','c3o','c4o','c6o','k2o','k3o','k4o','k6o','ks2o','ks3o','ks4o','ks6o')
+#nkey_s16 = ('logEn','logc2n','logk2n','c3n','c4n','c6n','k3n','k4n','k6n')
+#okey_s16 = ('logEo','logc2o','logk2o','c3o','c4o','c6o','k3o','k4o','k6o')
 
 ## -- S8
 define_prior_s8['nkey'] = nkey_s8
 define_prior_s8['okey'] = okey_s8
-define_prior_s8['logEn']=[]
-define_prior_s8['logEo']=[]
-define_prior_s8['logc1n']=[]
-define_prior_s8['logc1o']=[]
-define_prior_s8['logk1n']=[]
-define_prior_s8['logk1o']=[]
-define_prior_s8['c2n']=[]
-define_prior_s8['c3n']=[]
-define_prior_s8['c5n']=[]
-define_prior_s8['c6n']=[]
-define_prior_s8['c2o']=[]
-define_prior_s8['c3o']=[]
-define_prior_s8['c5o']=[]
-define_prior_s8['c6o']=[]
-define_prior_s8['k2n']=[]
-define_prior_s8['k3n']=[]
-define_prior_s8['k5n']=[]
-define_prior_s8['k6n']=[]
-define_prior_s8['k2o']=[]
-define_prior_s8['k3o']=[]
-define_prior_s8['k5o']=[]
-define_prior_s8['k6o']=[]
-## -- S8'
 define_prior_s8p['nkey'] = nkey_s8p
 define_prior_s8p['okey'] = okey_s8p
-define_prior_s8p['logEn']=[]
-define_prior_s8p['logc4n']=[]
-define_prior_s8p['logk4n']=[]
-define_prior_s8p['c7n']=[]
-define_prior_s8p['k7n']=[]
-define_prior_s8p['logEo']=[]
-define_prior_s8p['logc4o']=[]
-define_prior_s8p['logk4o']=[]
-define_prior_s8p['c7o']=[]
-define_prior_s8p['k7o']=[]
-## -- S16
 define_prior_s16['nkey'] = nkey_s16
 define_prior_s16['okey'] = okey_s16
-define_prior_s16['logEn']=[]
-define_prior_s16['logEo']=[]
-define_prior_s16['logc2n']=[]
-define_prior_s16['logk2n']=[]
-define_prior_s16['logc2o']=[]
-define_prior_s16['logk2o']=[]
-define_prior_s16['c3n']=[]
-define_prior_s16['c4n']=[]
-define_prior_s16['c6n']=[]
-define_prior_s16['k3n']=[]
-define_prior_s16['k4n']=[]
-define_prior_s16['k6n']=[]
-define_prior_s16['c3o']=[]
-define_prior_s16['c4o']=[]
-define_prior_s16['c6o']=[]
-define_prior_s16['k3o']=[]
-define_prior_s16['k4o']=[]
-define_prior_s16['k6o']=[]
+for key in nkey_s8 + okey_s8:
+  define_prior_s8[key]=[]
+for key in nkey_s8p + okey_s8p:
+  define_prior_s8p[key]=[]
+for key in nkey_s16 + okey_s16:
+  define_prior_s16[key]=[]
 
-## -- S16
-## -- even states
-## -- 0
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[ngrd_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[ngrd_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 1 -> override with delta prior from S(3/2,16)_0 fit
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[ovrs_s16.mean-ngrd_s16.mean-0*delt_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[ovrs_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 2
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delt_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delt_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 3
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delt_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delt_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 4
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delr_s16.mean-2*delt_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delr_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 5
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delt_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delt_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 6
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delt_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delt_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 7
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 8
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 9
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 10
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 11
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 12
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-## -- 13
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(nkey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(nkey_s16)-3)))
-
-## -- odd states
-## -- 0
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[ogrd_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[ogrd_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 1
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delt_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[delt_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 2
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delt_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[delt_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 3
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[dels_s16.mean-2*delt_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[dels_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 4
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delt_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[delt_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 5
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delt_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[delt_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 6
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delt_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[delt_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 7
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delr_s16.mean-3*delt_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[delr_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 8
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 9
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 10
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 11
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
-## -- 12
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delx_s16.mean,1,1]+[0]*(len(okey_s16)-3),
-[delx_s16.sdev,10,10]+[10]*(len(okey_s16)-3)))
+lAm = 1  # log amplitude mean
+lAs = 10 # log amplitude sdev
+Am  = 0  # amplitude mean
+As  = 10 # amplitude sdev
 
 ## -- S8
 ## -- even states
-## -- 0
+## -- 0 N
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[ngrd_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[ngrd_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
-## -- 1
+[ngrd_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[ngrd_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
+#[ngrd_s8.mean,lAm,lAm]+[Am]*(len(nkey_s8)-2),
+#[ngrd_s8.sdev,lAs,lAs]+[As]*(len(nkey_s8)-2)))
+## -- 1 N
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delt_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delt_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
-## -- 2
+[delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delt_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
+## -- 2 N
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delt_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delt_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
-## -- 3 -> override with delta prior from S(3/2,16)_0 fit
+[delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delt_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
+## -- 3 \Delta -> override with delta prior from S(3/2,16)_0 fit
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[ovrs_s8.mean-ngrd_s8.mean-2*delt_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[ovrs_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
-## -- 4
+[ovrs_s8.mean-ngrd_s8.mean-2*delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[ovrs_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
+## -- 4 \Delta
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delt_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delt_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
-## -- 5
+[delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delt_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
+## -- 5 N(roper)
+#print "value ngrd: ",ngrd_s8.mean
+#print "value ovrs: ",ovrs_s8.mean
+#print "value delr: ",delr_s8.mean
+#print "value delt: ",delt_s8.mean
+#print "prior set to: ",delr_s8.mean+ngrd_s8.mean-ovrs_s8.mean-3*delt_s8.mean
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delr_s8.mean-1*delt_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delr_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
-## -- 6
+#[delr_s8.mean+ngrd_s8.mean-ovrs_s8.mean-3*delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delr_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delr_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
+#[delr_s8.mean-1*delt_s8.mean,lAm,lAm]+[Am]*(len(nkey_s8)-2), ##old, doesn't make sense
+#[delr_s8.sdev,lAs,lAs]+[As]*(len(nkey_s8)-2)))
+## -- 6 N[1]
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delr_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delr_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
-## -- 7
+[delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delt_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
+#[delr_s8.mean,lAm,lAm]+[Am]*(len(nkey_s8)-2), ##old, wrong splitting
+#[delr_s8.sdev,lAs,lAs]+[As]*(len(nkey_s8)-2)))
+## -- 7 N[1]
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delt_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delt_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
-## -- 8
+[delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delt_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
+## -- 8 N[1]
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delx_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delx_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
-## -- 9
+[delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delt_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
+## -- 9 \Delta[1]
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delx_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delx_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
-## -- 10
+[dels_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[dels_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
+## -- 10 N[2]
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delx_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delx_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
+[delx_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delx_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
 ## -- 11
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delx_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delx_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
+[delx_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delx_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
 ## -- 12
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delx_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delx_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
+[delx_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delx_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
 ## -- 13
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delx_s8.mean,1,1]+[0]*(len(nkey_s8)-3),
-[delx_s8.sdev,10,10]+[10]*(len(nkey_s8)-3)))
+[delx_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delx_s8.sdev,lAs]+[As]*(len(nkey_s8)-2)))
 
 ## -- odd states
 ## -- 0
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[ogrd_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[ogrd_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[ogrd_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[ogrd_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 1
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delt_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[delt_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delt_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 2
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delt_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[delt_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delt_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 3
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delt_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[delt_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delt_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 4
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[dels_s8.mean-3*delt_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[dels_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[dels_s8.mean-3*delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[dels_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 5
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delu_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[delu_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[delu_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delu_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 6
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delr_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[delr_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[delr_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delr_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 7
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delt_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[delt_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delt_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 8
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delx_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[delx_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delx_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 9
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delx_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[delx_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delx_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 10
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delx_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[delx_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delx_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 11
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delx_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[delx_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delx_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 ## -- 12
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delx_s8.mean,1,1]+[0]*(len(okey_s8)-3),
-[delx_s8.sdev,10,10]+[10]*(len(okey_s8)-3)))
+[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delx_s8.sdev,lAs]+[As]*(len(okey_s8)-2)))
 
 ## -- S8'
 ## -- even states S8'
 ## -- 0
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
-[ngrd_s8p.mean,1,1]+[0]*(len(nkey_s8p)-3),
-[ngrd_s8p.sdev,10,10]+[10]*(len(nkey_s8p)-3)))
+[ngrd_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+[ngrd_s8p.sdev,lAs]+[As]*(len(nkey_s8p)-2)))
 ## -- 1
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
-[delt_s8p.mean,1,1]+[0]*(len(nkey_s8p)-3),
-[delt_s8p.sdev,10,10]+[10]*(len(nkey_s8p)-3)))
+[delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+[delt_s8p.sdev,lAs]+[As]*(len(nkey_s8p)-2)))
 ## -- 2
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
-[delr_s8p.mean,1,1]+[0]*(len(nkey_s8p)-3),
-[delr_s8p.sdev,10,10]+[10]*(len(nkey_s8p)-3)))
+[delr_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+[delr_s8p.sdev,lAs]+[As]*(len(nkey_s8p)-2)))
 ## -- 3
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(nkey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(nkey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(nkey_s8p)-2)))
 ## -- 4
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(nkey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(nkey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(nkey_s8p)-2)))
 ## -- 5
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(nkey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(nkey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(nkey_s8p)-2)))
 ## -- 6
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(nkey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(nkey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(nkey_s8p)-2)))
 ## -- 7
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(nkey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(nkey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(nkey_s8p)-2)))
 ## -- 8
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(nkey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(nkey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(nkey_s8p)-2)))
 
 ## -- odd states S8'
 ## -- 0
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[ogrd_s8p.mean,1,1]+[0]*(len(okey_s8p)-3),
-[ogrd_s8p.sdev,10,10]+[10]*(len(okey_s8p)-3)))
+[ogrd_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[ogrd_s8p.sdev,lAs]+[As]*(len(okey_s8p)-2)))
 ## -- 1
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delr_s8p.mean,1,1]+[0]*(len(okey_s8p)-3),
-[delr_s8p.sdev,10,10]+[10]*(len(okey_s8p)-3)))
+[delr_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delr_s8p.sdev,lAs]+[As]*(len(okey_s8p)-2)))
 ## -- 2
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(okey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(okey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(okey_s8p)-2)))
 ## -- 3
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(okey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(okey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(okey_s8p)-2)))
 ## -- 4
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(okey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(okey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(okey_s8p)-2)))
 ## -- 5
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(okey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(okey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(okey_s8p)-2)))
 ## -- 6
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(okey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(okey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(okey_s8p)-2)))
 ## -- 7
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delx_s8p.mean,1,1]+[0]*(len(okey_s8p)-3),
-[delx_s8p.sdev,10,10]+[10]*(len(okey_s8p)-3)))
+[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delx_s8p.sdev,lAs]+[As]*(len(okey_s8p)-2)))
+
+## -- S16
+## -- even states
+## -- 0
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[ngrd_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[ngrd_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 1 -> override with delta prior from S(3/2,16)_0 fit
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[ovrs_s16.mean-ngrd_s16.mean-0*delt_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[ovrs_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 2
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delt_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delt_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 3
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delt_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delt_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 4
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delr_s16.mean-2*delt_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delr_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 5
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delt_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delt_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 6
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delt_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delt_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 7
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 8
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 9
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 10
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 11
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 12
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+## -- 13
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(nkey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(nkey_s16)-3)))
+
+## -- odd states
+## -- 0
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[ogrd_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[ogrd_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 1
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delt_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[delt_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 2
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delt_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[delt_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 3
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[dels_s16.mean-2*delt_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[dels_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 4
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delt_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[delt_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 5
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delt_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[delt_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 6
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delt_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[delt_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 7
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delr_s16.mean-3*delt_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[delr_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 8
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 9
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 10
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 11
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
+## -- 12
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delx_s16.mean,lAm,lAm]+[Am]*(len(okey_s16)-3),
+[delx_s16.sdev,lAs,lAs]+[As]*(len(okey_s16)-3)))
 
 ## -- construct models quickly using loops
 key_list_s8 = list()
@@ -557,21 +569,18 @@ for sc in ['2','3','4','6']:
   key_list_s16.append(('G'+sc+sk,sc,sk))
   key_list_s16.append(('G'+sc+sk+'s',sc,'s'+sk))
 pass
+
 for key in key_list_s8:
   if key[1] == log_s8:
     logstr1='log'
   else:
     logstr1=''
-  if key[2] == log_s8 or key[2] == 's'+log_s8:
-    logstr2='log'
-  else:
-    logstr2=''
   try:
     define_prior_s8[key[0]]=\
      {logstr1+'c'+key[1]+'n':define_prior_s8[logstr1+'c'+key[1]+'n'],
       logstr1+'c'+key[1]+'o':define_prior_s8[logstr1+'c'+key[1]+'o'],
-      logstr2+'k'+key[2]+'n':define_prior_s8[logstr2+'k'+key[2]+'n'],
-      logstr2+'k'+key[2]+'o':define_prior_s8[logstr2+'k'+key[2]+'o'],
+      'k'+key[2]+'n':define_prior_s8['k'+key[2]+'n'],
+      'k'+key[2]+'o':define_prior_s8['k'+key[2]+'o'],
       'logEn':define_prior_s8['logEn'],
       'logEo':define_prior_s8['logEo'] }
   except KeyError:
@@ -582,16 +591,12 @@ for key in key_list_s8p:
     logstr1='log'
   else:
     logstr1=''
-  if key[2] == log_s8p or key[2] == 's'+log_s8p:
-    logstr2='log'
-  else:
-    logstr2=''
   try:
     define_prior_s8p[key[0]]=\
      {logstr1+'c'+key[1]+'n':define_prior_s8p[logstr1+'c'+key[1]+'n'],
       logstr1+'c'+key[1]+'o':define_prior_s8p[logstr1+'c'+key[1]+'o'],
-      logstr2+'k'+key[2]+'n':define_prior_s8p[logstr2+'k'+key[2]+'n'],
-      logstr2+'k'+key[2]+'o':define_prior_s8p[logstr2+'k'+key[2]+'o'],
+      'k'+key[2]+'n':define_prior_s8p['k'+key[2]+'n'],
+      'k'+key[2]+'o':define_prior_s8p['k'+key[2]+'o'],
       'logEn':define_prior_s8p['logEn'],
       'logEo':define_prior_s8p['logEo'] }
   except KeyError:
@@ -602,341 +607,17 @@ for key in key_list_s16:
     logstr1='log'
   else:
     logstr1=''
-  if key[2] == log_s16 or key[2] == 's'+log_s16:
-    logstr2='log'
-  else:
-    logstr2=''
   try:
-    define_prior_s8[key[0]]=\
+    define_prior_s16[key[0]]=\
      {logstr1+'c'+key[1]+'n':define_prior_s16[logstr1+'c'+key[1]+'n'],
       logstr1+'c'+key[1]+'o':define_prior_s16[logstr1+'c'+key[1]+'o'],
-      logstr2+'k'+key[2]+'n':define_prior_s16[logstr2+'k'+key[2]+'n'],
-      logstr2+'k'+key[2]+'o':define_prior_s16[logstr2+'k'+key[2]+'o'],
+      'k'+key[2]+'n':define_prior_s16['k'+key[2]+'n'],
+      'k'+key[2]+'o':define_prior_s16['k'+key[2]+'o'],
       'logEn':define_prior_s16['logEn'],
       'logEo':define_prior_s16['logEo'] }
   except KeyError:
     continue ## -- key is not defined, don't worry about it
 pass
-
-### -- Construct prior objects with their prior values
-### -- S8
-#define_prior_s8['G11']=\
-#{'logc1n':define_prior_s8['logc1n'],
-# 'logc1o':define_prior_s8['logc1o'],
-# 'logk1n':define_prior_s8['logk1n'],
-# 'logk1o':define_prior_s8['logk1o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G12']=\
-#{'logc1n':define_prior_s8['logc1n'],
-# 'logc1o':define_prior_s8['logc1o'],
-# 'k2n':define_prior_s8['k2n'],
-# 'k2o':define_prior_s8['k2o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G13']=\
-#{'logc1n':define_prior_s8['logc1n'],
-# 'logc1o':define_prior_s8['logc1o'],
-# 'k3n':define_prior_s8['k3n'],
-# 'k3o':define_prior_s8['k3o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G15']=\
-#{'logc1n':define_prior_s8['logc1n'],
-# 'logc1o':define_prior_s8['logc1o'],
-# 'k5n':define_prior_s8['k5n'],
-# 'k5o':define_prior_s8['k5o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G16']=\
-#{'logc1n':define_prior_s8['logc1n'],
-# 'logc1o':define_prior_s8['logc1o'],
-# 'k6n':define_prior_s8['k6n'],
-# 'k6o':define_prior_s8['k6o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G21']=\
-#{'logk1n':define_prior_s8['logk1n'],
-# 'logk1o':define_prior_s8['logk1o'],
-# 'c2n':define_prior_s8['c2n'],
-# 'c2o':define_prior_s8['c2o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G22']=\
-#{'c2n':define_prior_s8['c2n'],
-# 'c2o':define_prior_s8['c2o'],
-# 'k2n':define_prior_s8['k2n'],
-# 'k2o':define_prior_s8['k2o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G23']=\
-#{'c2n':define_prior_s8['c2n'],
-# 'c2o':define_prior_s8['c2o'],
-# 'k3n':define_prior_s8['k3n'],
-# 'k3o':define_prior_s8['k3o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G25']=\
-#{'c2n':define_prior_s8['c2n'],
-# 'c2o':define_prior_s8['c2o'],
-# 'k5n':define_prior_s8['k5n'],
-# 'k5o':define_prior_s8['k5o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G26']=\
-#{'c2n':define_prior_s8['c2n'],
-# 'c2o':define_prior_s8['c2o'],
-# 'k6n':define_prior_s8['k6n'],
-# 'k6o':define_prior_s8['k6o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G31']=\
-#{'logk1n':define_prior_s8['logk1n'],
-# 'logk1o':define_prior_s8['logk1o'],
-# 'c3n':define_prior_s8['c3n'],
-# 'c3o':define_prior_s8['c3o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G32']=\
-#{'k2n':define_prior_s8['k2n'],
-# 'k2o':define_prior_s8['k2o'],
-# 'c3n':define_prior_s8['c3n'],
-# 'c3o':define_prior_s8['c3o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G33']=\
-#{'c3n':define_prior_s8['c3n'],
-# 'c3o':define_prior_s8['c3o'],
-# 'k3n':define_prior_s8['k3n'],
-# 'k3o':define_prior_s8['k3o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G35']=\
-#{'c3n':define_prior_s8['c3n'],
-# 'c3o':define_prior_s8['c3o'],
-# 'k5n':define_prior_s8['k5n'],
-# 'k5o':define_prior_s8['k5o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G36']=\
-#{'c3n':define_prior_s8['c3n'],
-# 'c3o':define_prior_s8['c3o'],
-# 'k6n':define_prior_s8['k6n'],
-# 'k6o':define_prior_s8['k6o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G51']=\
-#{'logk1n':define_prior_s8['logk1n'],
-# 'logk1o':define_prior_s8['logk1o'],
-# 'c5n':define_prior_s8['c5n'],
-# 'c5o':define_prior_s8['c5o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G52']=\
-#{'k2n':define_prior_s8['k2n'],
-# 'k2o':define_prior_s8['k2o'],
-# 'c5n':define_prior_s8['c5n'],
-# 'c5o':define_prior_s8['c5o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G53']=\
-#{'k3n':define_prior_s8['k3n'],
-# 'k3o':define_prior_s8['k3o'],
-# 'c5n':define_prior_s8['c5n'],
-# 'c5o':define_prior_s8['c5o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G55']=\
-#{'c5n':define_prior_s8['c5n'],
-# 'c5o':define_prior_s8['c5o'],
-# 'k5n':define_prior_s8['k5n'],
-# 'k5o':define_prior_s8['k5o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G56']=\
-#{'c5n':define_prior_s8['c5n'],
-# 'c5o':define_prior_s8['c5o'],
-# 'k6n':define_prior_s8['k6n'],
-# 'k6o':define_prior_s8['k6o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G61']=\
-#{'logk1n':define_prior_s8['logk1n'],
-# 'logk1o':define_prior_s8['logk1o'],
-# 'c6n':define_prior_s8['c6n'],
-# 'c6o':define_prior_s8['c6o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G62']=\
-#{'k2n':define_prior_s8['k2n'],
-# 'k2o':define_prior_s8['k2o'],
-# 'c6n':define_prior_s8['c6n'],
-# 'c6o':define_prior_s8['c6o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G63']=\
-#{'k3n':define_prior_s8['k3n'],
-# 'k3o':define_prior_s8['k3o'],
-# 'c6n':define_prior_s8['c6n'],
-# 'c6o':define_prior_s8['c6o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G65']=\
-#{'k5n':define_prior_s8['k5n'],
-# 'k5o':define_prior_s8['k5o'],
-# 'c6n':define_prior_s8['c6n'],
-# 'c6o':define_prior_s8['c6o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-#define_prior_s8['G66']=\
-#{'c6n':define_prior_s8['c6n'],
-# 'c6o':define_prior_s8['c6o'],
-# 'k6n':define_prior_s8['k6n'],
-# 'k6o':define_prior_s8['k6o'],
-# 'logEn':define_prior_s8['logEn'],
-# 'logEo':define_prior_s8['logEo'] }
-### -- S8'
-#define_prior_s8p['G44']=\
-#{'logc4n':define_prior_s8p['logc4n'],
-# 'logc4o':define_prior_s8p['logc4o'],
-# 'logk4n':define_prior_s8p['logk4n'],
-# 'logk4o':define_prior_s8p['logk4o'],
-# 'logEn':define_prior_s8p['logEn'],
-# 'logEo':define_prior_s8p['logEo'] }
-#define_prior_s8p['G47']=\
-#{'k7n':define_prior_s8p['k7n'],
-# 'k7o':define_prior_s8p['k7o'],
-# 'logc4n':define_prior_s8p['logc4n'],
-# 'logc4o':define_prior_s8p['logc4o'],
-# 'logEn':define_prior_s8p['logEn'],
-# 'logEo':define_prior_s8p['logEo'] }
-#define_prior_s8p['G74']=\
-#{'logk4n':define_prior_s8p['logk4n'],
-# 'logk4o':define_prior_s8p['logk4o'],
-# 'c7n':define_prior_s8p['c7n'],
-# 'c7o':define_prior_s8p['c7o'],
-# 'logEn':define_prior_s8p['logEn'],
-# 'logEo':define_prior_s8p['logEo'] }
-#define_prior_s8p['G77']=\
-#{'c7n':define_prior_s8p['c7n'],
-# 'c7o':define_prior_s8p['c7o'],
-# 'k7n':define_prior_s8p['k7n'],
-# 'k7o':define_prior_s8p['k7o'],
-# 'logEn':define_prior_s8p['logEn'],
-# 'logEo':define_prior_s8p['logEo'] }
-### -- S16
-#define_prior_s16['G22']=\
-#{'logc2n':define_prior_s16['logc2n'],
-# 'logc2o':define_prior_s16['logc2o'],
-# 'logk2n':define_prior_s16['logk2n'],
-# 'logk2o':define_prior_s16['logk2o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G23']=\
-#{'logc2n':define_prior_s16['logc2n'],
-# 'logc2o':define_prior_s16['logc2o'],
-# 'k3n':define_prior_s16['k3n'],
-# 'k3o':define_prior_s16['k3o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G24']=\
-#{'logc2n':define_prior_s16['logc2n'],
-# 'logc2o':define_prior_s16['logc2o'],
-# 'k4n':define_prior_s16['k4n'],
-# 'k4o':define_prior_s16['k4o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G26']=\
-#{'logc2n':define_prior_s16['logc2n'],
-# 'logc2o':define_prior_s16['logc2o'],
-# 'k6n':define_prior_s16['k6n'],
-# 'k6o':define_prior_s16['k6o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G32']=\
-#{'logk2n':define_prior_s16['logk2n'],
-# 'logk2o':define_prior_s16['logk2o'],
-# 'c3n':define_prior_s16['c3n'],
-# 'c3o':define_prior_s16['c3o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G33']=\
-#{'c3n':define_prior_s16['c3n'],
-# 'c3o':define_prior_s16['c3o'],
-# 'k3n':define_prior_s16['k3n'],
-# 'k3o':define_prior_s16['k3o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G34']=\
-#{'c3n':define_prior_s16['c3n'],
-# 'c3o':define_prior_s16['c3o'],
-# 'k4n':define_prior_s16['k4n'],
-# 'k4o':define_prior_s16['k4o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G36']=\
-#{'c3n':define_prior_s16['c3n'],
-# 'c3o':define_prior_s16['c3o'],
-# 'k6n':define_prior_s16['k6n'],
-# 'k6o':define_prior_s16['k6o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G42']=\
-#{'logk2n':define_prior_s16['logk2n'],
-# 'logk2o':define_prior_s16['logk2o'],
-# 'c4n':define_prior_s16['c4n'],
-# 'c4o':define_prior_s16['c4o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G43']=\
-#{'k3n':define_prior_s16['k3n'],
-# 'k3o':define_prior_s16['k3o'],
-# 'c4n':define_prior_s16['c4n'],
-# 'c4o':define_prior_s16['c4o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G44']=\
-#{'c4n':define_prior_s16['c4n'],
-# 'c4o':define_prior_s16['c4o'],
-# 'k4n':define_prior_s16['k4n'],
-# 'k4o':define_prior_s16['k4o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G46']=\
-#{'c4n':define_prior_s16['c4n'],
-# 'c4o':define_prior_s16['c4o'],
-# 'k6n':define_prior_s16['k6n'],
-# 'k6o':define_prior_s16['k6o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G62']=\
-#{'logk2n':define_prior_s16['logk2n'],
-# 'logk2o':define_prior_s16['logk2o'],
-# 'c6n':define_prior_s16['c6n'],
-# 'c6o':define_prior_s16['c6o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G63']=\
-#{'k3n':define_prior_s16['k3n'],
-# 'k3o':define_prior_s16['k3o'],
-# 'c6n':define_prior_s16['c6n'],
-# 'c6o':define_prior_s16['c6o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G64']=\
-#{'k4n':define_prior_s16['k4n'],
-# 'k4o':define_prior_s16['k4o'],
-# 'c6n':define_prior_s16['c6n'],
-# 'c6o':define_prior_s16['c6o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
-#define_prior_s16['G66']=\
-#{'c6n':define_prior_s16['c6n'],
-# 'c6o':define_prior_s16['c6o'],
-# 'k6n':define_prior_s16['k6n'],
-# 'k6o':define_prior_s16['k6o'],
-# 'logEn':define_prior_s16['logEn'],
-# 'logEo':define_prior_s16['logEo'] }
 
 ## -- end
 

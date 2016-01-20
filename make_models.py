@@ -5,7 +5,7 @@ from corrfitter  import Corr2
 #from model_maker import model_object
 #from model_maker import use_model_definition
 
-def make_models(data=None,mdp=None,lkey=None):
+def make_models(data=None,mdp=None,lkey=None,mdef=None):
  """
  -- mdp is meta_data parameters, contains everything for a generic fit
  -- data is the averaged data, used to construct default models for each key
@@ -14,8 +14,14 @@ def make_models(data=None,mdp=None,lkey=None):
   ## -- nothing to do
   return None
  else:
-  models = use_model_definition(data,df.define_model,lkey)
-  return models
+  if mdef is None:
+    ## -- standard operation/stability loop
+    models = use_model_definition(data,df.define_model,lkey)
+    return models
+  else:
+    ## -- time vary loop
+    models = use_model_definition(data,mdef,lkey)
+    return models
 ## ------
 ##
 

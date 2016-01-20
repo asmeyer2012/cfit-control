@@ -85,7 +85,7 @@ def plot_corr_double_log(models,data,fit,**kwargs):
     color=utp.get_option("color1",'r',**kwargs[key]),
     marker=utp.get_option("marker",'o',**kwargs[key]),
     s=utp.get_option("markersize",36,**kwargs[key]))
-   fig.suptitle(utp.get_option("plottitle",str(idx[0])+" default title "+str(key),**kwargs[key]),
+   fig.suptitle(utp.get_option("plottitledl",str(idx[0])+" default title "+str(key),**kwargs[key]),
     fontsize=utp.get_option("titlesize",20,**kwargs[key]))
    ## -- modify some options 
    axm.set_xlabel(r'$t$ slice')
