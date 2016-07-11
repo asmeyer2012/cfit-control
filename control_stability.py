@@ -62,7 +62,7 @@ def doProcess(nst,ost,data=data,models=models):
   ## --
   print_fit(fit,prior)
   print_error_budget(fit)
-  save_data('fit/fit_'+str(nst)+'_'+str(ost)+'.out',fit,data)
+  save_data('fit-stability/fit_'+str(nst)+'_'+str(ost)+'.out',fit,data)
   #save_prior_from_fit(pdict0,df.define_model,fit,'prior/prior_'+str(nst)+'_'+str(ost)+'.out',
   #  round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
   #except ValueError:

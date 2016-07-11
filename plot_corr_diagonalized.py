@@ -4,35 +4,37 @@ import gvar as gv
 import util_funcs as utf
 import util_plots as utp
 import defines as df
+from extract_3pt_info import *
 
-#def plot_corr_double_log(models,data,fit,fig,**kwargs):
-def plot_corr_double_log(models,data,fit,**kwargs):
+def plot_corr_diagonalized(models,data,fit,idx,**kwargs):
  """
- Get all data ready so that it can be plotted on command
- Allows for dynamic cycling through plots
+ Plot a set of correlators on the same axis to compare
  """
- _dlNMod = len(models)
- _dlIdx = [0] ## -- index of plotted function, in array so it can be modified in functions
+ _dgIdx = idx ## -- set of c,k indices to plot on the same axis
  ## -- objects to hold all plot data
  ##  - Dat/Fit refers to the correlator data or the fit function
  ##  - Hi/Lo corresponds to the positive/negative half of the fit plot
  ##  - Central/Error are the central value and errors
- _dlDatHiCentral = []
- _dlDatHiError   = []
- _dlDatLoCentral = []
- _dlDatLoError   = []
- _dlFitHiCentral = []
- _dlFitHiError   = []
- _dlFitLoCentral = []
- _dlFitLoError   = []
+ _dgDatHiCentral = []
+ _dgDatHiError   = []
+ _dgDatLoCentral = []
+ _dgDatLoError   = []
+ _dgFitHiCentral = []
+ _dgFitHiError   = []
+ _dgFitLoCentral = []
+ _dgFitLoError   = []
+ _dgSrcMatrix = []
+ _dgSnkMatrix = []
+ _dgCorMatrix = []
  #
  ## -- other objects
- _dlTData = []
- _dlTFit  = []
+ _dgTData = []
+ _dgTFit  = []
  fig,(axp,axm) = plt.subplots(2,sharex=True,figsize=(8,16))
  #
  ## -- setup plot function
- def do_plot_double_log(idx,fig=fig):
+ ## -- do all arrangement of correlators, fit functions, then do diagonalization
+ def do_plot_diagonalized(fig=fig):
    fig.clear()
    axp = fig.add_subplot(211)
    axm = fig.add_subplot(212,sharex=axp)
@@ -41,8 +43,8 @@ def plot_corr_double_log(models,data,fit,**kwargs):
 
    axp.set_yscale('log')
    axm.set_yscale('log')
-   axp.set_xlim([-1,len(_dlTData[idx[0]])])
-   axm.set_xlim([-1,len(_dlTData[idx[0]])])
+   axp.set_xlim([-1,len(_dgTData[idx[0]])])
+   axm.set_xlim([-1,len(_dgTData[idx[0]])])
    axp.set_ylim(utp.get_option("y_pos_limit",[1e-8,1e0],**kwargs[key]))
    axm.set_ylim(utp.get_option("y_neg_limit",[1e-8,1e0],**kwargs[key]))
    axm.set_ylim(axm.get_ylim()[::-1])
@@ -56,42 +58,42 @@ def plot_corr_double_log(models,data,fit,**kwargs):
    plt.yticks(plt.yticks()[0][2:],expm)
    #
    ## -- plot fit
-   axp.plot(_dlTData[idx[0]],_dlFitHiCentral[idx[0]],
+   axp.plot(_dgTData[idx[0]],_dgFitHiCentral[idx[0]],
     color=utp.get_option("color2",'b',**kwargs[key]))
-   axm.plot(_dlTData[idx[0]],_dlFitLoCentral[idx[0]],
+   axm.plot(_dgTData[idx[0]],_dgFitLoCentral[idx[0]],
     color=utp.get_option("color2",'b',**kwargs[key]))
-   axp.plot(_dlTData[idx[0]],_dlFitHiError[idx[0]][0],
+   axp.plot(_dgTData[idx[0]],_dgFitHiError[idx[0]][0],
     color=utp.get_option("color2",'g',**kwargs[key]),
     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
-   axm.plot(_dlTData[idx[0]],_dlFitLoError[idx[0]][0],
+   axm.plot(_dgTData[idx[0]],_dgFitLoError[idx[0]][0],
     color=utp.get_option("color2",'g',**kwargs[key]),
     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
-   axp.plot(_dlTData[idx[0]],_dlFitHiError[idx[0]][1],
+   axp.plot(_dgTData[idx[0]],_dgFitHiError[idx[0]][1],
     color=utp.get_option("color2",'g',**kwargs[key]),
     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
-   axm.plot(_dlTData[idx[0]],_dlFitLoError[idx[0]][1],
+   axm.plot(_dgTData[idx[0]],_dgFitLoError[idx[0]][1],
     color=utp.get_option("color2",'g',**kwargs[key]),
     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
    ## -- plot correlator data
-   axp.errorbar(_dlTData[idx[0]],_dlDatHiCentral[idx[0]],yerr=_dlDatHiError[idx[0]],
+   axp.errorbar(_dgTData[idx[0]],_dgDatHiCentral[idx[0]],yerr=_dgDatHiError[idx[0]],
     mfc=utp.get_option("markerfacecolor1",'None',**kwargs[key]),
     mec=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
     color=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
     ls=utp.get_option("linestyle1",'None',**kwargs[key]),
     marker=utp.get_option("marker1",'o',**kwargs[key]),
     ms=utp.get_option("markersize",6,**kwargs[key]))
-   axm.errorbar(_dlTData[idx[0]],_dlDatLoCentral[idx[0]],yerr=_dlDatLoError[idx[0]],
+   axm.errorbar(_dgTData[idx[0]],_dgDatLoCentral[idx[0]],yerr=_dgDatLoError[idx[0]],
     mfc=utp.get_option("markerfacecolor1",'None',**kwargs[key]),
     mec=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
     color=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
     ls=utp.get_option("linestyle1",'None',**kwargs[key]),
     marker=utp.get_option("marker1",'o',**kwargs[key]),
     ms=utp.get_option("markersize",6,**kwargs[key]))
-   axp.scatter(_dlTFit[idx[0]],[_dlDatHiCentral[idx[0]][t] for t in _dlTFit[idx[0]]],
+   axp.scatter(_dgTFit[idx[0]],[_dgDatHiCentral[idx[0]][t] for t in _dgTFit[idx[0]]],
     color=utp.get_option("color1",'r',**kwargs[key]),
     marker=utp.get_option("marker",'o',**kwargs[key]),
     s=utp.get_option("markersize",36,**kwargs[key]))
-   axm.scatter(_dlTFit[idx[0]],[_dlDatLoCentral[idx[0]][t] for t in _dlTFit[idx[0]]],
+   axm.scatter(_dgTFit[idx[0]],[_dgDatLoCentral[idx[0]][t] for t in _dgTFit[idx[0]]],
     color=utp.get_option("color1",'r',**kwargs[key]),
     marker=utp.get_option("marker",'o',**kwargs[key]),
     s=utp.get_option("markersize",36,**kwargs[key]))
@@ -110,22 +112,23 @@ def plot_corr_double_log(models,data,fit,**kwargs):
    pass
  #
  ## -- setup button press action function
- def press_double_log(event,idx=_dlIdx):
-   #print('press_double_log', event.key)
+ ## -- disabled by commenting out invokation
+ def press_diagonalized(event,idx=_dgIdx):
+   #print('press_diagonalized', event.key)
    try:
      ## -- manually indicate index
      idx[0] = int(event.key) + (idx[0])*10
    except ValueError:
      if event.key==' ': ## -- space
        ## -- allows for replotting when changing index by typing number keys
-       idx[0] = idx[0] % _dlNMod
-       do_plot_double_log(idx)
+       idx[0] = idx[0] % _dgNMod
+       do_plot_diagonalized(idx)
      elif event.key=='left':
-       idx[0] = (idx[0] - 1) % _dlNMod
-       do_plot_double_log(idx)
+       idx[0] = (idx[0] - 1) % _dgNMod
+       do_plot_diagonalized(idx)
      elif event.key=='right':
-       idx[0] = (idx[0] + 1) % _dlNMod
-       do_plot_double_log(idx)
+       idx[0] = (idx[0] + 1) % _dgNMod
+       do_plot_diagonalized(idx)
      elif event.key=='backspace':
        ## -- reset index so can manually flip through using number keys
        idx[0] = 0
@@ -135,43 +138,53 @@ def plot_corr_double_log(models,data,fit,**kwargs):
          key = model.datatag
          save_dir  = utp.get_option("dl_save_dir","./plotdump",**kwargs[key])
          save_name = utp.get_option("dl_save_name","dlplot-"+key+".png",**kwargs[key])
-         do_plot_double_log([ix])
+         do_plot_diagonalized([ix])
          plt.savefig(save_dir+'/'+save_name)
-       do_plot_double_log(idx)
+       do_plot_diagonalized(idx)
  #
- ## -- 
- fig.canvas.mpl_connect('key_press_event',press_double_log)
+ ## -- disabled by commenting out
+ #fig.canvas.mpl_connect('key_press_event',press_diagonalized)
+ #
  ## -- save plot data
  for idx,model in zip(range(len(models)),models):
    key = model.datatag
-   _dlTData.append(model.tdata)
-   _dlTFit.append(model.tfit)
-   _dlTFit[-1] = np.append(_dlTFit[-1],list(sorted([len(_dlTData[-1]) - t for t in _dlTFit[-1]])))
+   _dgTData.append(model.tdata)
+   _dgTFit.append(model.tfit)
+   _dgTFit[-1] = np.append(_dgTFit[-1],list(sorted([len(_dgTData[-1]) - t for t in _dgTFit[-1]])))
    ## -- fit
-   _dlFitFunc = utp.create_fit_func(model,fit)
-   _dlFitMean = gv.mean(_dlFitFunc(_dlTData[-1]))
-   _dlFitSdev = gv.sdev(_dlFitFunc(_dlTData[-1]))
-   _dlFitHiCentral.append(
-     utf.pos_arr(_dlFitMean,utp.get_option("y_pos_limit",[1e-8,1e0],**kwargs[key])[0]/100) )
-   _dlFitLoCentral.append(
-     utf.neg_arr(_dlFitMean,utp.get_option("y_neg_limit",[1e-8,1e0],**kwargs[key])[0]/100) )
-   _dlFitHiError.append([
-     utf.pos_arr(np.array(_dlFitMean)-np.array(_dlFitSdev),
+   _dgFitFunc = utp.create_fit_func(model,fit)
+   _dgFitMean = gv.mean(_dgFitFunc(_dgTData[-1]))
+   _dgFitSdev = gv.sdev(_dgFitFunc(_dgTData[-1]))
+   _dgFitHiCentral.append(
+     utf.pos_arr(_dgFitMean,utp.get_option("y_pos_limit",[1e-8,1e0],**kwargs[key])[0]/100) )
+   _dgFitLoCentral.append(
+     utf.neg_arr(_dgFitMean,utp.get_option("y_neg_limit",[1e-8,1e0],**kwargs[key])[0]/100) )
+   _dgFitHiError.append([
+     utf.pos_arr(np.array(_dgFitMean)-np.array(_dgFitSdev),
      utp.get_option("y_pos_limit",[1e-8,1e0],**kwargs[key])[0]/1000),
-     utf.pos_arr(np.array(_dlFitMean)+np.array(_dlFitSdev),
+     utf.pos_arr(np.array(_dgFitMean)+np.array(_dgFitSdev),
      utp.get_option("y_pos_limit",[1e-8,1e0],**kwargs[key])[0]/1000) ])
-   _dlFitLoError.append([
-     utf.neg_arr(np.array(_dlFitMean)-np.array(_dlFitSdev),
+   _dgFitLoError.append([
+     utf.neg_arr(np.array(_dgFitMean)-np.array(_dgFitSdev),
      utp.get_option("y_neg_limit",[1e-8,1e0],**kwargs[key])[0]/1000),
-     utf.neg_arr(np.array(_dlFitMean)+np.array(_dlFitSdev),
+     utf.neg_arr(np.array(_dgFitMean)+np.array(_dgFitSdev),
      utp.get_option("y_neg_limit",[1e-8,1e0],**kwargs[key])[0]/1000) ])
    ## -- data
-   _dlDatMean = gv.mean(data[key])
-   _dlDatSdev = gv.sdev(data[key])
-   _dlDatHiCentral.append( utf.pos_arr(_dlDatMean) )
-   _dlDatLoCentral.append( utf.neg_arr(_dlDatMean) )
-   _dlDatHiError.append(utf.pos_err(_dlDatMean,_dlDatSdev))
-   _dlDatLoError.append(utf.neg_err(_dlDatMean,_dlDatSdev))
- ## -- done saving data
+   _dgDatMean = gv.mean(data[key])
+   _dgDatSdev = gv.sdev(data[key])
+   _dgDatHiCentral.append( utf.pos_arr(_dgDatMean) )
+   _dgDatLoCentral.append( utf.neg_arr(_dgDatMean) )
+   _dgDatHiError.append(utf.pos_err(_dgDatMean,_dgDatSdev))
+   _dgDatLoError.append(utf.neg_err(_dgDatMean,_dgDatSdev))
+ ## -- done saving data, organize
+ if df.do_irrep == "8":
+  classList = [1,2,3,5,6]
+ elif df.do_irrep == "8'":
+  classList = [4,7]
+ elif df.do_irrep == "16":
+  classList = [2,3,4,6]
+ ckey,kkey = get_overlap_keys(fit)
+ for c in classList:
+ _dgCorMatrix.append([data[
  
- do_plot_double_log(_dlIdx)
+ do_plot_diagonalized(_dgIdx)

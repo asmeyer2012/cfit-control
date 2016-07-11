@@ -65,7 +65,7 @@ def doProcess(tmin,tmax,data=data,mdef=mdef):
   ## --
   print_fit(fit,prior)
   print_error_budget(fit)
-  save_data('fittmvr/fit_'+str(tmin)+'_'+str(tmax)+'.out',fit,data)
+  save_data('fit-timevary/fit_'+str(tmin)+'_'+str(tmax)+'.out',fit,data)
   #save_prior_from_fit(pdict0,df.define_model,fit,'prior/prior_'+str(nst)+'_'+str(ost)+'.out',
   #  round_e=2,round_a=1,preserve_e_widths=True,preserve_a_widths=True)
   #except ValueError:

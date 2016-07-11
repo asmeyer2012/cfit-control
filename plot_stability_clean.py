@@ -6,6 +6,16 @@ import util_plots as utp
 import defines      as df
 import define_prior as dfp
 
+fix_tmin = False # only a single value of tmin
+fix_tmax = True # only a single value of tmin
+fix_tmin_val = 0
+fix_tmax_val = 12
+fix_nst = 5
+fix_ost = 4
+assert fix_tmin != fix_tmax # xor
+do_chi2 = False
+do_pval = False # not implemented
+
 def plot_stability(fit_collector,**kwargs):
  """
  """
@@ -67,6 +77,16 @@ def plot_stability(fit_collector,**kwargs):
   color='r',marker='o',linestyle='')
  ax.errorbar(hValDato,eoCentral,eoError,
   color='b',marker='o',linestyle='')
+ if fix_tmax:
+  boxLabel  = r'$t_{\rm max}='+str(fix_tmax_val)+'$'
+ elif fix_tmin:
+  boxLabel  = r'$t_{\rm min}='+str(fix_tmin_val)+'$'
+ boxLabel += '\n'
+ boxLabel += r'$N_{\rm even}='+str(fix_nst)+'$'
+ boxLabel += '\n'
+ boxLabel += r'$N_{\rm odd}='+str(fix_ost+'$')
+ ax.text(.75*fitCount,1.6,boxLabel,fontsize=20,
+  bbox={'facecolor':'white', 'alpha':0.8, 'pad':10})
  for x in range(1,fitCount):
   ax.axvline(x,color='k')
  plt.show()

@@ -34,6 +34,7 @@ def plot_corr_normalized(models,data,fit,**kwargs):
    ax = fig.add_subplot(111)
    key = models[idx[0]].datatag
 
+   ax.set_xlim([-1,len(_fnTData[idx[0]])])
    ax.set_ylim(utp.get_option("y_limit",[0.2,1.8],**kwargs[key]))
    #
    ## -- plot fit
@@ -62,7 +63,7 @@ def plot_corr_normalized(models,data,fit,**kwargs):
    fig.suptitle(utp.get_option("plottitlefn",str(idx[0])+" default title "+str(key),**kwargs[key]),
     fontsize=utp.get_option("titlesize",20,**kwargs[key]))
    ## -- modify some options 
-   ax.set_xlabel(r'$t$ slice')
+   ax.set_xlabel(r'$t$')
    ax.set_ylabel(utp.get_option("yaxistitle",r"$C(t)/C_{fit}(t)$",**kwargs[key]))
    for item in ([ax.xaxis.label,ax.yaxis.label]):
     # must be after setting label content (LaTeX ruins it)
