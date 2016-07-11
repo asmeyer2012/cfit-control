@@ -3,8 +3,12 @@ foo*
 bar*
 baz*
 *.pyc
-import-correlators-*
-fig-files/*
+bash_scripts/*
 data-files/*
+depricated/*
+fig-files/*
+fit-stability/*
+fit-timevary/*
+import-correlators-*
 unused/*
 ignore
