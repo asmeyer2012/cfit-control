@@ -15,6 +15,7 @@ class md_params:
   ## -- input variables
   self.input_type="real"
   self.key="default_key" #reference key for 
+  self.tag=""      # tag for pre-average manipulation
   self.corr_num=1  # correlator position in file
   self.corr_len=0  # length of correlator 
   ## -- fit variables
@@ -34,6 +35,7 @@ class md_params:
   print "Flag overwrite  : ",self.flag_overwrite
   print "Input type      : ",self.input_type
   print "Reference key   : ",self.key
+  print "Reference tag   : ",self.tag
   print "Correlator #    : ",self.corr_num
   print "Correlator len  : ",self.corr_len
   print "Even fit param  : ",self.n_nfit

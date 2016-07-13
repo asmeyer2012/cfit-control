@@ -35,24 +35,22 @@ if df.do_db:
 else:
  ## -- for raw correlator file input
  data,dset = make_data(df.mdp,do_makedata=df.do_makedata,\
-                       do_db=False,filename="./import-correlators")
- #data3,dset3 = make_data(df.mdp,do_makedata=df.do_makedata_3pt,\
- #                      do_db=False,filename="./import-correlators-3pt")
+                       do_db=False,filename="./import-correlators-bar2pt")
  data3,dset3 = make_data(df.mdp,do_makedata=df.do_makedata_3pt,\
-                       do_db=False,filename="./import-correlators-3pt-tmp")
- #models = make_models(mdp=df.mdp)
+                         do_db=False,filename="./import-correlators-bar3pt")
  models = make_models(data=data,lkey=df.lkey)
  prior = make_prior(models)
 ## --
 
-if df.do_uncorr:
- ## -- remove the correlations from the data
- dataCorr = data
- datlen = len(gv.evalcov(data)['Gaa','Gaa'])
- fakecov = np.zeros((datlen,datlen))
- for i in range(datlen):
-  fakecov[i,i] = np.diag(gv.evalcov(data)['Gaa','Gaa'])[i]
- data['Gaa'] = gv.gvar([data['Gaa'][i].mean for i in range(datlen)],np.array(fakecov))
+## -- DEPRICATED
+#if df.do_uncorr:
+# ## -- remove the correlations from the data
+# dataCorr = data
+# datlen = len(gv.evalcov(data)['Gaa','Gaa'])
+# fakecov = np.zeros((datlen,datlen))
+# for i in range(datlen):
+#  fakecov[i,i] = np.diag(gv.evalcov(data)['Gaa','Gaa'])[i]
+# data['Gaa'] = gv.gvar([data['Gaa'][i].mean for i in range(datlen)],np.array(fakecov))
 ## --
 
 fitter = CorrFitter(models=models,maxit=df.maxit)
@@ -90,16 +88,26 @@ if df.do_2pt:
    plt.show()
 pass #do_2pt
 
-if df.do_3pt
+if df.do_3pt:
   ## -- test routines
-  if df.do_irrep == "8":
-   classList = [1,2,3,5,6]
-  elif df.do_irrep == "8'":
-   classList = [4,7]
-  elif df.do_irrep == "16":
-   classList = [2,3,4,6]
+  if df.do_symm == "s":
+    if df.do_irrep == "8":
+     classList = [1,2,3,5,6]
+    elif df.do_irrep == "8'":
+     classList = [4,7]
+    elif df.do_irrep == "16":
+     classList = [2,3,4,6]
+  elif df.do_sym == "m":
+    print "not set up for mixed symmetry yet!"
+    raise ValueError # set up class list for mixed symmetry
+    if df.do_irrep == "8":
+     classList = [1,2,3,5,6]
+    elif df.do_irrep == "8'":
+     classList = [4,7]
+    elif df.do_irrep == "16":
+     classList = [2,3,4,6]
   
-  testpre = 'G'
+  testpre = 's'
   testpost= ''
   #testdat = np.array(
   # [[data[testpre+'44'+testpost],data[testpre+'47'+testpost]],
@@ -114,8 +122,8 @@ if df.do_3pt
   [cmat,kmat] = extract_3pt_cov(fit)
   diagdat = diagonalize_correlator(testdat,cmat,kmat)
   
-  #testpre3 = 'v4v4'
-  testpre3 = 'azaz'
+  testpre3 = 'v4v4'
+  #testpre3 = 'azaz'
   testpost3= 't6'
   #testdat3 = np.array(
   # [[data[testpre3+'44'+testpost3],data[testpre3+'47'+testpost3]],

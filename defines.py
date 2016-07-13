@@ -1,9 +1,10 @@
 from sqlalchemy     import create_engine
 from sqlalchemy.orm import sessionmaker
 import meta_data
-import gvar         as gv
-import util_funcs   as utf
-import define_prior as dfp
+import gvar             as gv
+import util_funcs       as utf
+import define_prior     as dfp
+import define_prior_3pt as dfp3
 
 ## ------
 ## FROM CONTROL.PY
@@ -16,48 +17,89 @@ do_plot=True
 do_baryon=True
 do_uncorr=False
 do_initial=True
-do_irrep="8"
-#do_irrep="8'"
+#do_irrep="8"
+do_irrep="8'"
 #do_irrep="16"
-do_symm="S"
-#do_symm="M"
+do_symm="s"
+#do_symm="m"
 do_2pt=False
 do_3pt=False
+
+## ------
+## FROM MAKE_MODELS.PY
+## ------
+cor_len=48 # parse this from filename?
+## --
+
+# 8  = 3N 2D / 4N 1D 1?
+# 8' = 0N 2D / 0N 1D 0?
+# 16 = 1N 3D / 3N 4D 0?
+num_nst_s8=7
+num_ost_s8=6
+num_nst_s8p=5
+num_ost_s8p=3
+num_nst_s16=6
+num_ost_s16=5
+
+## -- control size of matrices here!
+num_n3_s8 =2
+num_o3_s8 =2
+num_n3_s8p=3
+num_o3_s8p=2
+num_n3_s16=2
+num_o3_s16=2
+
+rangeMin=2
+rangeMax=9
+#
+max_chi2=25
+min_chi2=-10
+#
+current_list = dfp3.current_list
+tsep_list = dfp3.tsep_list
 
 ## -- other parameters
 if do_irrep == "8":
   lkey=[
-   'G61','G62','G63','G65','G66',
-   'G11','G12','G13','G15','G16',
-   'G21','G22','G23','G25','G26',
-   'G31','G32','G33','G35','G36',
-   'G51','G52','G53','G55','G56',
-   'G11s','G12s','G13s','G15s','G16s',
-   'G21s','G22s','G23s','G25s','G26s',
-   'G31s','G32s','G33s','G35s','G36s',
-   'G51s','G52s','G53s','G55s','G56s',
-   'G61s','G62s','G63s','G65s','G66s'
+   's61','s62','s63','s65','s66',
+   's11','s12','s13','s15','s16',
+   's21','s22','s23','s25','s26',
+   's31','s32','s33','s35','s36',
+   's51','s52','s53','s55','s56',
    ]
+  lkey3 = list()
+  for cur in current_list:
+   for key in lkey:
+    for tsep in tsep_list:
+     lkey3.append(cur+key+'t'+str(tsep))
 elif do_irrep == "8'":
   lkey=[
-   'G44','G47', 'G74', 'G77',
-   'G44s', 'G47s','G74s', 'G77s'
+   's44','s47', 's74', 's77'
   ]
+  lkey3 = list()
+  for cur in current_list:
+   for key in lkey:
+    for tsep in tsep_list:
+     lkey3.append(cur+key+'t'+str(tsep))
 elif do_irrep == "16":
   lkey=[
-   'G22','G23','G24','G26',
-   'G32','G33','G36',
-   'G34','G43', # noisy
-   'G42','G44','G46',
-   'G62','G63','G64','G66'
+   's22','s23','s24','s26',
+   's32','s33','s36',
+   's34','s43', # noisy
+   's42','s44','s46',
+   's62','s63','s64','s66'
   ]
+  lkey3 = list()
+  for cur in current_list:
+   for key in lkey:
+    for tsep in tsep_list:
+     lkey3.append(cur+key+'t'+str(tsep))
+pass
 
 maxit      =10000   # maximum iterations
 svdcut     =None
 svdcut     =1e-3
-## -- tolerance check does not work if lots of variation from + to -
-## -- need to fix
-ctol       =None # tolerance for consecutive correlator points
+ctol       =None # tolerance for consecutive correlator points, depricated
 
 fitargs={}
 for key in lkey:
@@ -94,49 +136,42 @@ out_path ='/project/axial/data/fit-in/'
 #out_fname='full2pt_s8p'
 out_fname='bar2pt.s8'
 
-## ------
-## FROM MAKE_MODELS.PY
-## ------
-cor_len=48
-#cor_len=64 ## -- TODO: parse this number out of configuration?
-## --
-# 3N 2D / 4N 1D 1?
-num_nst_s8=7
-num_ost_s8=6
-# 0N 2D / 0N 1D 0?
-num_nst_s8p=4
-num_ost_s8p=3
-# 1N 3D / 3N 4D 0?
-num_nst_s16=6
-num_ost_s16=5
-
-rangeMin=2
-rangeMax=9
-#
-max_chi2=25
-min_chi2=-10
-
 define_model_s8={}
 define_model_s8p={}
 define_model_s16={}
+define_model3_s8={}
+define_model3_s8p={}
+define_model3_s16={}
 ## -- construct models quickly using loops
 key_list_s8 = list()
 key_list_s8p = list()
 key_list_s16 = list()
+key_list3_s8 = list()
+key_list3_s8p = list()
+key_list3_s16 = list()
 for sc in ['1','2','3','5','6']:
  for sk in ['1','2','3','5','6']:
-  key_list_s8.append(('G'+sc+sk,sc,sk))
-  key_list_s8.append(('G'+sc+sk+'s',sc,'s'+sk))
+  key_list_s8.append(('s'+sc+sk,sc,sk))
+  #key_list_s8.append(('s'+sc+sk+'s',sc,'s'+sk))
+  for cur in current_list:
+   for tsep in tsep_list:
+    key_list3_s8.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur))
 pass
 for sc in ['4','7']:
  for sk in ['4','7']:
-  key_list_s8p.append(('G'+sc+sk,sc,sk))
-  key_list_s8p.append(('G'+sc+sk+'s',sc,'s'+sk))
+  key_list_s8p.append(('s'+sc+sk,sc,sk))
+  #key_list_s8p.append(('s'+sc+sk+'s',sc,'s'+sk))
+  for cur in current_list:
+   for tsep in tsep_list:
+    key_list3_s8p.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur))
 pass
 for sc in ['2','3','4','6']:
  for sk in ['2','3','4','6']:
-  key_list_s16.append(('G'+sc+sk,sc,sk))
-  key_list_s16.append(('G'+sc+sk+'s',sc,'s'+sk))
+  key_list_s16.append(('s'+sc+sk,sc,sk))
+  #key_list_s16.append(('s'+sc+sk+'s',sc,'s'+sk))
+  for cur in current_list:
+   for tsep in tsep_list:
+    key_list3_s16.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur))
 pass
 
 for key in key_list_s8:
@@ -145,20 +180,26 @@ for key in key_list_s8:
    'tdata':range(cor_len), 'tfit':model_range, 'tp':-cor_len,\
    'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),\
    'ekey':('En','Eo'), 'skey':(1.,-1.) }
+  if (key[1] == '1' and key[2] == '3') or (key[1] == '1' and key[2] == '3')\
+  or (key[1] == '2' and key[2] == '5') or (key[1] == '5' and key[2] == '2')\
+  or (key[1] == '2' and key[2] == '6') or (key[1] == '6' and key[2] == '2'):
+   define_model_s8[key[0]]['skey'] = (1.,1.)
 pass
-define_model_s8['G13']['skey'] = (1.,1.)
-define_model_s8['G31']['skey'] = (1.,1.)
-define_model_s8['G25']['skey'] = (1.,1.)
-define_model_s8['G52']['skey'] = (1.,1.)
-define_model_s8['G26']['skey'] = (1.,1.)
-define_model_s8['G62']['skey'] = (1.,1.)
-define_model_s8['G13s']['skey'] = (1.,1.)
-define_model_s8['G31s']['skey'] = (1.,1.)
-define_model_s8['G25s']['skey'] = (1.,1.)
-define_model_s8['G52s']['skey'] = (1.,1.)
-define_model_s8['G26s']['skey'] = (1.,1.)
-define_model_s8['G62s']['skey'] = (1.,1.)
-#
+for key in key_list3_s8:
+  model_range = range(1,key[3]-1)
+  define_model3_s8[key[0]]={
+   'tdata':range(cor_len), 'tfit':model_range, 'T':key[3], 
+   'tpa':-cor_len, 'tpb':-cor_len,
+   'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),
+   'eakey':('En','Eo'), 'ebkey':('En','Eo'),
+   'sakey':(1.,-1.), 'sbkey':(1.,-1.),
+   'vnn':key[4]+'nn', 'vno':key[4]+'no', 'von':key[4]+'on', 'voo':key[4]+'oo' }
+  if (key[1] == '1' and key[2] == '3') or (key[1] == '1' and key[2] == '3')\
+  or (key[1] == '2' and key[2] == '5') or (key[1] == '5' and key[2] == '2')\
+  or (key[1] == '2' and key[2] == '6') or (key[1] == '6' and key[2] == '2'):
+   define_model3_s8[key[0]]['sakey'] = (1.,1.)
+   define_model3_s8[key[0]]['sbkey'] = (1.,1.)
+pass
 
 for key in key_list_s8p:
   model_range = range(rangeMin,rangeMax)
@@ -166,6 +207,16 @@ for key in key_list_s8p:
    'tdata':range(cor_len), 'tfit':model_range, 'tp':-cor_len,\
    'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),\
    'ekey':('En','Eo'), 'skey':(1.,-1.) }
+pass
+for key in key_list3_s8p:
+  model_range = range(1,key[3]-1)
+  define_model3_s8p[key[0]]={
+   'tdata':range(cor_len), 'tfit':model_range, 'T':key[3], 
+   'tpa':-cor_len, 'tpb':-cor_len,
+   'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),
+   'eakey':('En','Eo'), 'ebkey':('En','Eo'),
+   'sakey':(1.,-1.), 'sbkey':(1.,-1.),
+   'vnn':key[4]+'nn', 'vno':key[4]+'no', 'von':key[4]+'on', 'voo':key[4]+'oo' }
 pass
 #
 
@@ -175,20 +226,33 @@ for key in key_list_s16:
    'tdata':range(cor_len), 'tfit':model_range, 'tp':-cor_len,\
    'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),\
    'ekey':('En','Eo'), 'skey':(1.,-1.) }
+  if (key[1] == '2' and key[2] == '3') or (key[1] == '3' and key[2] == '2')\
+  or (key[1] == '2' and key[2] == '4') or (key[1] == '4' and key[2] == '2')\
+  or (key[1] == '3' and key[2] == '4') or (key[1] == '4' and key[2] == '3')\
+  or (key[1] == '3' and key[2] == '6') or (key[1] == '6' and key[2] == '3')\
+  or (key[1] == '4' and key[2] == '6') or (key[1] == '6' and key[2] == '4'):
+   define_model_s16[key[0]]['skey'] = (1.,1.)
 pass
-define_model_s16['G23']['skey'] = (1.,1.)
-define_model_s16['G32']['skey'] = (1.,1.)
-define_model_s16['G24']['skey'] = (1.,1.)
-define_model_s16['G42']['skey'] = (1.,1.)
-define_model_s16['G34']['skey'] = (1.,1.)
-define_model_s16['G43']['skey'] = (1.,1.)
-define_model_s16['G36']['skey'] = (1.,1.)
-define_model_s16['G63']['skey'] = (1.,1.)
-define_model_s16['G46']['skey'] = (1.,1.)
-define_model_s16['G64']['skey'] = (1.,1.)
+for key in key_list3_s16:
+  model_range = range(1,key[3]-1)
+  define_model3_s16[key[0]]={
+   'tdata':range(cor_len), 'tfit':model_range, 'T':key[3], 
+   'tpa':-cor_len, 'tpb':-cor_len,
+   'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),
+   'eakey':('En','Eo'), 'ebkey':('En','Eo'),
+   'sakey':(1.,-1.), 'sbkey':(1.,-1.),
+   'vnn':key[4]+'nn', 'vno':key[4]+'no', 'von':key[4]+'on', 'voo':key[4]+'oo' }
+  if (key[1] == '2' and key[2] == '3') or (key[1] == '3' and key[2] == '2')\
+  or (key[1] == '2' and key[2] == '4') or (key[1] == '4' and key[2] == '2')\
+  or (key[1] == '3' and key[2] == '4') or (key[1] == '4' and key[2] == '3')\
+  or (key[1] == '3' and key[2] == '6') or (key[1] == '6' and key[2] == '3')\
+  or (key[1] == '4' and key[2] == '6') or (key[1] == '6' and key[2] == '4'):
+   define_model3_s16[key[0]]['sakey'] = (1.,1.)
+   define_model3_s16[key[0]]['sbkey'] = (1.,1.)
+pass
 
 ## -- explicit overriding
-#define_model_s8['G11']['tfit'] = range(rangeMin,rangeMaxDiag+1)
+#define_model_s8['s11']['tfit'] = range(rangeMin,rangeMaxDiag+1)
 
 ## ------
 ## FROM MAKE_PRIOR.PY
@@ -207,6 +271,11 @@ if do_irrep == "8":
   define_prior=dfp.define_prior_s8
   define_init =dfp.define_init_s8
   define_model=define_model_s8
+  num_nst_3pt=num_n3_s8
+  num_ost_3pt=num_o3_s8
+  define_prior_3pt=dfp3.define_prior3_s8
+  define_init_3pt =dfp3.define_init3_s8
+  define_model_3pt=define_model3_s8
   for key in lkey:
    suppressKey(key,'dl_save_name',"dl-s8-l1648-coul-"+key+".pdf")
    suppressKey(key,'em_save_name',"em-s8-l1648-coul-"+key+".pdf")
@@ -227,6 +296,11 @@ elif do_irrep == "8'":
   define_prior=dfp.define_prior_s8p
   define_init =dfp.define_init_s8p
   define_model=define_model_s8p
+  num_nst_3pt=num_n3_s8p
+  num_ost_3pt=num_o3_s8p
+  define_prior_3pt=dfp3.define_prior3_s8p
+  define_init_3pt =dfp3.define_init3_s8p
+  define_model_3pt=define_model3_s8p
   for key in lkey:
    suppressKey(key,'dl_save_name',"dl-s8p-l1648-coul-"+key+".pdf")
    suppressKey(key,'em_save_name',"em-s8p-l1648-coul-"+key+".pdf")
@@ -245,6 +319,11 @@ elif do_irrep == "16":
   define_prior=dfp.define_prior_s16
   define_init =dfp.define_init_s16
   define_model=define_model_s16
+  num_nst_3pt=num_n3_s16
+  num_ost_3pt=num_o3_s16
+  define_prior_3pt=dfp3.define_prior3_s16
+  define_init_3pt =dfp3.define_init3_s16
+  define_model_3pt=define_model3_s16
   for key in lkey:
    suppressKey(key,'dl_save_name',"dl-s16-l1648-coul-"+key+".pdf")
    suppressKey(key,'em_save_name',"em-s16-l1648-coul-"+key+".pdf")

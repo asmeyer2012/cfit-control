@@ -6,34 +6,35 @@ import util_funcs as utf
 
 ## -- PDG inputs
 # S8'
-ngrd_s8p=gv.gvar(0.94,0.3) ## -- even ground state (PDG)
-ogrd_s8p=gv.gvar(ngrd_s8p.mean+0.30,0.3) ## -- odd ground state (grd + radial, PDG)
-delr_s8p=gv.gvar(0.30,0.60) ## -- radial splitting (PDG)
+ngrd_s8p=gv.gvar(0.94,0.15)  ## -- even ground state (PDG \Delta mass)
+ogrd_s8p=gv.gvar(1.23,0.15)  ## -- odd ground state (PDG orbital state)
+delr_s8p=gv.gvar(0.30,0.15)  ## -- radial splitting (PDG radial state)
 # S8
-dels_s8=gv.gvar(0.23,0.23) ## -- \Delta-N splitting (PDG)
-delp_s8=gv.gvar(0.38,0.30) ## -- N-roper splitting (PDG)
+ngrd_s8=gv.gvar(0.71,0.3)  ## -- even ground state (PDG Nucleon mass)
+dels_s8=gv.gvar(0.23,0.23) ## -- \Delta-N splitting (PDG mass splitting)
+delp_s8=gv.gvar(0.38,0.30) ## -- N-roper splitting (PDG excited state)
 
 ## -- other priors
 # S8'
-delt_s8p=gv.gvar(4e-2,8e-2) ## -- taste splitting (HISQ \pi taste splittings)
+delt_s8p=gv.gvar(4e-2,4e-2) ## -- taste splitting (HISQ \pi taste splittings)
 delx_s8p=gv.gvar(1e0,2e0)   ## -- extra (hopefully unconstrained) states
 # S8
-ngrd_s8=gv.gvar(0.72,0.3)    ## -- even ground state (effective mass)
-ogrd_s8=gv.gvar(1.19-dels_s8.mean,dels_s8.sdev)  ## -- odd ground state (8' fit (\Delta orbital))
-ovrs_s8=gv.gvar(1.109,0.084) ## -- for overriding prior for first delta state (8' fit + taste)
 delr_s8=gv.gvar(0.81,1.62)   ## -- radial splitting (8' fit)
 delt_s8=gv.gvar(0.042,0.084) ## -- taste splitting (8' fit)
 delu_s8=dels_s8              ## -- splitting for states with unknown continuum limit
 delx_s8=gv.gvar(1e0,2e0)     ## -- extra (hopefully unconstrained) states
+ngrd_s8=gv.gvar(0.72,0.3)    ## -- even ground state (effective mass)
+ogrd_s8=gv.gvar(1.19-dels_s8.mean,dels_s8.sdev)  ## -- odd ground state (8' fit (\Delta orbital))
+ovrs_s8=gv.gvar(1.109,0.084) ## -- for overriding prior for first delta state (8' fit + taste)
 # S16
-ngrd_s16=gv.gvar(0.884,0.046) ## -- even ground state (8 fit + taste)
-ogrd_s16=gv.gvar(1.138,0.055) ## -- odd ground state (8 fit + taste)
-ovrs_s16=gv.gvar(1.182,0.098)-2*delt_s16 ## -- for overriding prior for first delta state (S8 fit)
 delr_s16=delr_s8  ## -- radial splitting (8' fit)
 dels_s16=gv.gvar(0.230,0.095)   ## -- N-\Del splitting (8 fit)
 delt_s16=gv.gvar(0.040,0.045)## -- taste splitting (8 fit)
 delu_s16=dels_s16 ## -- splitting for states with unknown continuum limit
 delx_s16=delx_s8  ## -- extra (hopefully unconstrained) states
+ngrd_s16=gv.gvar(0.884,0.046) ## -- even ground state (8 fit + taste)
+ogrd_s16=gv.gvar(1.138,0.055) ## -- odd ground state (8 fit + taste)
+ovrs_s16=gv.gvar(1.182,0.098)-2*delt_s16 ## -- for overriding prior for first delta state (S8 fit)
 
 ## -- used if do_init is defined in defines.py
 define_init_s8={}
@@ -45,10 +46,18 @@ num_nreal_s8p=2 #0N+2D +1radial
 num_oreal_s8p=1 #0N+1D+0?
 num_nreal_s16=4 #1N+3D
 num_oreal_s16=5 #3N+4D+1?
-Alog  = 2     # amplitude guess for actual log states
+Alog  = 1.2   # amplitude guess for actual log states
 xAlog = 1e-2  # amplitude guess for possibly unconstrained log states
 Anom  = 1     # amplitude guess for actual states (unknown sign)
 xAnom = 1e-3  # amplitude guess for possibly unconstrained states
+
+## -- list of keys
+nkey_s8 = ('logEn' ,'logc1n','c2n','c3n','c5n','c6n','k1n','k2n','k3n','k5n','k6n')
+okey_s8 = ('logEo' ,'logc1o','c2o','c3o','c5o','c6o','k1o','k2o','k3o','k5o','k6o')
+nkey_s8p = ('logEn','logc4n','c7n','k4n','k7n')
+okey_s8p = ('logEo','logc4o','c7o','k4o','k7o')
+nkey_s16 = ('logEn','logc2n','c3n','c4n','c6n','k2n','k3n','k4n','k6n')
+okey_s16 = ('logEo','logc2o','c3o','c4o','c6o','k2o','k3o','k4o','k6o')
 
 ## -- HISQ a=0.15 l3248 physical
 # S8
@@ -56,70 +65,29 @@ define_init_s8['logEn']=list(gv.exp([0.852,.032,.061,.237,.026,.186,.079,.117] +
 define_init_s8['logEo']=list(gv.exp([1.008,.076,.054,.095,.055,.171,1.011,.100] + [1]*10))
 define_init_s8['logc1n']=list(gv.exp([Alog]*num_nreal_s8 + [xAlog]*10))
 define_init_s8['logc1o']=list(gv.exp([Alog]*num_oreal_s8 + [xAlog]*10))
-#define_init_s8['logk1n']=list(gv.exp([Alog]*num_nreal_s8 + [xAlog]*10))
-#define_init_s8['logk1o']=list(gv.exp([Alog]*num_oreal_s8 + [xAlog]*10))
-define_init_s8['c2n']=[Anom]*num_nreal_s8 + [xAnom]*10
-define_init_s8['c3n']=[Anom]*num_nreal_s8 + [xAnom]*10
-define_init_s8['c5n']=[Anom]*num_nreal_s8 + [xAnom]*10
-define_init_s8['c6n']=[Anom]*num_nreal_s8 + [xAnom]*10
-define_init_s8['c2o']=[Anom]*num_oreal_s8 + [xAnom]*10
-define_init_s8['c3o']=[Anom]*num_oreal_s8 + [xAnom]*10
-define_init_s8['c5o']=[Anom]*num_oreal_s8 + [xAnom]*10
-define_init_s8['c6o']=[Anom]*num_oreal_s8 + [xAnom]*10
-define_init_s8['k1n']=[Anom]*num_nreal_s8 + [xAnom]*10
-define_init_s8['k2n']=[Anom]*num_nreal_s8 + [xAnom]*10
-define_init_s8['k3n']=[Anom]*num_nreal_s8 + [xAnom]*10
-define_init_s8['k5n']=[Anom]*num_nreal_s8 + [xAnom]*10
-define_init_s8['k6n']=[Anom]*num_nreal_s8 + [xAnom]*10
-define_init_s8['k1o']=[Anom]*num_oreal_s8 + [xAnom]*10
-define_init_s8['k2o']=[Anom]*num_oreal_s8 + [xAnom]*10
-define_init_s8['k3o']=[Anom]*num_oreal_s8 + [xAnom]*10
-define_init_s8['k5o']=[Anom]*num_oreal_s8 + [xAnom]*10
-define_init_s8['k6o']=[Anom]*num_oreal_s8 + [xAnom]*10
+for key in nkey_s8[2:]+okey_s8[2:]:
+  define_init_s8[key]=[Anom]*num_nreal_s8 + [xAnom]*10
 
 # S8'
-define_init_s8p['logEn']=list(gv.exp([1.28,.025,.29] + [1]*10))
-define_init_s8p['logEo']=list(gv.exp([1.54,.03] + [1]*10))
+define_init_s8p['logEn']=list(gv.exp([0.97,.05,.25,.4] + [1]*10))
+define_init_s8p['logEo']=list(gv.exp([1.23,.25,.5] + [1]*10))
 define_init_s8p['logc4n']=list(gv.exp([Alog]*num_nreal_s8p + [xAlog]*10))
 define_init_s8p['logc4o']=list(gv.exp([Alog]*num_oreal_s8p + [xAlog]*10))
-define_init_s8p['c7n']=[Anom]*num_nreal_s8p + [xAnom]*10
-define_init_s8p['c7o']=[Anom]*num_oreal_s8p + [xAnom]*10
-define_init_s8p['k4n']=[Anom]*num_nreal_s8p + [xAnom]*10
-define_init_s8p['k4o']=[Anom]*num_oreal_s8p + [xAnom]*10
-define_init_s8p['k7n']=[Anom]*num_nreal_s8p + [xAnom]*10
-define_init_s8p['k7o']=[Anom]*num_oreal_s8p + [xAnom]*10
+for key in nkey_s8p[2:]+okey_s8p[2:]:
+  define_init_s8p[key]=[Anom]*num_nreal_s8p + [xAnom]*10
 
 # S16
 define_init_s16['logEn']=list(gv.exp([0.852,.237,.026,.040,.186,.079,.117] + [1]*10))
 define_init_s16['logEo']=list(gv.exp([1.008,.076,.054,.095,.055,.171,1.011,.100] + [1]*10))
 define_init_s16['logc2n']=list(gv.exp([Alog]*num_nreal_s16 + [xAlog]*10))
 define_init_s16['logc2o']=list(gv.exp([Alog]*num_oreal_s16 + [xAlog]*10))
-define_init_s16['c3n']=[Anom]*num_nreal_s16 + [xAnom]*10
-define_init_s16['c4n']=[Anom]*num_nreal_s16 + [xAnom]*10
-define_init_s16['c6n']=[Anom]*num_nreal_s16 + [xAnom]*10
-define_init_s16['c3o']=[Anom]*num_oreal_s16 + [xAnom]*10
-define_init_s16['c4o']=[Anom]*num_oreal_s16 + [xAnom]*10
-define_init_s16['c6o']=[Anom]*num_oreal_s16 + [xAnom]*10
-define_init_s16['k2n']=[Anom]*num_oreal_s16 + [xAnom]*10
-define_init_s16['k3n']=[Anom]*num_nreal_s16 + [xAnom]*10
-define_init_s16['k4n']=[Anom]*num_nreal_s16 + [xAnom]*10
-define_init_s16['k6n']=[Anom]*num_nreal_s16 + [xAnom]*10
-define_init_s16['k2o']=[Anom]*num_oreal_s16 + [xAnom]*10
-define_init_s16['k3o']=[Anom]*num_oreal_s16 + [xAnom]*10
-define_init_s16['k4o']=[Anom]*num_oreal_s16 + [xAnom]*10
-define_init_s16['k6o']=[Anom]*num_oreal_s16 + [xAnom]*10
+for key in nkey_s16[2:]+okey_s16[2:]:
+  define_init_s16[key]=[Anom]*num_nreal_s16 + [xAnom]*10
 
 ## -- define prior objects to pass to defines.py if requested
 define_prior_s8={}
 define_prior_s8p={}
 define_prior_s16={}
-
-nkey_s8 = ('logEn' ,'logc1n','c2n','c3n','c5n','c6n','k1n','k2n','k3n','k5n','k6n')
-okey_s8 = ('logEo' ,'logc1o','c2o','c3o','c5o','c6o','k1o','k2o','k3o','k5o','k6o')
-nkey_s8p = ('logEn','logc4n','c7n','k4n','k7n')
-okey_s8p = ('logEo','logc4o','c7o','k4o','k7o')
-nkey_s16 = ('logEn','logc2n','c3n','c4n','c6n','k2n','k3n','k4n','k6n')
-okey_s16 = ('logEo','logc2o','c3o','c4o','c6o','k2o','k3o','k4o','k6o')
 
 ## -- S8
 define_prior_s8['nkey'] = nkey_s8
@@ -499,17 +467,17 @@ log_s8p='4'
 log_s16='2'
 for sc in ['1','2','3','5','6']:
  for sk in ['1','2','3','5','6']:
-  key_list_s8.append(('G'+sc+sk,sc,sk))
+  key_list_s8.append(('s'+sc+sk,sc,sk))
   #key_list_s8.append(('G'+sc+sk+'s',sc,'s'+sk))
 pass
 for sc in ['4','7']:
  for sk in ['4','7']:
-  key_list_s8p.append(('G'+sc+sk,sc,sk))
+  key_list_s8p.append(('s'+sc+sk,sc,sk))
   #key_list_s8p.append(('G'+sc+sk+'s',sc,'s'+sk))
 pass
 for sc in ['2','3','4','6']:
  for sk in ['2','3','4','6']:
-  key_list_s16.append(('G'+sc+sk,sc,sk))
+  key_list_s16.append(('s'+sc+sk,sc,sk))
   #key_list_s16.append(('G'+sc+sk+'s',sc,'s'+sk))
 pass
 

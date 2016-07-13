@@ -10,18 +10,37 @@ def extract_2pt_val(dat,key,tsep):
 def get_overlap_keys(fit):
   cKey = list()
   kKey = list()
-  for key in fit.transformed_p:
-   ## -- sort keys; assuming keys start with E,c,k,ks; neglecting ks,E, odd keys
-   if key[:3] == 'log' or key[:4] == 'sqrt':
-    continue # only use transformed
-   if key[1] == 's':
-    continue # no alternate sinks
-   if key[-1] == 'o':
-    continue # only even states
-   if key[0] == 'c':
-    cKey.append(key)
-   elif key[0] == 'k':
-    kKey.append(key)
+  try:
+   for key in fit.transformed_p:
+    ## -- sort keys; assuming keys start with E,c,k,ks; neglecting ks,E, odd keys
+    if key[:3] == 'log' or key[:4] == 'sqrt':
+     continue # only use transformed
+    if key[1] == 's':
+     continue # no alternate sinks
+    if key[-1] == 'o':
+     continue # only even states
+    if key[0] == 'c':
+     cKey.append(key)
+    elif key[0] == 'k':
+     kKey.append(key)
+  except NameError:
+   ## -- try assuming fit is a prior instead
+   for key in fit:
+    ## -- sort keys; assuming keys start with E,c,k,ks; neglecting ks,E, odd keys
+    if key[-1] == 'o':
+     continue # only even states
+    if key[:3] == 'log':
+     testkey = key[:3]
+    elif key[:4] == 'sqrt':
+     testkey = key[:4]
+    else:
+     testkey = key
+    if testkey[1] == 's':
+     continue # no alternate sinks
+    if testkey[0] == 'c':
+     cKey.append(testkey)
+    elif key[0] == 'k':
+     kKey.append(testkey)
   ## -- sort lists by class so output is consistent
   cKey = sorted(cKey)
   kKey = sorted(kKey)

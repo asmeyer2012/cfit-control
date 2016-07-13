@@ -26,18 +26,18 @@ def print_fit(fit, prior):
         lkey[len(lkey)-2:] == 'Eo' or \
         lkey[len(lkey)-1 ] == 'E'):
      if j > 0:
-      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']  :  '\
+      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']      :  '\
             +ut.fmt_num(sum(fit.transformed_p[lkey][:j+1]),do_sigdigit,do_unicode)\
             +'  '+sigstr+' |    delE'+'['+'{:>2}'.format(j)+']  :  '\
             +ut.fmt_num(fit.transformed_p[lkey][j],do_sigdigit,do_unicode)
     ##else j==0 for energy
      else:
-      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']  :  '\
+      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']      :  '\
             +ut.fmt_num(sum(fit.transformed_p[lkey][:j+1]),do_sigdigit,do_unicode)\
             +'  '+sigstr
     ##else not energy
     else:
-      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']  :  '\
+      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']      :  '\
             +ut.fmt_num(fit.transformed_p[lkey][j],do_sigdigit,do_unicode)\
             +'  '+sigstr
   ##endif log
@@ -51,43 +51,56 @@ def print_fit(fit, prior):
         lkey[len(lkey)-2:] == 'Eo' or \
         lkey[len(lkey)-1 ] == 'E'):
      if j > 0:
-      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']  :  '\
+      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']      :  '\
             +ut.fmt_num(sum(fit.transformed_p[lkey][:j+1]),do_sigdigit,do_unicode)\
             +'  '+sigstr+' |    delE'+'['+'{:>2}'.format(j)+']  :  '\
             +ut.fmt_num(fit.transformed_p[lkey][j],do_sigdigit,do_unicode)
     ##else j==0 for energy
      else:
-      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']  :  '\
+      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']      :  '\
             +ut.fmt_num(sum(fit.transformed_p[lkey][:j+1]),do_sigdigit,do_unicode)\
             +'  '+sigstr
     ##else not energy
     else:
-      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']  :  '\
+      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']      :  '\
             +ut.fmt_num(fit.transformed_p[lkey][j],do_sigdigit,do_unicode)\
             +'  '+sigstr
   ##endif sqrt
   print "------"
   efirst=0.
   for j in range(len(fit.transformed_p[skey])):
-   sigstr=get_sigma_str(skey,fit,prior,j,do_unicode)
+   if skey[-2:] == 'nn' or skey[-2:] == 'no' or\
+      skey[-2:] == 'on' or skey[-2:] == 'oo':
+     for k in range(len(fit.transformed_p[skey][0])):
+       sigstr=get_sigma_str(skey,fit,prior,(j,k),do_unicode)
+   else:
+     sigstr=get_sigma_str(skey,fit,prior,j,do_unicode)
    if (skey[len(skey)-2:] == 'En' or \
        skey[len(skey)-2:] == 'Eo' or \
        skey[len(skey)-1 ] == 'E'):
     if j > 0:
-     print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']  :  '\
+     print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']      :  '\
            +ut.fmt_num(sum(fit.transformed_p[skey][:j+1]),do_sigdigit,do_unicode)\
            +'  '+sigstr+' |    delE'+'['+'{:>2}'.format(j)+']  :  '\
            +ut.fmt_num(fit.transformed_p[skey][j],do_sigdigit,do_unicode)
     ##else j==0 for energy
     else:
-     print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']  :  '\
+     print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']      :  '\
            +ut.fmt_num(sum(fit.transformed_p[skey][:j+1]),do_sigdigit,do_unicode)\
            +'  '+sigstr
    ##else not energy
    else:
-    print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']  :  '\
-          +ut.fmt_num(fit.transformed_p[skey][j],do_sigdigit,do_unicode)\
-          +'  '+sigstr
+    if skey[-2:] == 'nn' or skey[-2:] == 'no' or\
+       skey[-2:] == 'on' or skey[-2:] == 'oo':
+      ## -- print 3-point factors
+      for k in range(len(fit.transformed_p[skey][0])):
+        print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']'+'['+'{:>2}'.format(k)+']  :  '\
+              +ut.fmt_num(fit.transformed_p[skey][j][k],do_sigdigit,do_unicode)\
+              +'  '+sigstr
+    else:
+      print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']      :  '\
+            +ut.fmt_num(fit.transformed_p[skey][j],do_sigdigit,do_unicode)\
+            +'  '+sigstr
  #
  print "------"
 ## ------
@@ -105,7 +118,6 @@ def print_error_budget(fit):
 ## ------
 ##
  
-
 def get_sigma_str(key,fit,prior,j,do_unicode=True):
  ## -- list the sigma away from prior
  #
@@ -125,6 +137,11 @@ def get_sigma_str(key,fit,prior,j,do_unicode=True):
    sig=int(np.abs(np.trunc(\
        (gv.sqrt(fit.transformed_p[key][j].mean)-prior['sqrt'+key][j].mean)\
         /(prior['sqrt'+key][j]).sdev)))
+ except TypeError:
+  ## -- Vnn, Vno, etc...
+  sig=int(np.abs(np.trunc(\
+      (fit.p[key][j[0]][j[1]].mean-prior[key][j[0]][j[1]].mean)\
+       /(prior[key][j[0]][j[1]]).sdev)))
  if do_unicode:
   if sig > 0:
    sigstr=str(sig)+u'\u03C3' # unicode for sigma (cannot be saved to string)

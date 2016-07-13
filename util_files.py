@@ -1,6 +1,44 @@
 import gvar  as gv
 import numpy as np
 import datetime
+from collections import namedtuple 
+Node = namedtuple('Node', ['pos', 'next'])
+
+## -- looking for faster search algorithm
+def build_corr_table(f, size):
+  table = [ None ] * size
+  keyList = list()
+  f.seek(0)
+  while True:
+    pos = f.tell()
+    line = f.readline()
+    if not line: break
+    #if line.find('correlator_key') != -1:
+    if 'correlator_key' in line:
+      keyList.append(line.split(' ')[-1])
+      i = hash(keyList[-1]) % size
+      if table[i] is None:
+        table[i] = pos
+      else:
+        table[i] = Node(pos, table[i])
+  return table,keyList
+
+def search_corr_table(string, table, f):
+  i = hash(string) % len(table)
+  entry = table[i]
+  while entry is not None:
+    pos = entry.pos if isinstance(entry, Node) else entry
+    f.seek(pos)
+    #if f.readline().find(string) != -1:
+    if string in f.readline():
+      return pos
+    entry = entry.next if isinstance(entry, Node) else None
+  return -1
+
+#SIZE = 2**24
+#with open('data.txt', 'r') as f:
+#    table = build_table(f, SIZE)
+#    print search('Some test string\n', table, f)
 
 def ins_line(file,line,lnum):
  """
@@ -15,6 +53,15 @@ def ins_line(file,line,lnum):
   lfsp.pop()
  for ltmp in lfsp:
   file.write(ltmp+"\n")         # write all of the lines back
+## ------
+##
+
+def append_line(file,line):
+ """
+ -- simple implementation for faster file writes
+ """
+ file.seek(0,2)
+ file.write(line +'\n')
 ## ------
 ##
 
