@@ -13,17 +13,21 @@ do_makedata=False
 do_makedata_3pt=False
 do_db=False
 do_default_plot=False
-do_plot=True
+do_plot=False
+do_plot_terminal=False
+do_plot_file=True
 do_baryon=True
 do_uncorr=False
 do_initial=True
+do_init2=True
+do_init3=True
 #do_irrep="8"
 do_irrep="8'"
 #do_irrep="16"
 do_symm="s"
 #do_symm="m"
-do_2pt=False
-do_3pt=False
+do_2pt=True
+#do_3pt=False
 
 ## ------
 ## FROM MAKE_MODELS.PY
@@ -34,53 +38,83 @@ cor_len=48 # parse this from filename?
 # 8  = 3N 2D / 4N 1D 1?
 # 8' = 0N 2D / 0N 1D 0?
 # 16 = 1N 3D / 3N 4D 0?
-num_nst_s8=7
-num_ost_s8=6
-num_nst_s8p=5
+#num_nst_s8p=3 #2pt
+#num_ost_s8p=2 #2pt
+#num_nst_s8p=5 #3pt?
+#num_ost_s8p=4 #3pt?
+#num_nst_s8=7
+#num_ost_s8=6
+#num_nst_s16=6
+#num_ost_s16=5
+
+#num_nst_s8p=2
+#num_ost_s8p=3
+num_nst_s8p=4
 num_ost_s8p=3
-num_nst_s16=6
-num_ost_s16=5
+num_nst_s8=7
+num_ost_s8=5
+num_nst_s16=1
+num_ost_s16=1
 
 ## -- control size of matrices here!
-num_n3_s8 =2
-num_o3_s8 =2
+#num_n3_s8p=2
+#num_o3_s8p=2
 num_n3_s8p=3
-num_o3_s8p=2
-num_n3_s16=2
-num_o3_s16=2
+num_o3_s8p=3
+num_n3_s8 =5
+num_o3_s8 =3
+num_n3_s16=1
+num_o3_s16=1
 
 rangeMin=2
 rangeMax=9
+mesonAvgMin=12
+mesonAvgMax=18
 #
 max_chi2=25
 min_chi2=-10
 #
 current_list = dfp3.current_list
+current_key = dfp3.current_key
 tsep_list = dfp3.tsep_list
 
 ## -- other parameters
 if do_irrep == "8":
   lkey=[
-   's61','s62','s63','s65','s66',
-   's11','s12','s13','s15','s16',
-   's21','s22','s23','s25','s26',
-   's31','s32','s33','s35','s36',
-   's51','s52','s53','s55','s56',
+   's11','s12','s13','s15',#'s16',
+   's21','s22','s23','s25',#'s26',
+   's31','s32','s33','s35',#'s36',
+   's51','s52','s53','s55'#,'s56',
+   #'s61','s62','s63','s65','s66'
    ]
   lkey3 = list()
-  for cur in current_list:
+  #for cur in current_list:
+  for cur in current_key:
    for key in lkey:
     for tsep in tsep_list:
      lkey3.append(cur+key+'t'+str(tsep))
 elif do_irrep == "8'":
   lkey=[
-   's44','s47', 's74', 's77'
+   's44'
+   ,'s47','s74',
+   's77'
   ]
   lkey3 = list()
-  for cur in current_list:
+  #for cur in current_list:
+  for cur in current_key:
    for key in lkey:
+    #if key == 's77'\
+    #if key == 's74'\
+    #or key == 's47':
+    #  continue
     for tsep in tsep_list:
      lkey3.append(cur+key+'t'+str(tsep))
+  #for cur in current_list:
+  # for tsep in tsep_list:
+  #  lkey3.append(cur+'s77'+'t'+str(tsep))
+
+  #for key in lkey+lkey3:
+  # print key
 elif do_irrep == "16":
   lkey=[
    's22','s23','s24','s26',
@@ -90,19 +124,22 @@ elif do_irrep == "16":
    's62','s63','s64','s66'
   ]
   lkey3 = list()
-  for cur in current_list:
+  #for cur in current_list:
+  for cur in current_key:
    for key in lkey:
     for tsep in tsep_list:
      lkey3.append(cur+key+'t'+str(tsep))
 pass
 
 maxit      =10000   # maximum iterations
-svdcut     =None
-svdcut     =1e-3
+#svdcut     =None
+svdcut     =1e-2
 ctol       =None # tolerance for consecutive correlator points, depricated
 
 fitargs={}
 for key in lkey:
+ fitargs[key]={}
+for key in lkey3:
  fitargs[key]={}
 def suppressKey(key,tag,line): ## -- ignore errors
  try:
@@ -116,6 +153,11 @@ def suppressKey(key,tag,line): ## -- ignore errors
 ## -- create meta_data, initial setup
 ## -- trying to eliminate need for meta_data
 mdp = meta_data.md_params()
+
+## ------
+## FROM PLOT_CORR_EFFECTIVE_MASS_CHECK.PY
+## ------
+ec_reference_lines = [.71,.82,.91]
 
 ## ------
 ## FROM MAKE_DATA_DB.PY
@@ -153,25 +195,28 @@ for sc in ['1','2','3','5','6']:
  for sk in ['1','2','3','5','6']:
   key_list_s8.append(('s'+sc+sk,sc,sk))
   #key_list_s8.append(('s'+sc+sk+'s',sc,'s'+sk))
-  for cur in current_list:
+  for cur,ckey in zip(current_list,current_key):
    for tsep in tsep_list:
-    key_list3_s8.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur))
+    #key_list3_s8.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
+    key_list3_s8.append((ckey+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
 pass
 for sc in ['4','7']:
  for sk in ['4','7']:
   key_list_s8p.append(('s'+sc+sk,sc,sk))
   #key_list_s8p.append(('s'+sc+sk+'s',sc,'s'+sk))
-  for cur in current_list:
+  for cur,ckey in zip(current_list,current_key):
    for tsep in tsep_list:
-    key_list3_s8p.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur))
+    #key_list3_s8p.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
+    key_list3_s8p.append((ckey+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
 pass
 for sc in ['2','3','4','6']:
  for sk in ['2','3','4','6']:
   key_list_s16.append(('s'+sc+sk,sc,sk))
   #key_list_s16.append(('s'+sc+sk+'s',sc,'s'+sk))
-  for cur in current_list:
+  for cur,ckey in zip(current_list,current_key):
    for tsep in tsep_list:
-    key_list3_s16.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur))
+    #key_list3_s16.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
+    key_list3_s16.append((ckey+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
 pass
 
 for key in key_list_s8:
@@ -186,14 +231,14 @@ for key in key_list_s8:
    define_model_s8[key[0]]['skey'] = (1.,1.)
 pass
 for key in key_list3_s8:
-  model_range = range(1,key[3]-1)
+  model_range = range(1,key[3])
   define_model3_s8[key[0]]={
    'tdata':range(cor_len), 'tfit':model_range, 'T':key[3], 
    'tpa':-cor_len, 'tpb':-cor_len,
    'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),
    'eakey':('En','Eo'), 'ebkey':('En','Eo'),
    'sakey':(1.,-1.), 'sbkey':(1.,-1.),
-   'vnn':key[4]+'nn', 'vno':key[4]+'no', 'von':key[4]+'on', 'voo':key[4]+'oo' }
+   'vnn':key[5]+'nn', 'vno':key[5]+'no', 'von':key[5]+'on', 'voo':key[5]+'oo' }
   if (key[1] == '1' and key[2] == '3') or (key[1] == '1' and key[2] == '3')\
   or (key[1] == '2' and key[2] == '5') or (key[1] == '5' and key[2] == '2')\
   or (key[1] == '2' and key[2] == '6') or (key[1] == '6' and key[2] == '2'):
@@ -206,17 +251,32 @@ for key in key_list_s8p:
   define_model_s8p[key[0]]={\
    'tdata':range(cor_len), 'tfit':model_range, 'tp':-cor_len,\
    'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),\
-   'ekey':('En','Eo'), 'skey':(1.,-1.) }
+   'ekey':('En','Eo'), 'skey':(1.,1.) }
+  ## -- only 77 is fixed
 pass
 for key in key_list3_s8p:
-  model_range = range(1,key[3]-1)
+  model_range = range(1,key[3])
   define_model3_s8p[key[0]]={
    'tdata':range(cor_len), 'tfit':model_range, 'T':key[3], 
    'tpa':-cor_len, 'tpb':-cor_len,
    'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),
    'eakey':('En','Eo'), 'ebkey':('En','Eo'),
-   'sakey':(1.,-1.), 'sbkey':(1.,-1.),
-   'vnn':key[4]+'nn', 'vno':key[4]+'no', 'von':key[4]+'on', 'voo':key[4]+'oo' }
+   'sakey':(1.,1.), 'sbkey':(1.,1.),
+   'vnn':key[5]+'nn', 'vno':key[5]+'no', 'von':key[5]+'on', 'voo':key[5]+'oo' }
+  ## -- only 44 has freedom in both sakey and sbkey;
+  ##    for others, choice of sakey fixes sbkey
+  if (key[1] == '4' and key[2] == '4'):
+   define_model3_s8p[key[0]]['sbkey'] = (1.,1.)
+   pass
+  if (key[1] == '4' and key[2] == '7'):
+   #define_model3_s8p[key[0]]['sbkey'] = (-1.,1.)
+   pass
+  if (key[1] == '7' and key[2] == '4'):
+   #define_model3_s8p[key[0]]['sbkey'] = (-1.,1.)
+   pass
+  if (key[1] == '7' and key[2] == '7'):
+   #define_model3_s8p[key[0]]['sbkey'] = (-1.,1.)
+   pass
 pass
 #
 
@@ -234,14 +294,14 @@ for key in key_list_s16:
    define_model_s16[key[0]]['skey'] = (1.,1.)
 pass
 for key in key_list3_s16:
-  model_range = range(1,key[3]-1)
+  model_range = range(1,key[3])
   define_model3_s16[key[0]]={
    'tdata':range(cor_len), 'tfit':model_range, 'T':key[3], 
    'tpa':-cor_len, 'tpb':-cor_len,
    'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),
    'eakey':('En','Eo'), 'ebkey':('En','Eo'),
    'sakey':(1.,-1.), 'sbkey':(1.,-1.),
-   'vnn':key[4]+'nn', 'vno':key[4]+'no', 'von':key[4]+'on', 'voo':key[4]+'oo' }
+   'vnn':key[5]+'nn', 'vno':key[5]+'no', 'von':key[5]+'on', 'voo':key[5]+'oo' }
   if (key[1] == '2' and key[2] == '3') or (key[1] == '3' and key[2] == '2')\
   or (key[1] == '2' and key[2] == '4') or (key[1] == '4' and key[2] == '2')\
   or (key[1] == '3' and key[2] == '4') or (key[1] == '4' and key[2] == '3')\
@@ -277,11 +337,18 @@ if do_irrep == "8":
   define_init_3pt =dfp3.define_init3_s8
   define_model_3pt=define_model3_s8
   for key in lkey:
-   suppressKey(key,'dl_save_name',"dl-s8-l1648-coul-"+key+".pdf")
-   suppressKey(key,'em_save_name',"em-s8-l1648-coul-"+key+".pdf")
-   suppressKey(key,'fn_save_name',"fn-s8-l1648-coul-"+key+".pdf")
+   suppressKey(key,'dl_save_name',"dl-s8p-l3248-coul-"+key+".pdf")
+   suppressKey(key,'em_save_name',"em-s8p-l3248-coul-"+key+".pdf")
+   suppressKey(key,'ec_save_name',"ec-s8p-l3248-coul-"+key+".pdf")
+   suppressKey(key,'fn_save_name',"fn-s8p-l3248-coul-"+key+".pdf")
+   suppressKey(key,'p3_save_name',"p3-s8p-l3248-coul-"+key+".pdf")
+   suppressKey(key,'plottitleem',"")
+   suppressKey(key,'plottitleec',"")
    suppressKey(key,'plottitledl',"")
    suppressKey(key,'plottitlefn',"")
+  for key in lkey3:
+   suppressKey(key,'p3_save_name',"p3-s8p-l3248-coul-"+key+".pdf")
+   suppressKey(key,'plottitlep3',"")
 elif do_irrep == "8'":
   stab_min_nst=1
   stab_mid_nst=1
@@ -302,9 +369,18 @@ elif do_irrep == "8'":
   define_init_3pt =dfp3.define_init3_s8p
   define_model_3pt=define_model3_s8p
   for key in lkey:
-   suppressKey(key,'dl_save_name',"dl-s8p-l1648-coul-"+key+".pdf")
-   suppressKey(key,'em_save_name',"em-s8p-l1648-coul-"+key+".pdf")
-   suppressKey(key,'fn_save_name',"fn-s8p-l1648-coul-"+key+".pdf")
+   suppressKey(key,'dl_save_name',"dl-s8m-l3248-coul-"+key+".pdf")
+   suppressKey(key,'em_save_name',"em-s8m-l3248-coul-"+key+".pdf")
+   suppressKey(key,'ec_save_name',"ec-s8m-l3248-coul-"+key+".pdf")
+   suppressKey(key,'fn_save_name',"fn-s8m-l3248-coul-"+key+".pdf")
+   suppressKey(key,'p3_save_name',"p3-s8m-l3248-coul-"+key+".pdf")
+   suppressKey(key,'plottitleem',"")
+   suppressKey(key,'plottitleec',"")
+   suppressKey(key,'plottitledl',"")
+   suppressKey(key,'plottitlefn',"")
+  for key in lkey3:
+   suppressKey(key,'p3_save_name',"p3-s8m-l3248-coul-"+key+".pdf")
+   suppressKey(key,'plottitlep3',"")
 elif do_irrep == "16":
   stab_min_nst=2
   stab_mid_nst=2
@@ -325,27 +401,80 @@ elif do_irrep == "16":
   define_init_3pt =dfp3.define_init3_s16
   define_model_3pt=define_model3_s16
   for key in lkey:
-   suppressKey(key,'dl_save_name',"dl-s16-l1648-coul-"+key+".pdf")
-   suppressKey(key,'em_save_name',"em-s16-l1648-coul-"+key+".pdf")
-   suppressKey(key,'fn_save_name',"fn-s16-l1648-coul-"+key+".pdf")
+   suppressKey(key,'dl_save_name',"dl-s16-l3248-coul-"+key+".pdf")
+   suppressKey(key,'em_save_name',"em-s16-l3248-coul-"+key+".pdf")
+   suppressKey(key,'ec_save_name',"ec-s16-l3248-coul-"+key+".pdf")
+   suppressKey(key,'fn_save_name',"fn-s16-l3248-coul-"+key+".pdf")
+   suppressKey(key,'p3_save_name',"p3-s16-l3248-coul-"+key+".pdf")
+   suppressKey(key,'plottitleem',"")
+   suppressKey(key,'plottitleec',"")
    suppressKey(key,'plottitledl',"")
    suppressKey(key,'plottitlefn',"")
+  for key in lkey3:
+   suppressKey(key,'p3_save_name',"p3-s16-l3248-coul-"+key+".pdf")
+   suppressKey(key,'plottitlep3',"")
 
 for key in lkey:
- suppressKey(key,'y_pos_limit',[1e-13,1e2])
- suppressKey(key,'y_neg_limit',[1e-13,1e2])
+ suppressKey(key,'y_pos_limit',[1e-3,1e2])
+ suppressKey(key,'y_neg_limit',[1e-3,1e2])
 if do_irrep == "8":
   for key in key_list_s8:
     suppressKey(key[0],"meff_fit_max",13)
+    if not(do_plot_terminal):
+      suppressKey(key[0],"to_terminal",False)
+    if do_plot_file:
+      suppressKey(key[0],"to_file",True)
+  for key in key_list3_s8:
+    if (int(key[1]) == 1 and int(key[2]) == 5)\
+    or (int(key[1]) == 1 and int(key[2]) == 6)\
+    or (int(key[1]) == 3 and int(key[2]) == 5)\
+    or (int(key[1]) == 3 and int(key[2]) == 6)\
+    or (int(key[1]) == 5 and int(key[2]) == 5)\
+    or (int(key[1]) == 5 and int(key[2]) == 6)\
+    or (int(key[1]) == 6 and int(key[2]) == 3)\
+    or (int(key[1]) == 6 and int(key[2]) == 5)\
+    or (int(key[1]) == 6 and int(key[2]) == 6):
+     suppressKey(key[0],"y_scale",[-0.1,0.1])
+    if (int(key[1]) == 2 and int(key[2]) == 3)\
+    or (int(key[1]) == 2 and int(key[2]) == 5)\
+    or (int(key[1]) == 2 and int(key[2]) == 6)\
+    or (int(key[1]) == 3 and int(key[2]) == 3)\
+    or (int(key[1]) == 5 and int(key[2]) == 3):
+     suppressKey(key[0],"y_scale",[-0.3,0.3])
+    if not(do_plot_terminal):
+      suppressKey(key[0],"to_terminal",False)
+    if do_plot_file:
+      suppressKey(key[0],"to_file",True)
   pass
 elif do_irrep == "8'":
   for key in key_list_s8p:
-    #suppressKey(key[0],"meff_fit_min",10)
-    suppressKey(key[0],"meff_fit_max",13)
+    suppressKey(key[0],"meff_do_fold",False)
+    suppressKey(key[0],"meff_fit_min",3)
+    suppressKey(key[0],"meff_fit_max",9)
+    if not(do_plot_terminal):
+      suppressKey(key[0],"to_terminal",False)
+    if do_plot_file:
+      suppressKey(key[0],"to_file",True)
+  for key in key_list3_s8p:
+    #suppressKey(key[0],"y_scale",[-0.1,0.1]) #axax
+    #suppressKey(key[0],"y_scale",[-0.1,0.1]) #axp
+    if not(do_plot_terminal):
+      suppressKey(key[0],"to_terminal",False)
+    if do_plot_file:
+      suppressKey(key[0],"to_file",True)
   pass
 elif do_irrep == "16":
   for key in key_list_s16:
     suppressKey(key[0],"meff_fit_max",13)
+    if not(do_plot_terminal):
+      suppressKey(key[0],"to_terminal",False)
+    if do_plot_file:
+      suppressKey(key[0],"to_file",True)
+  for key in key_list3_s8p:
+    if not(do_plot_terminal):
+      suppressKey(key[0],"to_terminal",False)
+    if do_plot_file:
+      suppressKey(key[0],"to_file",True)
   pass
 pass
 

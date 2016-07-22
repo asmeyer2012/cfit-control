@@ -20,9 +20,9 @@ def fn_apply_tags(dset,fn,prea,preb=None,newtag=None,copytags=False):
   if isinstance(prea,str):
    ## -- apply just to a single prea
    for tag in dset:
-    pfix = tag.split('_')[0]
+    pfix = '_'.join(tag.split('_')[:-1])
     if pfix == prea:
-     sfix = '_'+tag.split('_')[1]
+     sfix = '_'+tag.split('_')[-1]
      if not(preb is None):
       ## -- 2-tag function
       try: 
@@ -36,10 +36,10 @@ def fn_apply_tags(dset,fn,prea,preb=None,newtag=None,copytags=False):
   else:
    ## -- apply to the entire list of prea
    for tag in dset:
-    pfix = tag.split('_')[0]
+    pfix = '_'.join(tag.split('_')[:-1])
     if pfix in prea:
       pos = [i for i,x in enumerate(prea) if x==pfix][0]
-      sfix = '_'+tag.split('_')[1]
+      sfix = '_'+tag.split('_')[-1]
       if not(preb is None):
        ## -- 2-tag function
        try: 
@@ -53,14 +53,71 @@ def fn_apply_tags(dset,fn,prea,preb=None,newtag=None,copytags=False):
   if copytags: ## -- copy over unused tags
    if isinstance(pout,str):
     for tag in dset:
-     pfix = tag.split('_')[0]
+     pfix = '_'.join(tag.split('_')[:-1])
      if pfix != pout:
       dout[tag] = dset[tag]
    else:
     for tag in dset:
-     pfix = tag.split('_')[0]
+     pfix = '_'.join(tag.split('_')[:-1])
      if not(pfix in pout):
       dout[tag] = dset[tag]
+  return dout
+
+def fn_apply_tags2(dseta,dsetb,fn,prea,preb=None,newtag=None,copytags=False):
+  """
+  -- same as fn_apply_tags, but when prea and preb are in different data sets
+  ==
+  -- use before consolidate_tags
+  """
+  dout = gv.dataset.Dataset()
+  if not(newtag is None):
+   pout=newtag
+  else: 
+   pout=prea
+  if isinstance(prea,str):
+   ## -- apply just to a single prea
+   for tag in dseta:
+    pfix = '_'.join(tag.split('_')[:-1])
+    if pfix == prea:
+     sfix = '_'+tag.split('_')[-1]
+     if not(preb is None):
+      ## -- 2-tag function
+      try: 
+       dout[pout+sfix] = fn(dseta[prea+sfix],dsetb[preb+sfix])
+      except KeyError:
+       print "key",preb+sfix,"missing from dataset"
+       continue
+     else:
+      ## -- 1-tag function
+      dout[pout+sfix] = fn(dseta[prea+sfix])
+  else:
+   ## -- apply to the entire list of prea
+   for tag in dseta:
+    pfix = '_'.join(tag.split('_')[:-1])
+    if pfix in prea:
+      pos = [i for i,x in enumerate(prea) if x==pfix][0]
+      sfix = '_'+tag.split('_')[-1]
+      if not(preb is None):
+       ## -- 2-tag function
+       try: 
+        dout[pout[pos]+sfix] = fn(dseta[pfix+sfix],dsetb[preb+sfix])
+       except KeyError:
+        print "key",preb+sfix,"missing from dataset"
+        continue
+      else:
+       ## -- 1-tag function
+       dout[pout[pos]+sfix] = fn(dseta[pfix+sfix])
+  if copytags: ## -- copy over unused tags
+   if isinstance(pout,str):
+    for tag in dseta:
+     pfix = '_'.join(tag.split('_')[:-1])
+     if pfix != pout:
+      dout[tag] = dseta[tag]
+   else:
+    for tag in dseta:
+     pfix = '_'.join(tag.split('_')[:-1])
+     if not(pfix in pout):
+      dout[tag] = dseta[tag]
   return dout
 
 def average_tag_fn(cor):
@@ -113,24 +170,90 @@ def apply_t_fn(cor,fn,t=None):
    cnew.append(np.array([fn(c,tp) for tp in tval]))
   return cnew
 
-def correlator_ratio_fn(cora,corb,t,m,fac):
+# -- not sure if this is what I want, averages before ratio
+
+def correlator_pion_ratio_fn(cora,corb,t,T,expm,fac):
   """
-  -- average corb*exp{+m*t} for a range of t,
+  -- average corb*expm^t for a range of t,
      then divide all of cora by fac*sqrt(avg)
   ==
   -- prototype function
-     must define a new function with t,m,fac fixed to use with fn_apply_tags
+     must define a new function with t,T,expm,fac fixed to use with fn_apply_tags
   """
   def fexp(cor,tp):
-    return cor[tp]*np.exp(m*tp)
+    if tp<T/2:
+     return np.abs(cor[tp])*np.power(expm,float(tp))
+    else:
+     return np.abs(cor[tp])*np.power(expm,float(T-tp))
   cor2=average_tag_fn(corb)
   cor1=apply_t_fn(cor2,fexp,t)
   cor0=plateau_tag_fn(cor1)
-  cor0=np.sqrt(cor0)*fac
+  cor0=gv.mean(np.sqrt(cor0)*fac)
   cnew=list()
   for c in cora:
    cnew.append(c*cor0)
   return cnew
+
+def correlator_timeshift_ratio(cor,tshf):
+  """
+  -- shifts a correlator by tshf, then takes the ratio with the original
+  ==
+  -- prototype function
+     must define a new function with tshf fixed to use with fn_apply_tags
+  """
+  cnew = list()
+  for c in cor:
+   cshf = c[tshf:]
+   corg = c[:len(cor)-tshf]
+   cnew.append(list(np.array(cshf)/np.array(corg)))
+  return cnew
+
+def correlator_power(cor,pwr):
+  """
+  -- takes all timeslices of correlator to some power
+  ==
+  -- prototype function
+     must define a new function with tshf fixed to use with fn_apply_tags
+  """
+  cnew = list()
+  for c in cor:
+   cnew.append(list())
+   for t in range(len(c)):
+    cnew[-1].append(np.power(c[t],pwr))
+    if np.isnan(cnew[-1][-1]):
+     cnew[-1][-1] = 0.
+  return cnew
+
+def correlator_plateau_avg(cor):
+  """
+  -- calculate dumb average of entire correlator
+  ==
+  -- use before consolidate tags
+  """
+  cnew = list()
+  for c in cor:
+   cnew.append(np.sum(c)/len(c))
+  return cnew
+
+def separate_tags(dset,tag):
+  """
+  -- return a dataset whose suffix tags are only in the list of tags provided
+  ==
+  """
+  dout = gv.dataset.Dataset()
+  for key in dset:
+   sfix=key.split('_')[-1]
+   try:
+    if not(sfix in tag):
+     continue
+   except KeyError:
+    if sfix != tag:
+     continue
+   if not(key in dout):
+    dout[key] = list()
+   for cor in dset[key]:
+    dout[key].append(cor)
+  return dout
 
 def consolidate_tags(dset):
   """
@@ -141,6 +264,7 @@ def consolidate_tags(dset):
   dout = gv.dataset.Dataset()
   for key in dset:
    pfix='_'.join(key.split('_')[:-1])
+   #print pfix
    try:
     ## -- test if entry already exists
     for cor in dset[key]:
@@ -150,6 +274,57 @@ def consolidate_tags(dset):
     dout[pfix] = list()
     for cor in dset[key]:
      dout[pfix].append(cor)
+  return dout
+
+def average_tags(dset):
+  """
+  -- same as consolidate_tags, except averages configurations rather than appending
+  -- removes last suffix during process
+  ==
+  """
+  dout = gv.dataset.Dataset()
+  for key in dset:
+   pfix='_'.join(key.split('_')[:-1])
+   #print pfix
+   try:
+    ## -- test if entry already exists
+    for cor in dset[key]:
+     dout[pfix].append(cor)
+   except KeyError:
+    #dset[pfix] = list()
+    dout[pfix] = list()
+    for cor in dset[key]:
+     dout[pfix].append(cor)
+  for key in dout:
+   dout[key] = average_tag_fn(dout[key])
+  return dout
+
+def average_prefix(dset,pfixin,pfixout):
+  """
+  -- averages all leading prefixes in list pfixin
+  -- returns dataset with averaged prefixes replaced by pfixout
+  -- all other prefixes are returned unchanged
+  ==
+  """
+  dout = gv.dataset.Dataset()
+  print "averaging keys for prefix in ",pfixin
+  for key in dset:
+   pfix=key.split('_')[0]
+   if pfix in pfixin:
+    sfix='_'.join(key.split('_')[1:])
+    try:
+     ## -- test if entry already exists
+     for cor in dset[key]:
+      dout[pfixout+'_'+sfix].append(cor)
+    except KeyError:
+     dout[pfixout+'_'+sfix] = list()
+     for cor in dset[key]:
+      dout[pfixout+'_'+sfix].append(cor)
+   else:
+    dout[key] = dset[key]
+  for key in dout:
+   if key.split('_')[0] == pfixout:
+    dout[key] = average_tag_fn(dout[key])
   return dout
 
 def scale_tag(dset,tag,fac):
@@ -171,6 +346,33 @@ def scale_tag(dset,tag,fac):
       cnew = list()
       for cor in dset[key]:
        cnew.append(cor*fac)
+      dset[key] = cnew
+  return dset
+
+def munich_filter(dset,tag):
+  """
+  -- multiplies correlators of tag or list of tags by -1^t
+  -- name supplied by Andreas Kronfeld
+  ==
+  -- use after consolidate_tags
+  -- argument dset is altered by this function
+  """
+  if isinstance(tag,str):
+    ## -- single tag given
+    cnew = list()
+    tfac = np.array(np.cos(np.pi*np.arange(len(dset[tag][0]))))
+    for cor in dset[tag]:
+     #cnew.append(list(np.array(cor)*tfac))
+     cnew.append(cor*tfac)
+    dset[tag] = cnew
+  else:
+    ## -- assuming list of tags given
+    for key in tag:
+      cnew = list()
+      tfac = np.array(np.cos(np.pi*np.arange(len(dset[key][0]))))
+      for cor in dset[key]:
+       #cnew.append(list(np.array(cor)*tfac))
+       cnew.append(cor*tfac)
       dset[key] = cnew
   return dset
 

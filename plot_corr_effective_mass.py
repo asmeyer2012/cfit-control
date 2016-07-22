@@ -20,6 +20,10 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
  _emLogRatioCentral = []
  _emLogRatioError   = []
  _emLogRatioFit     = []
+ _emFoldRatio       = []
+ _emFoldRatioCentral= []
+ _emFoldRatioError  = []
+ _emFoldRatioFit    = []
  _emRatioFit        = []
  _emRatioFitNonZero = []
  _emFitCentral      = []
@@ -27,6 +31,8 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
  ## -- timeslice objects
  _emTPosRatio    = []
  _emTPosFit      = []
+ _emTPosFold     = []
+ _emTPosFoldFit  = []
  #
  ## -- fitting options
  _emFitMin = 0
@@ -45,28 +51,41 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
    ax.plot(_emTPosFit[idx[0]],_emFitCentral[idx[0]],
     color=utp.get_option("color3",'b',**kwargs[key]))
    ax.plot(_emTPosFit[idx[0]],_emFitError[idx[0]][0],
-    color=utp.get_option("color3",'g',**kwargs[key]),
+    color=utp.get_option("color3",'b',**kwargs[key]),
     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
    ax.plot(_emTPosFit[idx[0]],_emFitError[idx[0]][1],
-    color=utp.get_option("color3",'g',**kwargs[key]),
+    color=utp.get_option("color3",'b',**kwargs[key]),
     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
    # -- plot correlator data
-   #print _emLogRatio[idx[0]]
-   ax.errorbar(_emTPosRatio[idx[0]],_emLogRatioCentral[idx[0]],yerr=_emLogRatioError[idx[0]],
-    mfc=utp.get_option("markerfacecolor1",'None',**kwargs[key]),
-    mec=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
-    color=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
-    ls=utp.get_option("linestyle1",'None',**kwargs[key]),
-    marker=utp.get_option("marker1",'o',**kwargs[key]),
-    ms=utp.get_option("markersize",6,**kwargs[key]))
-   ax.scatter(_emTPosFit[idx[0]],gv.mean(_emLogRatioFit[idx[0]]),
-    color=utp.get_option("color1",'r',**kwargs[key]),
-    marker=utp.get_option("marker",'o',**kwargs[key]),
-    s=utp.get_option("markersize",36,**kwargs[key]))
-   fig.suptitle(utp.get_option("plottitle",str(idx[0])+" default title "+str(key),**kwargs[key]),
+   if utp.get_option("meff_do_fold",False,**kwargs[key]):
+    ## -- _emTPosRatio not necessarily symmetric, get times correct
+    ax.errorbar(_emTPosFold[idx[0]],_emFoldRatioCentral[idx[0]],yerr=_emFoldRatioError[idx[0]],
+     mfc=utp.get_option("markerfacecolor1",'None',**kwargs[key]),
+     mec=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
+     color=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
+     ls=utp.get_option("linestyle1",'None',**kwargs[key]),
+     marker=utp.get_option("marker1",'o',**kwargs[key]),
+     ms=utp.get_option("markersize",6,**kwargs[key]))
+    ax.scatter(_emTPosFoldFit[idx[0]],gv.mean(_emFoldRatioFit[idx[0]]),
+     color=utp.get_option("color1",'r',**kwargs[key]),
+     marker=utp.get_option("marker",'o',**kwargs[key]),
+     s=utp.get_option("markersize",36,**kwargs[key]))
+   else:
+    ax.errorbar(_emTPosRatio[idx[0]],_emLogRatioCentral[idx[0]],yerr=_emLogRatioError[idx[0]],
+     mfc=utp.get_option("markerfacecolor1",'None',**kwargs[key]),
+     mec=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
+     color=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
+     ls=utp.get_option("linestyle1",'None',**kwargs[key]),
+     marker=utp.get_option("marker1",'o',**kwargs[key]),
+     ms=utp.get_option("markersize",6,**kwargs[key]))
+    ax.scatter(_emTPosFit[idx[0]],gv.mean(_emLogRatioFit[idx[0]]),
+     color=utp.get_option("color1",'r',**kwargs[key]),
+     marker=utp.get_option("marker",'o',**kwargs[key]),
+     s=utp.get_option("markersize",36,**kwargs[key]))
+   fig.suptitle(utp.get_option("plottitleem",str(idx[0])+" default title "+str(key),**kwargs[key]),
     fontsize=utp.get_option("titlesize",20,**kwargs[key]))
    # -- modify some options 
-   ax.set_xlabel(r'$t$ slice')
+   ax.set_xlabel(r'$t$')
    ax.set_ylabel(utp.get_option("yaxistitle",
     r"$-\frac{1}{"+str(_emSep)+r"}\,log\frac{C(t+"+str(_emSep)+r")}{C(t)}$",**kwargs[key]))
    for item in ([ax.xaxis.label,ax.yaxis.label]):
@@ -74,7 +93,12 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
     item.set_fontsize(fontsize=utp.get_option("fontsize",20,**kwargs[key]))
    rect =fig.patch
    rect.set_facecolor('white')
-   plt.draw()
+   if utp.get_option("to_file",False,**kwargs[key]):
+    save_dir  = utp.get_option("em_save_dir","./plotdump",**kwargs[key])
+    save_name = utp.get_option("em_save_name","emplot-"+key+".pdf",**kwargs[key])
+    plt.savefig(save_dir+'/'+save_name)
+   if utp.get_option("to_terminal",True,**kwargs[key]):
+    plt.draw()
    pass
  #
  ## -- setup button press action function
@@ -138,18 +162,58 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
    _emRatio = np.append(_emRatio,
     [data[key][t-_emSep]/data[key][t] for t in _emTData
     if (t in _emTDataNonZero) and (t >= _emTData[-1]/2 +1 + _emSep) ] ) # second half
+   ## -- times
    _emTPosRatio.append(
     [_emTDataRatio[t] for t in range(len(_emTDataRatio)) if _emRatio[t] > 0] )
    _emTPosFit.append(
     [_emTDataRatio[t] for t in range(len(_emTDataRatio))
     if _emRatio[t] > 0 and _emTDataRatio[t] in _emTFit] )
+   ## -- ratios 
    _emLogRatio.append(
     [-gv.log(_emRatio[t])/_emSep for t in range(len(_emTDataRatio)) if _emRatio[t] > 0] )
    _emLogRatioFit.append(
     [-gv.log(_emRatio[t])/_emSep for t in range(len(_emTDataRatio))
     if (gv.mean(_emRatio[t]) > 0) and (_emTDataRatio[t] in _emTPosFit[-1])] )
+   # -- folding
+   #print tuple([(t,tp) for t,tp in 
+   #  zip(range(1,(len(_emTPosRatio[-1]))/2+1),_emTPosRatio[-1][1:(len(_emTPosRatio[-1]))/2+1])
+   #  ])\
+   #+ tuple([(t,tp) for t,tp in 
+   #  zip(range(len(_emTPosRatio[-1])-1,(len(_emTPosRatio[-1]))/2-1,-1),
+   #  _emTPosRatio[-1][len(_emTPosRatio[-1]):(len(_emTPosRatio[-1]))/2-1:-1])
+   # ])
+
+   _emFoldRatio.append(list())
+   _emTPosFold.append(list())
+   for t in range(1,len(_emTData)/2):
+    #if not(t in _emTDataRatio[-1]) or not(len(_emTDataRatio[-1])-t in _emTDataRatio[-1]):
+    # continue
+    if not(t in _emTPosRatio[-1]) or not(len(_emTData)-t in _emTPosRatio[-1]):
+     continue
+    print t,len(_emTData)-t
+    ## -- HERE: get the index for position of len(_tdata) in _emTDataRatio, don't use t itself
+    _emFoldRatio[-1].append(_emLogRatio[-1][t]+_emLogRatio[-1][len(_emTData)-t])
+    _emTPosFold[-1].append(t)
+    if not(t in _emTPosFit[-1]) or not(len(_emTData)-t in _emTPosFit[-1]):
+     continue
+    _emFoldRatioFit[-1].append(_emLogRatio[-1][t]+_emLogRatio[-1][len(_emTData)-t])
+    _emTPosFoldFit[-1].append(t)
+   #_emFoldRatioFit.append(
+   # [(_emLogRatio[-1][t] + _emLogRatio[-1][len(_emTData)-_emSep-t-1])/2
+   #  for t in range(1,(len(_emTData)-_emSep)/2-1)
+   #  if ((t in _emTPosFit[-1]) and ((len(_emTData)-_emSep-t-1) in _emTPosFit[-1]))]
+   #)
    _emLogRatioCentral.append(gv.mean(_emLogRatio[-1]))
    _emLogRatioError.append([ list(gv.sdev(_emLogRatio[-1])), list(gv.sdev(_emLogRatio[-1])) ])
+   _emFoldRatioCentral.append(gv.mean(_emFoldRatio[-1]))
+   _emFoldRatioError.append([ list(gv.sdev(_emFoldRatio[-1])), list(gv.sdev(_emFoldRatio[-1])) ])
+   ## -- fold times
+   #_emTPosFold.append(
+   # [ t for t in range(1,(len(_emTData)-_emSep)/2-1)
+   #  if ((t in _emTPosRatio[-1]) and (len(_emTData)-_emSep-t-1 in _emTPosRatio[-1]))] )
+   #_emTPosFoldFit.append(
+   # [ t for t in range(1,(len(_emTData)-_emSep)/2-1)
+   #  if ((t in _emTPosFit[-1]) and (len(_emTData)-_emSep-t-1 in _emTPosFit[-1]))] )
    ## -- fit
    _emRatioFit.append(lsq.wavg(_emLogRatioFit[-1]))
    _emFitCentral.append([gv.mean(_emRatioFit[-1]) for t in _emTPosFit[-1]])
@@ -163,5 +227,12 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
  print "   ----------------- "
  _emRatioFitNonZero = [x for x in _emRatioFit if not(x is None)]
  print "   avg  : ",lsq.wavg(_emRatioFitNonZero)
+
  ## -- done saving data
- do_plot_corr_effective_mass(_emIdx)
+ if not(utp.get_option("to_terminal",True,**kwargs[key])) and\
+    utp.get_option("to_file",False,**kwargs[key]):
+  for ix in range(len(models)):
+    ## -- loops and saves all without creating window
+    do_plot_corr_effective_mass([ix])
+ else:
+  do_plot_corr_effective_mass(_emIdx)

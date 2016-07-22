@@ -138,7 +138,11 @@ def make_tag_data_raw_fast(mdp,filename):
       print "Could not open file ",file
       continue
      ## -- get tag
-     mdp.tag = '_'+file.split('/')[-1].split('_')[1][1:]
+     ##  baryons:
+     #mdp.tag = '_'+file.split('/')[-1].split('_')[1][1:]+'_r'+file.split('/')[-1].split('_')[4][-1]
+     ##  mesons:
+     mdp.tag = '_'+file.split('/')[-1].split('_')[1][1:]+'_'+file.split('/')[-1].split('_')[4][0]\
+      +file.split('/')[-1].split('_')[4][-1]
      #print file,',',mdp.tag
      iter+=1
      if iter%400 == 0:

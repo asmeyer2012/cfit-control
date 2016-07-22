@@ -7,7 +7,14 @@ import define_prior as dp
 
 def curkey(key):
   return (key+'nn',key+'no',key+'on',key+'oo')
-current_list = ['v4v4']
+#current_list = ['ss']
+#current_list = ['v4v4']
+current_list = ['axax','ayay','azaz']
+#current_list = ['vxvx','vyvy','vzvz']
+#current_list = ['axax','ayay']
+#current_list = ['ayay']
+current_key = current_list
+current_key = ['aiai','aiai','aiai']
 tsep_list = [6,7]
 
 ## -- PDG inputs
@@ -45,11 +52,12 @@ okey_s8p= dp.okey_s8p
 nkey_s16= dp.nkey_s16
 okey_s16= dp.okey_s16
 
-vkey_s8 = tuple()
-for cur in current_list:
- vkey_s8 += curkey(cur)
-vkey_s8p= vkey_s8
-vkey_s16= vkey_s8
+vkey3_s8 = tuple()
+for cur in current_key:
+ vkey3_s8 += curkey(cur)
+vkey3_s8p= vkey3_s8
+vkey3_s16= vkey3_s8
+#print vkey3_s8p
 ## -- match initial guesses/priors with 2-point functions for overlaps,energies
 for key in nkey_s8+okey_s8:
   define_init3_s8[key] =dp.define_init_s8[key]
@@ -61,7 +69,7 @@ for key in nkey_s16+okey_s16:
   define_init3_s16[key] =dp.define_init_s16[key]
   define_prior3_s16[key]=dp.define_prior_s16[key]
 
-for cur in current_list:
+for cur in current_key:
  # S8
  define_init3_s8 [cur+'nn']=[[Vnom]*num_n3_s8  + [xVnom]*10]*(num_n3_s8 +10)\
    + [[xVnom]*(num_n3_s8 +10)]*10
@@ -96,15 +104,16 @@ nkey3_s8p = nkey_s8p
 okey3_s8p = okey_s8p
 nkey3_s16 = nkey_s16
 okey3_s16 = okey_s16
-vkey3_s8 = tuple()
-vkey3_s8p= tuple()
-vkey3_s16= tuple()
-for cur in current_list:
- vkey3_s8 += curkey(cur)
- vkey3_s8p+= curkey(cur)
- vkey3_s16+= curkey(cur)
+#vkey3_s8 = tuple()
+#vkey3_s8p= tuple()
+#vkey3_s16= tuple()
+#for cur in current_key:
+# vkey3_s8 += curkey(cur)
+# vkey3_s8p+= curkey(cur)
+# vkey3_s16+= curkey(cur)
 
 ## -- S8
+#print vkey3_s8p
 define_prior3_s8['nkey'] = nkey3_s8
 define_prior3_s8['okey'] = okey3_s8
 define_prior3_s8['vkey'] = vkey3_s8
@@ -123,7 +132,7 @@ nlen8p= len(define_prior3_s8p['logEn'])
 olen8p= len(define_prior3_s8p['logEo'])
 nlen16= len(define_prior3_s16['logEn'])
 olen16= len(define_prior3_s16['logEo'])
-for cur in current_list:
+for cur in current_key:
  define_prior3_s8 [cur+'nn'] = gv.gvar([[Vm]*nlen8 ]*nlen8 ,[[Vs]*nlen8 ]*nlen8 )
  define_prior3_s8 [cur+'no'] = gv.gvar([[Vm]*nlen8 ]*olen8 ,[[Vs]*nlen8 ]*olen8 )
  define_prior3_s8 [cur+'on'] = gv.gvar([[Vm]*olen8 ]*nlen8 ,[[Vs]*olen8 ]*nlen8 )
@@ -144,19 +153,22 @@ key_list3_s16 = list()
 log_s8='1'
 log_s8p='4'
 log_s16='2'
-for cur in current_list:
+for cur,ckey in zip(current_list,current_key):
  for tsep in tsep_list:
   for sc in ['1','2','3','5','6']:
    for sk in ['1','2','3','5','6']:
-    key_list3_s8.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur))
+    #key_list3_s8.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
+    key_list3_s8.append((ckey+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
   pass
   for sc in ['4','7']:
    for sk in ['4','7']:
-    key_list3_s8p.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur))
+    #key_list3_s8p.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
+    key_list3_s8p.append((ckey+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
   pass
   for sc in ['2','3','4','6']:
    for sk in ['2','3','4','6']:
-    key_list3_s16.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur))
+    #key_list3_s16.append((cur+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
+    key_list3_s16.append((ckey+'s'+sc+sk+'t'+str(tsep),sc,sk,tsep,cur,ckey))
   pass
 
 for key in key_list3_s8:
@@ -174,10 +186,10 @@ for key in key_list3_s8:
       'logEo':define_prior3_s8['logEo'] }
     for cur in current_list:
      for tsep in tsep_list:
-      define_prior3_s8[key[0]][cur+'nn']=define_prior3_s8[cur+'nn']
-      define_prior3_s8[key[0]][cur+'no']=define_prior3_s8[cur+'no']
-      define_prior3_s8[key[0]][cur+'on']=define_prior3_s8[cur+'on']
-      define_prior3_s8[key[0]][cur+'oo']=define_prior3_s8[cur+'oo']
+      define_prior3_s8[key[0]][key[5]+'nn']=define_prior3_s8[key[5]+'nn']
+      define_prior3_s8[key[0]][key[5]+'no']=define_prior3_s8[key[5]+'no']
+      define_prior3_s8[key[0]][key[5]+'on']=define_prior3_s8[key[5]+'on']
+      define_prior3_s8[key[0]][key[5]+'oo']=define_prior3_s8[key[5]+'oo']
   except KeyError:
     continue ## -- key is not defined, don't worry about it
 pass
@@ -194,10 +206,10 @@ for key in key_list3_s8p:
       'k'+key[2]+'o':define_prior3_s8p['k'+key[2]+'o'],
       'logEn':define_prior3_s8p['logEn'],
       'logEo':define_prior3_s8p['logEo'] }
-    define_prior3_s8p[key[0]][key[4]+'nn']=define_prior3_s8p[key[4]+'nn']
-    define_prior3_s8p[key[0]][key[4]+'no']=define_prior3_s8p[key[4]+'no']
-    define_prior3_s8p[key[0]][key[4]+'on']=define_prior3_s8p[key[4]+'on']
-    define_prior3_s8p[key[0]][key[4]+'oo']=define_prior3_s8p[key[4]+'oo']
+    define_prior3_s8p[key[0]][key[5]+'nn']=define_prior3_s8p[key[5]+'nn']
+    define_prior3_s8p[key[0]][key[5]+'no']=define_prior3_s8p[key[5]+'no']
+    define_prior3_s8p[key[0]][key[5]+'on']=define_prior3_s8p[key[5]+'on']
+    define_prior3_s8p[key[0]][key[5]+'oo']=define_prior3_s8p[key[5]+'oo']
   except KeyError:
     continue ## -- key is not defined, don't worry about it
 pass
@@ -216,10 +228,10 @@ for key in key_list3_s16:
       'logEo':define_prior3_s16['logEo'] }
     for cur in current_list:
      for tsep in tsep_list:
-      define_prior3_s16[key[0]][cur+'nn']=define_prior3_s16[cur+'nn']
-      define_prior3_s16[key[0]][cur+'no']=define_prior3_s16[cur+'no']
-      define_prior3_s16[key[0]][cur+'on']=define_prior3_s16[cur+'on']
-      define_prior3_s16[key[0]][cur+'oo']=define_prior3_s16[cur+'oo']
+      define_prior3_s16[key[0]][key[5]+'nn']=define_prior3_s16[key[5]+'nn']
+      define_prior3_s16[key[0]][key[5]+'no']=define_prior3_s16[key[5]+'no']
+      define_prior3_s16[key[0]][key[5]+'on']=define_prior3_s16[key[5]+'on']
+      define_prior3_s16[key[0]][key[5]+'oo']=define_prior3_s16[key[5]+'oo']
   except KeyError:
     continue ## -- key is not defined, don't worry about it
 pass

@@ -70,7 +70,12 @@ def plot_corr_normalized(models,data,fit,**kwargs):
     item.set_fontsize(fontsize=utp.get_option("fontsize",20,**kwargs[key]))
    rect =fig.patch
    rect.set_facecolor('white')
-   plt.draw()
+   if utp.get_option("to_file",False,**kwargs[key]):
+    save_dir  = utp.get_option("fn_save_dir","./plotdump",**kwargs[key])
+    save_name = utp.get_option("fn_save_name","fnplot-"+key+".pdf",**kwargs[key])
+    plt.savefig(save_dir+'/'+save_name)
+   if utp.get_option("to_terminal",True,**kwargs[key]):
+    plt.draw()
    pass
  #
  ## -- setup button press action function
@@ -132,4 +137,10 @@ def plot_corr_normalized(models,data,fit,**kwargs):
    _fnDatError.append([ list(_fnDatSdev), list(_fnDatSdev) ])
  ## -- done saving data
  
- do_plot_normalized(_fnIdx)
+ if not(utp.get_option("to_terminal",True,**kwargs[key])) and\
+    utp.get_option("to_file",False,**kwargs[key]):
+  for ix in range(len(models)):
+    ## -- loops and saves all without creating window
+    do_plot_normalized([ix])
+ else:
+  do_plot_normalized(_fnIdx)

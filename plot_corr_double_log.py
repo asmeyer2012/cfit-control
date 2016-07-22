@@ -106,7 +106,18 @@ def plot_corr_double_log(models,data,fit,**kwargs):
     item.set_fontsize(fontsize=utp.get_option("fontsize",20,**kwargs[key]))
    rect =fig.patch
    rect.set_facecolor('white')
-   plt.draw()
+   if utp.get_option("to_file",False,**kwargs[key]):
+    save_dir  = utp.get_option("dl_save_dir","./plotdump",**kwargs[key])
+    save_name = utp.get_option("dl_save_name","dlplot-"+key+".pdf",**kwargs[key])
+    plt.savefig(save_dir+'/'+save_name)
+    #mng = plt.get_current_fig_manager()
+    #mng.resize(*mng.window.maxsize())
+    #fig.set_size_inches(5,12)
+    #save_dir  = utp.get_option("dl_save_dir","./plotdump",**kwargs[key])
+    #save_name = utp.get_option("dl_save_name","dlplot-"+key+".pdf",**kwargs[key])
+    #fig.savefig(save_dir+'/'+save_name)
+   if utp.get_option("to_terminal",True,**kwargs[key]):
+    plt.draw()
    pass
  #
  ## -- setup button press action function
@@ -134,7 +145,7 @@ def plot_corr_double_log(models,data,fit,**kwargs):
        for ix,model in zip(range(len(models)),models):
          key = model.datatag
          save_dir  = utp.get_option("dl_save_dir","./plotdump",**kwargs[key])
-         save_name = utp.get_option("dl_save_name","dlplot-"+key+".png",**kwargs[key])
+         save_name = utp.get_option("dl_save_name","dlplot-"+key+".pdf",**kwargs[key])
          do_plot_double_log([ix])
          plt.savefig(save_dir+'/'+save_name)
        do_plot_double_log(idx)
@@ -174,4 +185,10 @@ def plot_corr_double_log(models,data,fit,**kwargs):
    _dlDatLoError.append(utf.neg_err(_dlDatMean,_dlDatSdev))
  ## -- done saving data
  
- do_plot_double_log(_dlIdx)
+ if not(utp.get_option("to_terminal",True,**kwargs[key])) and\
+    utp.get_option("to_file",False,**kwargs[key]):
+  for ix in range(len(models)):
+    ## -- loops and saves all without creating window
+    do_plot_double_log([ix])
+ else:
+  do_plot_double_log(_dlIdx)
