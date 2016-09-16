@@ -200,6 +200,8 @@ def read_fit_file(fit_file):
    rdict['chi2'] = float(lspl[1])
   elif lspl[0] == 'dof':
    rdict['dof'] = int(lspl[1])
+  elif lspl[0] == 'rdof':
+   rdict['rdof'] = int(lspl[1])
   elif lspl[0] == 'Q':
    rdict['Q'] = float(lspl[1])
   elif lspl[0] == 'fit_mean':

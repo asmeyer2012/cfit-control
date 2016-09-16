@@ -1,9 +1,7 @@
 from corrfitter               import CorrFitter
-from data_manipulations       import standard_load
 from make_data                import make_data
 from make_data_db             import make_data_db
 from make_models              import make_models
-#from make_models              import *
 from make_prior               import make_prior
 from make_bootstrap           import make_bootstrap
 from print_results            import print_fit
@@ -25,53 +23,18 @@ import gvar.dataset      as gvd
 import matplotlib.pyplot as plt
 import numpy             as np
 import sn_minimizer      as snm
-import argparse
-import hashlib
 import sys
 
-parser = argparse.ArgumentParser(description='fit 3-point correlators') # description of what?
-parser.add_argument('-r','--reset',dest='override_init',action='store_true')
-parser.add_argument('-p','--plot',dest='override_plot',action='store_true')
-parser.add_argument('-d','--dump',dest='dump_gvar',action='store_true')
-parser.add_argument('-D','--dump-by-name',dest='dump_gvar_name',action='store_const',const=None)
-parser.add_argument('-l','--load',dest='load_gvar',action='store_true')
-parser.add_argument('-L','--load-by-name',dest='load_gvar_name',action='store_const',const=None)
-argsin = parser.parse_known_args(sys.argv[1:]) ## in namespace
-argsin = vars(argsin[0]) ## pull out of namespace
-print argsin
+makeData = df.do_makedata_3pt
 
+## -- for raw correlator file input
+data,dset = make_data(df.mdp,do_makedata=makeData,\
+                      do_db=False,filename="./import-correlators-bar3pt")
+## --
 
-if df.do_irrep == "8":
-  irrepStr = '8p'
-elif df.do_irrep == "8'":
-  irrepStr = '8m'
-elif df.do_irrep == "16":
-  irrepStr = '16p'
-
-## 8+ representation
-taglist = list() # for gvar.dump hash key
-#filekey = ''   ## -- e2dd3e49
-#filekey = 'm'  ## -- b41cef9f
-#filekey = 'n'  ## -- 
-#filekey = 'mn' ## -- c58f8d33
-filekey = 'an' ## -- e4b56737
-#taglist.append(('l32v4.mes2pt','mes'))
-taglist.append(('l32v4.bar2pt.'+irrepStr,'bar2pt'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
-
-argsin['dump_gvar'] = False
-argsin['load_gvar'] = True
-dall =  standard_load(taglist,filekey,argsin)
-
-inCurrent=['aiai']
+inPrefix='v4v4'
 inPostfix='t6'
-outCurrent='aiai'
-outPrefix='sn3an'
+outPrefix='prod3'
 tsep=6
 
 cmat = list()
@@ -85,14 +48,7 @@ elif df.do_irrep == "16":
   op_list = [2,3,4,6]
   nameStr = "16"
 for c in op_list:
-  #cmat.append([dall[inCurrent+'s'+str(c)+str(k)+inPostfix] for k in op_list])
-  datin = list()
-  for k in op_list:
-    datin.append(0)
-    for v in inCurrent:
-      datin[-1] += dall[v+'s'+str(c)+str(k)+inPostfix]
-  cmat.append(datin)
-print cmat
+  cmat.append([data[inPrefix+'s'+str(c)+str(k)+inPostfix] for k in op_list])
 cmat = np.array(cmat)
 cvec,kvec = snm.minimize_3pt(cmat,tsep)
 
@@ -154,5 +110,5 @@ plt.yticks(range(-3,4),fontsize=10)
 mng = plt.get_current_fig_manager()
 mng.resize(*mng.window.maxsize())
 fig.set_size_inches(8,5)
-fig.savefig('/home/asm58/dump3pt/'+outPrefix+'_s'+nameStr+'_'+outCurrent+'.pdf',dpi=400)
+fig.savefig('/home/asm58/dump3pt/'+outPrefix+'.s'+nameStr+'.'+inPrefix+'.opt3pt.pdf',dpi=400)
 

@@ -32,7 +32,7 @@ class model_object_3pt:
   self.von=von
   self.voo=voo
   self.transpose_V=False
-  self.symmetric_V=False
+  self.symmetric_V=symmetric_V
  #
  def generate(self):
   model_obj = Corr3(datatag=self.datatag,

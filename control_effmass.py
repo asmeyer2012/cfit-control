@@ -1,4 +1,5 @@
 from corrfitter               import CorrFitter
+from data_manipulations       import standard_load,sn_minimize_postload
 from extract_3pt_info         import *
 from make_data                import make_data,import_corfit_file
 from make_data_db             import make_data_db
@@ -12,6 +13,7 @@ from print_results            import print_fit
 from print_results            import print_error_budget
 from save_data                import save_data
 from save_prior               import save_prior_from_fit
+from sn_minimizer             import *
 from make_plot                import make_plot
 from make_plot                import make_plot_corr_neg
 from make_plot                import make_plot_1plus1
@@ -58,64 +60,54 @@ elif df.do_irrep == "8":
 taglist = list() # for gvar.dump hash key
 filekey = 'm'
 taglist.append(('l32v4.bar2pt.'+irrepStr,'2pt'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'.ss.t06.p00','ss','t6'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'.ss.t-7.p00','ss','t7'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'v4v4.t06.p00','v4v4','t6'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'v4v4.t-7.p00','v4v4','t7'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'axp.t06.p00','axp','t6'))
-#taglist.append(('l32v4.bar3pt.'+irrepStr+'axp.t-7.p00','axp','t7'))
 
-## -- get just the first entry of array
-filelist = list(np.transpose(np.array(taglist))[0])
+dall = standard_load(taglist,filekey,argsin)
+if df.do_sn_minimize:
+ defm = {}
+ for key in dall:
+  tlen = len(dall[key])
+  #if dall[key][2]/dall[key][0] > 0.\
+  #and dall[key][tlen-2]/dall[key][0] > 0.:
+  # defm[key] = [-gv.log(dall[key][2]/dall[key][0])/2.+gv.log(dall[key][tlen-2]/dall[key][0])/2.]
+  #else:
+  # defm[key] = [gv.gvar(1e-8,1e-6)]
+  defm[key] = [] ## -- skip the first
+  for t in range(1,tlen/2-2):
+   if dall[key][t+2]/dall[key][t] > 0.\
+   and dall[key][tlen-t-2]/dall[key][tlen-t] > 0.:
+    defm[key].append(-gv.log(dall[key][t+2]/dall[key][t])/4.
+     -gv.log(dall[key][tlen-t-2]/dall[key][tlen-t])/4.)
+   else:
+    defm[key].append(gv.gvar(1e-8,1e-8)) ## -- add garbage value, > 0
+  #defm[key].append(-gv.log(dall[key][tlen/2]/dall[key][tlen/2-2])/2.
+  # -gv.log(dall[key][tlen/2]/dall[key][tlen/2+2])/2.)
+  #print defm[key]
+ #raise ValueError("test")
+ cvec,kvec,_ = sn_minimize_postload(defm,df.rangeMax)
+ clist = list()
+ klist = list()
+ for key in dall:
+  ## -- deconstruct key based on current conventions
+  k = int(key[-1])
+  if not(k in klist):
+   klist.append(k)
+  c = int(key[-2])
+  if not(c in clist):
+   clist.append(c)
+ call = list()
+ for i,c in zip(range(len(clist)),sorted(clist)):
+  call.append(list(np.zeros(len(klist))))
+  for j,k in zip(range(len(klist)),sorted(klist)):
+   call[i][j] = dall['s'+str(c)+str(k)]
+ cdia = diagonalize_correlator(call,cvec,kvec)
+ ddia = {}
+ for i,c in zip(range(len(clist)),sorted(clist)):
+  for j,k in zip(range(len(klist)),sorted(klist)):
+   ddia['s'+str(c)+str(k)] = cdia[i][j]
 
-if argsin['load_gvar']:
- gvarhash = hashlib.md5(''.join(filelist)+filekey).hexdigest()[:8]
- dall = gv.load('gvar.dump.'+gvarhash)
- print "loaded data from gvar file: gvar.dump."+gvarhash
 else:
- for tag in taglist:
-  td[tag[1:]] = import_corfit_file(tag[0]) ## -- import all of the files in taglist
-
- ## -- pre-consolidation manipulation
- pass
+ ddia = dall
  
- for key in td:
-  dset0[key] = consolidate_tags(td[key])
- for key in dset0:
-  dset1[key] = consolidate_tags(dset0[key])
- 
- ## -- post-consolidation manipulation
- for key in dset1:
-  for xkey in dset1[key]:
-   if 'v4v4' in xkey\
-   or 'axax' in xkey\
-   or 'ayay' in xkey\
-   or 'azaz' in xkey:
-    print "applying filter to key",key,xkey
-    munich_filter(dset1[key],xkey)
- pass
- 
- dnavg = gv.dataset.Dataset()
- for key in dset1:
-  for xkey in dset1[key]:
-   if 'm' in xkey:
-    #print "skipping mixed symmetry key",key,xkey,"..."
-    continue
-   dnavg[xkey] = dset1[key][xkey]
- dall = gv.dataset.avg_data(dnavg)
- ## -- if requested, save to pickle file
- if argsin['dump_gvar']:
-  gvarhash = hashlib.md5(''.join(filelist)+filekey).hexdigest()[:8]
-  gv.dump(dall,'gvar.dump.'+gvarhash)
-  print "dumped data to gvar file: gvar.dump."+gvarhash
-pass # dataset
-  
 models2 = make_models    (data=dall,lkey=df.lkey)
 models3 = make_models_3pt(data=dall,lkey=df.lkey3)
 priors2 = make_prior    (models2)
@@ -162,7 +154,9 @@ else:
 pass 
 
 ## -- plot
-plot_corr_effective_mass      (models2,dall,None,**df.fitargs)
-plot_corr_effective_mass_check(models2,dall,None,**df.fitargs)
+plot_corr_effective_mass      (models2,ddia,None,**df.fitargs)
+plot_corr_effective_mass_check(models2,ddia,None,**df.fitargs)
+#plot_corr_effective_mass      (models2,dall,None,**df.fitargs)
+#plot_corr_effective_mass_check(models2,dall,None,**df.fitargs)
 if df.do_plot_terminal:
  plt.show()

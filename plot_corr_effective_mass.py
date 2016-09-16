@@ -47,17 +47,17 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
    key = models[idx[0]].datatag
    ax.set_ylim(utp.get_option("y_limit",[0.0,2.0],**kwargs[key]))
    #
-   ## -- plot fit
-   ax.plot(_emTPosFit[idx[0]],_emFitCentral[idx[0]],
-    color=utp.get_option("color3",'b',**kwargs[key]))
-   ax.plot(_emTPosFit[idx[0]],_emFitError[idx[0]][0],
-    color=utp.get_option("color3",'b',**kwargs[key]),
-    ls=utp.get_option("linestyle2",'--',**kwargs[key]))
-   ax.plot(_emTPosFit[idx[0]],_emFitError[idx[0]][1],
-    color=utp.get_option("color3",'b',**kwargs[key]),
-    ls=utp.get_option("linestyle2",'--',**kwargs[key]))
    # -- plot correlator data
    if utp.get_option("meff_do_fold",False,**kwargs[key]):
+    ## -- plot fit
+    ax.plot([t for t in _emTPosFit[idx[0]] if t < len(_emTData)/2],_emFitCentral[idx[0]],
+     color=utp.get_option("color3",'b',**kwargs[key]))
+    ax.plot([t for t in _emTPosFit[idx[0]] if t < len(_emTData)/2],_emFitError[idx[0]][0],
+     color=utp.get_option("color3",'b',**kwargs[key]),
+     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
+    ax.plot([t for t in _emTPosFit[idx[0]] if t < len(_emTData)/2],_emFitError[idx[0]][1],
+     color=utp.get_option("color3",'b',**kwargs[key]),
+     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
     ## -- _emTPosRatio not necessarily symmetric, get times correct
     ax.errorbar(_emTPosFold[idx[0]],_emFoldRatioCentral[idx[0]],yerr=_emFoldRatioError[idx[0]],
      mfc=utp.get_option("markerfacecolor1",'None',**kwargs[key]),
@@ -71,6 +71,16 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
      marker=utp.get_option("marker",'o',**kwargs[key]),
      s=utp.get_option("markersize",36,**kwargs[key]))
    else:
+    ## -- plot fit
+    ax.plot(_emTPosFit[idx[0]],_emFitCentral[idx[0]],
+     color=utp.get_option("color3",'b',**kwargs[key]))
+    ax.plot(_emTPosFit[idx[0]],_emFitError[idx[0]][0],
+     color=utp.get_option("color3",'b',**kwargs[key]),
+     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
+    ax.plot(_emTPosFit[idx[0]],_emFitError[idx[0]][1],
+     color=utp.get_option("color3",'b',**kwargs[key]),
+     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
+    ## -- 
     ax.errorbar(_emTPosRatio[idx[0]],_emLogRatioCentral[idx[0]],yerr=_emLogRatioError[idx[0]],
      mfc=utp.get_option("markerfacecolor1",'None',**kwargs[key]),
      mec=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
@@ -175,52 +185,45 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
     [-gv.log(_emRatio[t])/_emSep for t in range(len(_emTDataRatio))
     if (gv.mean(_emRatio[t]) > 0) and (_emTDataRatio[t] in _emTPosFit[-1])] )
    # -- folding
-   #print tuple([(t,tp) for t,tp in 
-   #  zip(range(1,(len(_emTPosRatio[-1]))/2+1),_emTPosRatio[-1][1:(len(_emTPosRatio[-1]))/2+1])
-   #  ])\
-   #+ tuple([(t,tp) for t,tp in 
-   #  zip(range(len(_emTPosRatio[-1])-1,(len(_emTPosRatio[-1]))/2-1,-1),
-   #  _emTPosRatio[-1][len(_emTPosRatio[-1]):(len(_emTPosRatio[-1]))/2-1:-1])
-   # ])
-
    _emFoldRatio.append(list())
+   _emFoldRatioFit.append(list())
    _emTPosFold.append(list())
+   _emTPosFoldFit.append(list())
    for t in range(1,len(_emTData)/2):
-    #if not(t in _emTDataRatio[-1]) or not(len(_emTDataRatio[-1])-t in _emTDataRatio[-1]):
-    # continue
     if not(t in _emTPosRatio[-1]) or not(len(_emTData)-t in _emTPosRatio[-1]):
      continue
-    print t,len(_emTData)-t
-    ## -- HERE: get the index for position of len(_tdata) in _emTDataRatio, don't use t itself
-    _emFoldRatio[-1].append(_emLogRatio[-1][t]+_emLogRatio[-1][len(_emTData)-t])
+    _emFoldRatio[-1].append((_emLogRatio[-1][list(_emTPosRatio[-1]).index(t)]
+      +_emLogRatio[-1][list(_emTPosRatio[-1]).index(len(_emTData)-t)])/2)
     _emTPosFold[-1].append(t)
     if not(t in _emTPosFit[-1]) or not(len(_emTData)-t in _emTPosFit[-1]):
      continue
-    _emFoldRatioFit[-1].append(_emLogRatio[-1][t]+_emLogRatio[-1][len(_emTData)-t])
+    _emFoldRatioFit[-1].append((_emLogRatio[-1][list(_emTPosRatio[-1]).index(t)]
+      +_emLogRatio[-1][list(_emTPosRatio[-1]).index(len(_emTData)-t)])/2)
     _emTPosFoldFit[-1].append(t)
-   #_emFoldRatioFit.append(
-   # [(_emLogRatio[-1][t] + _emLogRatio[-1][len(_emTData)-_emSep-t-1])/2
-   #  for t in range(1,(len(_emTData)-_emSep)/2-1)
-   #  if ((t in _emTPosFit[-1]) and ((len(_emTData)-_emSep-t-1) in _emTPosFit[-1]))]
-   #)
+   for t in range(len(_emTPosFold[-1])):
+    print t,_emTPosFold[-1][t],_emFoldRatio[-1][t]
+   for t in range(len(_emTPosFoldFit[-1])):
+    print t,_emTPosFoldFit[-1][t],_emFoldRatioFit[-1][t]
    _emLogRatioCentral.append(gv.mean(_emLogRatio[-1]))
    _emLogRatioError.append([ list(gv.sdev(_emLogRatio[-1])), list(gv.sdev(_emLogRatio[-1])) ])
    _emFoldRatioCentral.append(gv.mean(_emFoldRatio[-1]))
    _emFoldRatioError.append([ list(gv.sdev(_emFoldRatio[-1])), list(gv.sdev(_emFoldRatio[-1])) ])
-   ## -- fold times
-   #_emTPosFold.append(
-   # [ t for t in range(1,(len(_emTData)-_emSep)/2-1)
-   #  if ((t in _emTPosRatio[-1]) and (len(_emTData)-_emSep-t-1 in _emTPosRatio[-1]))] )
-   #_emTPosFoldFit.append(
-   # [ t for t in range(1,(len(_emTData)-_emSep)/2-1)
-   #  if ((t in _emTPosFit[-1]) and (len(_emTData)-_emSep-t-1 in _emTPosFit[-1]))] )
    ## -- fit
    _emRatioFit.append(lsq.wavg(_emLogRatioFit[-1]))
-   _emFitCentral.append([gv.mean(_emRatioFit[-1]) for t in _emTPosFit[-1]])
-   _emFitError.append(
-    [list(np.array(_emFitCentral[-1])-np.array([gv.sdev(_emRatioFit[-1]) for t in _emTPosFit[-1]])),
-     list(np.array(_emFitCentral[-1])+np.array([gv.sdev(_emRatioFit[-1]) for t in _emTPosFit[-1]]))]
-    )
+   if utp.get_option("meff_do_fold",False,**kwargs[key]):
+    _emFitCentral.append([gv.mean(_emRatioFit[-1]) for t in _emTPosFit[-1] if t < len(_emTData)/2])
+    _emFitError.append(
+     [list(np.array(_emFitCentral[-1])-np.array([gv.sdev(_emRatioFit[-1])
+       for t in _emTPosFit[-1] if t < len(_emTData)/2])),
+      list(np.array(_emFitCentral[-1])+np.array([gv.sdev(_emRatioFit[-1])
+        for t in _emTPosFit[-1] if t < len(_emTData)/2]))])
+   else:
+    _emFitCentral.append([gv.mean(_emRatioFit[-1]) for t in _emTPosFit[-1]])
+    _emFitError.append(
+     [list(np.array(_emFitCentral[-1])-np.array([gv.sdev(_emRatioFit[-1])
+       for t in _emTPosFit[-1]])),
+      list(np.array(_emFitCentral[-1])+np.array([gv.sdev(_emRatioFit[-1])
+        for t in _emTPosFit[-1]]))])
  print "Best plateau fits: "
  for key,rfit in zip([model.datatag for model in models],_emRatioFit):
   print "  ",key," : ",rfit

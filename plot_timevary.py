@@ -27,23 +27,25 @@ def plot_timevary(fit_collector,**kwargs):
    tkey=(tmin,tmax,'fit')
    ## -- ignore fits with large chi2
    try:
-    dof = float(fit_collector[tkey]['dof'])
-    npr = float(len(df.define_prior['nkey']))
-    if dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] > df.max_chi2\
-       or dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] < df.min_chi2:
-     print dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] 
-     continue 
+    fit_collector[tkey]
+    #dof = float(fit_collector[tkey]['dof'])
+    #npr = float(len(df.define_prior['nkey']))
+    #if dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] > df.max_chi2\
+    #   or dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] < df.min_chi2:
+    # print dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'] 
+    # continue 
    except KeyError:
-    "KeyError"
+    "KeyError",tkey
     continue
    except ZeroDivisionError:
     "ZeroDivisionError"
     continue
    ## -- collect only important info
    hVal.append(fitCount+0.5)
-   hName.append(str(tmin) +'-'+ str(tmax) +' ('+
-    str(round(dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'],2))+')')
-   hChi2.append(fit_collector[tkey]['chi2'])
+   hName.append(str(tmin) +'-'+ str(tmax) #+' ('+
+    #str(round(dof/(dof-npr*(nst+ost))*fit_collector[tkey]['chi2'],2))+')'
+   )
+   #hChi2.append(fit_collector[tkey]['chi2'])
    for key in fit_collector[tkey]:
     sum=0
     if key[:2] == 'En' and not(key[3:] == 'log'):
@@ -63,7 +65,7 @@ def plot_timevary(fit_collector,**kwargs):
  ax = fig.add_subplot(111)
  plt.xticks(hVal,hName,rotation='vertical')
  ax.set_xlim([0,fitCount])
- ax.set_ylim([0.9,1.8])
+ ax.set_ylim([0.6,1.5])
  ax.errorbar(hValDatn,enCentral,enError,
   color='r',marker='o',linestyle='')
  ax.errorbar(hValDato,eoCentral,eoError,

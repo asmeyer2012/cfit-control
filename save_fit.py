@@ -1,4 +1,5 @@
 import gvar as gv
+from print_results import reduced_dof
 
 ## -- save a fit so it can be used as initial values in the next calculation
 
@@ -11,7 +12,7 @@ def format_entries(f,obj,key,addc=True):
   f.write('\''+str(key)+'\': gv.gvar([[\''+'\', \''.join(['{:>10}'.format(x).strip()\
     for x in obj[0]])+'\']\\\n')
   for i in range(1,len(obj)):
-   f.write(',[\''+'\', \''.join(['{:>10}'.format(x).strip() for x in obj[i]])+']\\\n')
+   f.write(',[\''+'\', \''.join(['{:>10}'.format(x).strip() for x in obj[i]])+'\']\\\n')
   if addc:
    f.write(']),\\\n')
   else:
@@ -30,6 +31,9 @@ def save_init_from_fit(fit,file_name):
  f = open(file_name,'w')
  f.write('import gvar as gv\n')
  f.write('init_val_import = {\\\n')
+ f.write('\'dof\':'+str(fit.dof)+'\\\n')
+ f.write(',\'rdof\':'+str(reduced_dof(fit))+'\\\n')
+ f.write(',\'chi2\':'+str(fit.chi2)+',\\\n')
  ltfp = len(fit.transformed_p)
  for i,key in zip(range(ltfp),fit.transformed_p):
   format_entries(f,fit.transformed_p[key],key,not(i==ltfp-1))

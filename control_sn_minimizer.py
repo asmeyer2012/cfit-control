@@ -51,7 +51,7 @@ elif df.do_irrep == "16":
 for c in op_list:
   cmat.append([data[inPrefix+'s'+str(c)+str(k)+inPostfix] for k in op_list])
 cmat = np.array(cmat)
-cvec,kvec = snm.minimize_all(cmat,tsep)
+cvec,kvec = snm.minimize_3pt(cmat,tsep)
 
 diag3pt = np.array(snm.apply_matrices(cmat,snm.get_perp_list(cvec),snm.get_perp_list(kvec)))
 print 'optimized 3pt'

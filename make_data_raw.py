@@ -145,11 +145,15 @@ def make_tag_data_raw_fast(mdp,filename):
       +file.split('/')[-1].split('_')[4][-1]
      #print file,',',mdp.tag
      iter+=1
-     if iter%400 == 0:
-      print "file",iter
      ##endif ! flag_out_open
      save_data_fast(mdp)
      mdp.corr_file.close()
+     if iter%400 == 0:
+      print "file",iter
+     max_iter = None
+     if not(max_iter is None) and iter==max_iter:
+      print "reached max file iterations, ending loop..."
+      break
      ## end comb_path
     pass
 

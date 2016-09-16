@@ -1,6 +1,15 @@
 import gvar as gv
 import defines as df
 import numpy as np
+import os
+
+def load_dict_from_fit_file_3pt(directory,filename):
+ initdir = os.getcwd()
+ os.chdir(directory)
+ infile = __import__(filename)
+ rdict = infile.init_val_import
+ os.chdir(initdir)
+ return rdict
 
 def make_init_from_fit_file_3pt(models,filename,prior_dict=None,nst=-1,ost=-1):
  init = {}

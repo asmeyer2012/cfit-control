@@ -20,12 +20,10 @@ def plot_corr_3pt(models,data,fit,**kwargs):
  _p3FitCentral = []
  _p3FitError   = []
  #
- ## -- timeslice objects
+ ## -- other objects
  _p3TData = []
  _p3TFit  = []
- _p3TDataSub = []
- _p3TFitSub  = []
- fig,axp = plt.subplots(1,figsize=(10,8))
+ fig,axp = plt.subplots(1,figsize=(8,8))
  #
  ## -- setup plot function
  def do_plot_3pt(idx,fig=fig):
@@ -34,7 +32,9 @@ def plot_corr_3pt(models,data,fit,**kwargs):
    #fig.subplots_adjust(hspace=0)
    key = models[idx[0]].datatag
 
-   axp.set_xlim([-float(len(_p3TFit[idx[0]]))/2-1,float(len(_p3TFit[idx[0]]))/2+1])
+   #axp.set_yscale('log')
+   #axp.set_xlim([-1,len(_p3TData[idx[0]])])
+   axp.set_xlim([-.5,len(_p3TFit[idx[0]])+1.5])
    axp.set_ylim(utp.get_option("y_scale",[-2,2],**kwargs[key]))
    #plt.sca(axp)
    #expp = [int(np.floor(np.log10(np.abs(x)))) for x in plt.yticks()[0][2:]]
@@ -42,40 +42,32 @@ def plot_corr_3pt(models,data,fit,**kwargs):
    #plt.yticks(plt.yticks()[0][2:],expp)
    #
    ## -- plot fit
-   axp.plot(_p3TFitSub[idx[0]],_p3FitCentral[idx[0]],
+   axp.plot(_p3TData[idx[0]],_p3FitCentral[idx[0]],
     color=utp.get_option("color2",'b',**kwargs[key]))
-   axp.plot(_p3TFitSub[idx[0]],_p3FitError[idx[0]][0],
+   axp.plot(_p3TData[idx[0]],_p3FitError[idx[0]][0],
     color=utp.get_option("color2",'g',**kwargs[key]),
     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
-   axp.plot(_p3TFitSub[idx[0]],_p3FitError[idx[0]][1],
+   axp.plot(_p3TData[idx[0]],_p3FitError[idx[0]][1],
     color=utp.get_option("color2",'g',**kwargs[key]),
     ls=utp.get_option("linestyle2",'--',**kwargs[key]))
    ## -- plot correlator data
-   (_,caps,_) = axp.errorbar(_p3TDataSub[idx[0]],_p3DatCentral[idx[0]],yerr=_p3DatError[idx[0]],
+   axp.errorbar(_p3TData[idx[0]],_p3DatCentral[idx[0]],yerr=_p3DatError[idx[0]],
     mfc=utp.get_option("markerfacecolor1",'None',**kwargs[key]),
     mec=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
     color=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
     ls=utp.get_option("linestyle1",'None',**kwargs[key]),
     marker=utp.get_option("marker1",'o',**kwargs[key]),
-    ms=utp.get_option("markersize",9,**kwargs[key]),
-    capsize=6,elinewidth=2)
-   for cap in caps:
-    cap.set_markeredgewidth(1)
-   axp.scatter(_p3TFitSub[idx[0]],[_p3DatCentral[idx[0]][t] for t in _p3TFit[idx[0]]],
+    ms=utp.get_option("markersize",6,**kwargs[key]))
+   axp.scatter(_p3TFit[idx[0]],[_p3DatCentral[idx[0]][t] for t in _p3TFit[idx[0]]],
     color=utp.get_option("color1",'r',**kwargs[key]),
     marker=utp.get_option("marker",'o',**kwargs[key]),
-    s=utp.get_option("markersize",81,**kwargs[key]))
+    s=utp.get_option("markersize",36,**kwargs[key]))
    fig.suptitle(utp.get_option("plottitlep3",str(idx[0])+" default title "+str(key),**kwargs[key]),
     fontsize=utp.get_option("titlesize",20,**kwargs[key]))
-   axp.set_xlabel(r'$t-\frac{T}{2}$')
-   axp.set_ylabel(utp.get_option("yaxistitle",r"$C(t,T)$",**kwargs[key]),
-    #fontsize=30,rotation=0,position=(0.05,0.98))
-    fontsize=30,rotation=0)
-   axp.yaxis.set_label_coords(-0.07,0.38)
    ## -- modify some options 
    for item in ([axp.xaxis.label,axp.yaxis.label]):
     # must be after setting label content (LaTeX ruins it)
-    item.set_fontsize(fontsize=utp.get_option("fontsize",30,**kwargs[key]))
+    item.set_fontsize(fontsize=utp.get_option("fontsize",20,**kwargs[key]))
    rect =fig.patch
    rect.set_facecolor('white')
    if utp.get_option("to_file",False,**kwargs[key]):
@@ -121,21 +113,20 @@ def plot_corr_3pt(models,data,fit,**kwargs):
  ## -- save plot data
  for idx,model in zip(range(len(models)),models):
    key = model.datatag
-   _p3TFit.append(list(model.tfit))
-   _p3TData.append(model.tdata[:len(_p3TFit[-1])+2])
-   _p3TFitSub.append([t-float(len(_p3TFit[-1])+1)/2 for t in _p3TFit[-1]])
-   _p3TDataSub.append([t-float(len(_p3TFit[-1])+1)/2 for t in _p3TData[-1]])
+   _p3TData.append(model.tdata)
+   _p3TFit.append(model.tfit)
+   #_p3TFit[-1] = np.append(_p3TFit[-1],list(sorted([len(_p3TData[-1]) - t for t in _p3TFit[-1]])))
    ## -- fit
    _p3FitFunc = utp.create_fit_func_3pt(model,fit) ## not defined yet!
-   _p3FitMean = gv.mean(_p3FitFunc(_p3TFit[-1]))
-   _p3FitSdev = gv.sdev(_p3FitFunc(_p3TFit[-1]))
+   _p3FitMean = gv.mean(_p3FitFunc(_p3TData[-1]))
+   _p3FitSdev = gv.sdev(_p3FitFunc(_p3TData[-1]))
    _p3FitCentral.append(_p3FitMean)
    _p3FitError.append([
      np.array(_p3FitMean)-np.array(_p3FitSdev),
      np.array(_p3FitMean)+np.array(_p3FitSdev)])
    ## -- data
-   _p3DatMean = gv.mean([data[key][t] for t in _p3TData[-1]])
-   _p3DatSdev = gv.sdev([data[key][t] for t in _p3TData[-1]])
+   _p3DatMean = gv.mean(data[key])
+   _p3DatSdev = gv.sdev(data[key])
    _p3DatCentral.append( _p3DatMean )
    _p3DatError.append([list(_p3DatSdev),list(_p3DatSdev)])
  ## -- done saving data

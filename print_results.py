@@ -1,6 +1,47 @@
 import gvar as gv
 import numpy as np
+import defines as df
 import util_funcs as ut
+from lsqfit._utilities import gammaQ
+
+def reduced_dof(fit):
+ try:
+  n3 = len(fit.transformed_p[df.current_key[0]+'nn'])
+  o3 = len(fit.transformed_p[df.current_key[0]+'oo'])
+ except KeyError:
+  ## -- 2pt fit
+  n3 = 0
+  o3 = 0
+ klen = len(df.define_prior['nkey'])
+ n2 = len(fit.transformed_p['En'])
+ o2 = len(fit.transformed_p['Eo'])
+ if df.do_v_symmetric:
+  return fit.dof - ( klen*(n2+o2) + (n3+o3)*(n3+o3+1)/2 )
+ else:
+  return fit.dof - ( klen*(n2+o2) + (n3+o3)*(n3+o3) )
+
+def fmt_reduced_chi2(fit):
+ rstr = 'reduced chi2/dof = '
+ #try:
+ # n3 = len(fit.transformed_p[df.current_key[0]+'nn'])
+ # o3 = len(fit.transformed_p[df.current_key[0]+'oo'])
+ #except KeyError:
+ # ## -- 2pt fit
+ # n3 = 0
+ # o3 = 0
+ #klen = len(df.define_prior['nkey'])
+ #n2 = len(fit.transformed_p['En'])
+ #o2 = len(fit.transformed_p['Eo'])
+ #newdof = fit.dof - ( klen*(n2+o2) + (n3+o3)*(n3+o3) )
+ newdof = reduced_dof(fit)
+ if newdof < 1:
+  newchi2 = np.nan
+  rstr = rstr + 'nan [' + str(newdof) + ']    Q = ?'
+ else:
+  newchi2 = fit.chi2/newdof
+  rstr = rstr + str(ut.round_to_n_sigdig(newchi2,len(str(newdof)))) + ' [' + str(newdof)\
+    + ']    Q = %.2g' % gammaQ(newdof/2.,fit.chi2/2.)
+ return rstr
 
 def print_fit(fit, prior):
  ## -- print the fit parameters neatly
@@ -10,7 +51,8 @@ def print_fit(fit, prior):
  do_unicode=False
  do_sigdigit=True
  #
- print gv.fmt_chi2(fit)
+ print '        '+gv.fmt_chi2(fit)
+ print fmt_reduced_chi2(fit)
  print
  print "Printing best fit parameters : "
  #

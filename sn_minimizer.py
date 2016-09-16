@@ -182,7 +182,7 @@ def project_contributions(corr,vc,vk):
   proj = np.array([np.dot(np.dot(mc,t),mk) for t in incor])
   return np.transpose(proj,[1,2,0])
 
-def minimize_all(corr,tmax):
+def minimize_3pt(corr,tmax):
   ## -- minimize the correlation function for a particular correlation function linear combination
   doPrint = False
   corNow = corr

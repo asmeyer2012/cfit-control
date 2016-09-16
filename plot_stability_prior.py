@@ -44,8 +44,8 @@ def plot_stability(fit_collector,**kwargs):
    ## -- collect only important info
    try:
     Qval = gammaQ(fit_collector[tkey]['rdof']/2.,fit_collector[tkey]['chi2']/2.)
-    if Qval < 0.001:
-     continue
+    #if Qval < 0.001:
+    # continue
     hQval.append(Qval)
    except:
     continue
@@ -78,6 +78,28 @@ def plot_stability(fit_collector,**kwargs):
  plt.xticks(hVal,hName,rotation='vertical')
  ax.set_xlim([0,fitCount])
  ax.set_ylim([0.6,1.5])
+ for i,en,den in zip(range(len(df.define_prior['logEn'])),
+  utf.sum_dE(df.define_prior['logEn']),df.define_prior['logEn']):
+   if i==0:
+    ax.axhline(en.mean,color='r')
+    ax.fill_between([0,fitCount],[en.mean-den.sdev,en.mean-den.sdev],
+     [en.mean+den.sdev,en.mean+den.sdev],hatch='/',facecolor='r',alpha=0.1)
+   else:
+    ax.axhline(en.mean,color='r')
+    if i<df.plot_n_maxprior:
+     ax.fill_between([0,fitCount],[en.mean-den.sdev,en.mean-den.sdev],
+      [en.mean+den.sdev,en.mean+den.sdev],facecolor='r',alpha=0.2)
+ for i,eo,deo in zip(range(len(df.define_prior['logEo'])),
+  utf.sum_dE(df.define_prior['logEo']),df.define_prior['logEo']):
+   if i==0:
+    ax.axhline(eo.mean,color='b')
+    ax.fill_between([0,fitCount],[eo.mean-deo.sdev,eo.mean-deo.sdev],
+     [eo.mean+deo.sdev,eo.mean+deo.sdev],hatch='\\',facecolor='b',alpha=0.1)
+   else:
+    ax.axhline(eo.mean,color='b')
+    if i<df.plot_o_maxprior:
+     ax.fill_between([0,fitCount],[eo.mean-deo.sdev,eo.mean-deo.sdev],
+      [eo.mean+deo.sdev,eo.mean+deo.sdev],facecolor='b',alpha=0.2)
  ax.errorbar(hValDatn,enCentral,enError,
   color='r',marker='o',linestyle='')
  ax.errorbar(hValDato,eoCentral,eoError,
