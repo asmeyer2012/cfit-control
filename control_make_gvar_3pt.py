@@ -54,6 +54,8 @@ elif do_irrep == "16":
 taglist = list() # for gvar.dump hash key
 #taglist.append(('l32v3.mes2pt','mes2pt'))
 filekey='a'
+#filekey='m'
+#filekey='mn'
 
 taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
 if not(do_irrep == "16"):

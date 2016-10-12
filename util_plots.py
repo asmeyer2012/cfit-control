@@ -3,6 +3,8 @@ import gvar as gv
 import lsqfit as lsf
 import util_funcs as utf
 
+do_v_symm = True
+
 def get_option(key,default,**kwargs):
  try:
   return kwargs[key]
@@ -261,25 +263,45 @@ def create_fit_func_3pt(model,fit):
  tsb = model.tpb
  T = model.T
  ## -- of course the new one is different, typical
- lvnn = tfp[model.V[0][0]]
- lvno = tfp[model.V[0][1]]
- lvon = tfp[model.V[1][0]]
- lvoo = tfp[model.V[1][1]]
- ## need to resize arrays if matrix is not same size as parameter list length
+ #if df.do_v_symmetric:
+ if do_v_symm:
+  lvnn = utf.reconstruct_upper_triangle(tfp[model.V[0][0]],
+   int(np.sqrt(8*len(tfp[model.V[0][0]])+1)-1)/2)
+  lvoo = utf.reconstruct_upper_triangle(tfp[model.V[1][1]],
+   int(np.sqrt(8*len(tfp[model.V[1][1]])+1)-1)/2)
+  lvno = tfp[model.V[0][1]]
+  lvon = np.transpose(tfp[model.V[0][1]])
+ else:
+  lvnn = tfp[model.V[0][0]]
+  lvoo = tfp[model.V[1][1]]
+  lvno = tfp[model.V[0][1]]
+  lvon = tfp[model.V[1][0]]
  nn = len(lvnn)
  no = len(lvoo)
+ ## need to resize arrays if matrix is not same size as parameter list length
  nt = np.abs(model.tpa)
  def new_func(t):
+  #print no,len(t)
+  #print np.shape(np.transpose(lvon)),np.transpose(lvon)
+  #print np.shape(np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t)))),
+  # np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t)))
+  #print np.dot(np.transpose(lvon),np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t))))
+  #print np.resize(fn_evn(lbn,lEbn,T-np.array(t),tsb),(nn,len(t)))
+  #print np.transpose(np.dot(np.transpose(lvon),np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t))))*\
+  # np.resize(fn_evn(lbn,lEbn,T-np.array(t),tsb),(nn,len(t))))
+  #print model.sa[1]*model.sb[0]*np.array([np.sum(x) for x in\
+  # np.transpose(np.dot(np.transpose(lvon),np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t))))*\
+  # np.resize(fn_evn(lbn,lEbn,T-np.array(t),tsb),(nn,len(t))))])
   return list(
      model.sa[0]*model.sb[0]*np.array([np.sum(x) for x in\
      np.transpose(np.dot(np.transpose(lvnn),np.resize(fn_evn(lan,lEan,t,tsa),(nn,len(t))))*\
      np.resize(fn_evn(lbn,lEbn,T-np.array(t),tsb),(nn,len(t))))])\
-   + model.sa[0]*model.sb[1]*np.array([np.sum(x) for x in\
-     np.transpose(np.dot(np.transpose(lvno),np.resize(fn_evn(lan,lEan,t,tsa),(nn,len(t))))*\
-     np.resize(fn_odd(lbo,lEbo,T-np.array(t),tsb),(no,len(t))))])\
    + model.sa[1]*model.sb[0]*np.array([np.sum(x) for x in\
      np.transpose(np.dot(np.transpose(lvon),np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t))))*\
      np.resize(fn_evn(lbn,lEbn,T-np.array(t),tsb),(nn,len(t))))])\
+   + model.sa[0]*model.sb[1]*np.array([np.sum(x) for x in\
+     np.transpose(np.dot(np.transpose(lvno),np.resize(fn_evn(lan,lEan,t,tsa),(nn,len(t))))*\
+     np.resize(fn_odd(lbo,lEbo,T-np.array(t),tsb),(no,len(t))))])\
    + model.sa[1]*model.sb[1]*np.array([np.sum(x) for x in\
      np.transpose(np.dot(np.transpose(lvoo),np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t))))*\
      np.resize(fn_odd(lbo,lEbo,T-np.array(t),tsb),(no,len(t))))])\

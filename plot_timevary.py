@@ -6,6 +6,9 @@ import util_plots as utp
 import defines      as df
 import define_prior as dfp
 
+import matplotlib as mpl
+mpl.use('TkAgg')
+
 def plot_timevary(fit_collector,**kwargs):
  """
  """

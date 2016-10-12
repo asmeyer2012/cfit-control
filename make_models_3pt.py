@@ -1,5 +1,6 @@
 import gvar    as gv
 import defines as df
+import util_funcs as utf
 from corrfitter  import Corr3
 
 def make_models_3pt(data,lkey=None,mdef=None):

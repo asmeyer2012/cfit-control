@@ -18,6 +18,7 @@ from plot_corr_effective_mass import plot_corr_effective_mass
 from plot_corr_normalized     import plot_corr_normalized
 from meta_data                import *
 from util_files               import read_fit_file
+import data_manipulations as dm
 import defines           as df
 import define_prior      as dfp
 import gvar              as gv
@@ -48,21 +49,35 @@ elif df.do_irrep == "8'":
 elif df.do_irrep == "16":
   irrepStr = '16p'
 
-## 8+ representation
 taglist = list() # for gvar.dump hash key
-#filekey = ''   ## -- e2dd3e49
-#filekey = 'm'  ## -- b41cef9f
-#filekey = 'n'  ## -- 
-#filekey = 'mn' ## -- c58f8d33
-filekey = 'an' ## -- e4b56737
-#taglist.append(('l32v4.mes2pt','mes'))
-taglist.append(('l32v4.bar2pt.'+irrepStr,'bar2pt'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
-taglist.append(('l32v4.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
+filekey = 'a'  ## -- standard choice, no filters
+#filekey = 'm'  ## -- munich filter
+#print "Using munich filter"
+#taglist.append(('l32v5.mes2pt','mes'))
+taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
+if not(df.do_irrep == "16"):
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
+else:
+ ## -- both 16+ and 16-
+ irrepStr = '16p'
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16p'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16p'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16p'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16p'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16p'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16p'))
+ irrepStr = '16m'
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16m'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16m'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16m'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
 
 argsin['dump_gvar'] = False
 argsin['load_gvar'] = True
@@ -74,27 +89,28 @@ outCurrent='aiai'
 outPrefix='sn3an'
 tsep=6
 
-cmat = list()
-if df.do_irrep == "8":
-  op_list = [1,2,3,5,6]
-  nameStr = "8p"
-elif df.do_irrep == "8'":
-  op_list = [4,7]
-  nameStr = "8m"
-elif df.do_irrep == "16":
-  op_list = [2,3,4,6]
-  nameStr = "16"
-for c in op_list:
-  #cmat.append([dall[inCurrent+'s'+str(c)+str(k)+inPostfix] for k in op_list])
-  datin = list()
-  for k in op_list:
-    datin.append(0)
-    for v in inCurrent:
-      datin[-1] += dall[v+'s'+str(c)+str(k)+inPostfix]
-  cmat.append(datin)
-print cmat
-cmat = np.array(cmat)
-cvec,kvec = snm.minimize_3pt(cmat,tsep)
+#cmat = list()
+#if df.do_irrep == "8":
+#  op_list = [1,2,3,5,6]
+#  nameStr = "8p"
+#elif df.do_irrep == "8'":
+#  op_list = [4,7]
+#  nameStr = "8m"
+#elif df.do_irrep == "16":
+#  op_list = [2,3,4,6]
+#  nameStr = "16"
+#for c in op_list:
+#  #cmat.append([dall[inCurrent+'s'+str(c)+str(k)+inPostfix] for k in op_list])
+#  datin = list()
+#  for k in op_list:
+#    datin.append(0)
+#    for v in inCurrent:
+#      datin[-1] += dall[v+'s'+str(c)+str(k)+inPostfix]
+#  cmat.append(datin)
+#print cmat
+#cmat = np.array(cmat)
+#cvec,kvec = snm.minimize_3pt(cmat,tsep)
+cvec,kvec,cmat = dm.sn_minimize_postload_3pt(dall,tsep,'aiai')
 
 diag3pt = np.array(snm.apply_matrices(cmat,snm.get_perp_list(cvec),snm.get_perp_list(kvec)))
 print 'optimized 3pt'
@@ -151,8 +167,11 @@ plt.axhline(0,color='k')
 plt.xticks(range(0,tsep+1),fontsize=10)
 plt.yticks(range(-3,4),fontsize=10)
 #plt.get_current_fig_manager().full_screen_toggle() ## full screen, not maximized
-mng = plt.get_current_fig_manager()
-mng.resize(*mng.window.maxsize())
-fig.set_size_inches(8,5)
-fig.savefig('/home/asm58/dump3pt/'+outPrefix+'_s'+nameStr+'_'+outCurrent+'.pdf',dpi=400)
+if True:
+ plt.show()
+else:
+ mng = plt.get_current_fig_manager()
+ mng.resize(*mng.window.maxsize())
+ fig.set_size_inches(8,5)
+ fig.savefig('/home/asm58/dump3pt/'+outPrefix+'_s'+nameStr+'_'+outCurrent+'.pdf',dpi=400)
 

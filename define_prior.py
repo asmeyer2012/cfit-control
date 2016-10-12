@@ -4,30 +4,77 @@ import util_funcs as utf
 ## -- HISQ a=0.15 l3248 physical
 ## -- prior mass splittings
 
+xnpi=10. ## -- N pi state suppression factor (EFT gives 1/30.)
 ## -- PDG inputs
 ## -- S8'
 ngrd_s8p=gv.gvar(0.94,0.1)  ## -- even ground state (PDG \Delta mass)
-ogrd_s8p=gv.gvar(1.23,0.1)  ## -- odd ground state (PDG orbital state)
+nn1440_s8p=gv.gvar(1.10,0.1) ## -- even radial state (PDG Nucleon(1440) state)
+nn1680_s8p=gv.gvar(1.28,0.1) ## -- even radial state (PDG Nucleon(1680) state)
+on1520_s8p=gv.gvar(1.16,0.1)  ## -- odd nucleon state (PDG nucleon(1520) state)
+on1535_s8p=gv.gvar(1.17,0.1)  ## -- odd nucleon state (PDG nucleon(1535) state)
+on1650_s8p=gv.gvar(1.26,0.1)  ## -- odd nucleon state (PDG delta(1675) state)
+on1675_s8p=gv.gvar(1.28,0.1)  ## -- odd nucleon state (PDG delta(1675) state)
+nd1600_s8p=gv.gvar(1.22,0.1)  ## -- odd delta state (PDG delta(1600) state)
+nd1620_s8p=gv.gvar(1.23,0.1)  ## -- odd delta state (PDG delta(1600) state)
+nd1680_s8p=gv.gvar(1.28,0.1)  ## -- odd delta state (PDG delta(1680) state)
+od1620_s8p=gv.gvar(1.23,0.1)  ## -- odd delta state (PDG delta(1620) state) (UNUSED)
+od1700_s8p=gv.gvar(1.29,0.1)  ## -- odd delta state (PDG delta(1700) state)
 delr_s8p=gv.gvar(0.30,0.1)  ## -- radial splitting (PDG radial state)
 ## -- S8
 ngrd_s8=gv.gvar(0.71,0.1)  ## -- even ground state (PDG Nucleon mass)
+ogrd_s8=gv.gvar(0.97,0.1)  ## -- odd ground state (N+pi, 1 momentum unit)
+onpi100t_s8=gv.gvar(1.03,0.1)  ## -- odd ground state (N+pi, 1 momentum unit)
+onpi110_s8=gv.gvar(1.07,0.03)  ## -- odd ground state (N+pi, 1 momentum unit)
+nn1440_s8=nn1440_s8p       ## -- even radial state (PDG Nucleon(1440) state)
+nn1680_s8=nn1680_s8p       ## -- even radial state (PDG Nucleon(1680) state)
+on1520_s8=on1520_s8p       ## -- odd nucleon state (PDG nucleon(1520) state)
+on1535_s8=on1535_s8p       ## -- odd nucleon state (PDG nucleon(1520) state)
+on1650_s8=on1650_s8p       ## -- odd nucleon state (PDG nucleon(1520) state)
+on1675_s8=on1675_s8p       ## -- odd nucleon state (PDG nucleon(1520) state)
+nd1600_s8=nd1600_s8p       ## -- even radial state (PDG Delta(1600) state)
+nd1680_s8=nd1680_s8p       ## -- even radial state (PDG Delta(1600) state)
+od1620_s8=od1620_s8p       ## -- odd delta state (PDG nucleon(1620) state)
+od1700_s8=od1700_s8p       ## -- odd delta state (PDG nucleon(1620) state)
 dels_s8=gv.gvar(0.23,0.1)  ## -- \Delta-N splitting (PDG mass splitting)
 delp_s8=gv.gvar(0.38,0.1)  ## -- N-roper splitting (PDG excited state)
+## -- S16
+nn1440_s16=nn1440_s8       ## -- even radial state (PDG Nucleon(1440) state)
+nn1680_s16=nn1680_s8       ## -- even radial state (PDG Nucleon(1680) state)
+on1520_s16=on1520_s8       ## -- odd nucleon state (PDG nucleon(1520) state)
+on1535_s16=on1535_s8       ## -- odd nucleon state (PDG nucleon(1520) state)
+on1650_s16=on1650_s8       ## -- odd nucleon state (PDG nucleon(1520) state)
+on1675_s16=on1675_s8       ## -- odd nucleon state (PDG nucleon(1520) state)
+nd1600_s16=nd1600_s8       ## -- even radial state (PDG Delta(1600) state)
+nd1680_s16=nd1680_s8       ## -- even radial state (PDG Delta(1600) state)
+od1620_s16=od1620_s8       ## -- odd delta state (PDG nucleon(1620) state)
+od1700_s16=od1700_s8       ## -- odd delta state (PDG nucleon(1620) state)
+
 
 ## -- other priors
 ## -- S8'
 delt_s8p=gv.gvar(4.6e-2,8e-2)   ## -- taste splitting (HISQ \pi taste splittings)
 delx_s8p=gv.gvar(5e-1,5e-1)       ## -- extra (hopefully unconstrained) states
 ## -- S8
-## v5.2.0 (3+4,g2+3 fit)
-delr_s8=gv.gvar(0.33,0.1)    ## -- radial splitting (8' fit)
-delt_s8=gv.gvar(0.039,0.044) ## -- taste splitting (8' fit, actualx2s)
-ovrs_s8=gv.gvar(0.984,0.042) ## -- for overriding prior for first delta state (8' \Delta[0]x2s)
-#ovrs_s8=gv.gvar(1.023,0.042) ## -- for overriding prior for first delta state (8' \Delta[1]x2s)
-odel_s8=gv.gvar(1.134,dels_s8.sdev)  ## -- odd delta state (8' fit (\Delta orbital))
-ogrd_s8=gv.gvar(1.134-dels_s8.mean,dels_s8.sdev)  ## -- odd ground state (8' fit (\Delta orbital))
+## v5.3.0 (3+3,g3+3 fit)
+delr_s8=gv.gvar(0.278,0.1)    ## -- radial splitting (8' fit, actualx1s)
+delt_s8=gv.gvar(0.043,0.059) ## -- taste splitting (8' fit, actualx1s)
+ovrs_s8=gv.gvar(0.927,0.060) ## -- for overriding prior for first delta state (8' \Delta[0]x2s)
+#ovrs_s8=gv.gvar(0.970,0.060) ## -- for overriding prior for first delta state (8' \Delta[1]x2s)
+#odel_s8=gv.gvar(1.166,dels_s8.sdev)  ## -- odd delta state (8' fit (\Delta orbital))
+odel_s8=gv.gvar(1.166,0.086)  ## -- odd delta state (8' fit (\Delta orbital, actualx1s))
+#ogrd_s8=gv.gvar(1.166-dels_s8.mean,dels_s8.sdev)  ## -- odd ground state (8' fit (\Delta orbital))
 delu_s8=delr_s8              ## -- splitting for states with unknown continuum limit
 delx_s8=delx_s8p             ## -- extra (hopefully unconstrained) states
+
+### v5.2.0 (3+4,g2+3 fit)
+#delr_s8=gv.gvar(0.33,0.1)    ## -- radial splitting (8' fit)
+#delt_s8=gv.gvar(0.039,0.044) ## -- taste splitting (8' fit, actualx2s)
+#ovrs_s8=gv.gvar(0.984,0.042) ## -- for overriding prior for first delta state (8' \Delta[0]x2s)
+##ovrs_s8=gv.gvar(1.023,0.042) ## -- for overriding prior for first delta state (8' \Delta[1]x2s)
+#odel_s8=gv.gvar(1.134,dels_s8.sdev)  ## -- odd delta state (8' fit (\Delta orbital))
+#ogrd_s8=gv.gvar(1.134-dels_s8.mean,dels_s8.sdev)  ## -- odd ground state (8' fit (\Delta orbital))
+#delu_s8=delr_s8              ## -- splitting for states with unknown continuum limit
+#delx_s8=delx_s8p             ## -- extra (hopefully unconstrained) states
 
 ### -- S8
 ### v5 (3+3,g2+2 fit)
@@ -64,15 +111,16 @@ delx_s8=delx_s8p             ## -- extra (hopefully unconstrained) states
 ##ogrd_s8=gv.gvar(1.19-dels_s8.mean,dels_s8.sdev)  ## -- odd ground state (8' fit (\Delta orbital))
 ##ovrs_s8=gv.gvar(.94,0.3) ## -- for overriding prior for first delta state (PDG)
 
-## -- S16
-delr_s16=delr_s8  ## -- radial splitting (PDG value)
+## -- S16 (S8v3.0.1 n8o7 gn8o7)
+#delr_s16=delr_s8  ## -- radial splitting (PDG value)
 delu_s16=dels_s8  ## -- splitting for states with unknown continuum limit
 delx_s16=delx_s8  ## -- extra (hopefully unconstrained) states
-dels_s16=gv.gvar(0.254,0.036)   ## -- N-\Del splitting (8 fit, D0-N0, actualx1s)
-delt_s16=gv.gvar(0.061,0.066)   ## -- taste splitting (8 fit x1s)
-ngrd_s16=gv.gvar(0.731,0.1)     ## -- even ground state (8 fit, large error )
-ogrd_s16=gv.gvar(0.932,0.036) ## -- odd ground state (8 fit N'0, actual x3s)
-ovrs_s16=gv.gvar(0.985,0.036) ## -- overriding prior for first delta state (S8 fit, actual x1s)
+#dels_s16=gv.gvar(0.254,0.036)   ## -- N-\Del splitting (8 fit, D0-N0, actualx1s)
+delt_s16=gv.gvar(0.042,0.076)   ## -- taste splitting (8 fit x1s)
+ngrd_s16=gv.gvar(0.7493,0.1)     ## -- even ground state (8 fit, large error )
+ogrd_s16=gv.gvar(0.942,0.1)    ## -- odd ground state (8 fit N'0, large error)
+#ogrd_s16=gv.gvar(0.942,0.042) ## -- odd ground state (8 fit N'0, actual x3s)
+ovrs_s16=gv.gvar(0.944,0.030) ## -- overriding prior for first delta state (S8 fit, actual x1s)
 
 ## v5 old
 #dels_s16=gv.gvar(0.280,0.028)   ## -- N-\Del splitting (8 fit, D0-N0, actual x3 error)
@@ -102,7 +150,7 @@ define_init_s8={}
 define_init_s8p={}
 define_init_s16={}
 num_nreal_s8=5 #3N+2D +1radial
-num_oreal_s8=3 #4N+1D+1?
+num_oreal_s8=5 #4N+1D+1?
 num_nreal_s8p=2 #0N+2D +1radial
 num_oreal_s8p=1 #0N+1D+0?
 num_nreal_s16=4 #1N+3D
@@ -185,16 +233,15 @@ for key in nkey_s16 + okey_s16:
 #Acs  = 1e2 # amplitude sdev (source)
 #Aks  = 1e1 # amplitude sdev (sink)
 
-## v5.1
-lAm  = 1e2 # log amplitude mean
-lAcs = 1e3 # log amplitude sdev (source)
-lAks = 1e1 # log amplitude sdev (sink)
-Am   = 0   # amplitude mean
-#As   = 1e0 # amplitude sdev (source) (temporary)
-Acs  = 1e3 # amplitude sdev (source)
-Aks  = 1e1 # amplitude sdev (sink)
+## v5.1 , v5.0
+#lAm  = 1e2 # log amplitude mean
+#lAcs = 1e3 # log amplitude sdev (source)
+#lAks = 1e1 # log amplitude sdev (sink)
+#Am   = 0   # amplitude mean
+#Acs  = 1e3 # amplitude sdev (source)
+#Aks  = 1e1 # amplitude sdev (sink)
 
-## v5.2
+## v5.2.2
 #lAm  = 5e1 # log amplitude mean
 #lAcs = 1e2 # log amplitude sdev (source)
 #lAks = 1e1 # log amplitude sdev (sink)
@@ -202,88 +249,119 @@ Aks  = 1e1 # amplitude sdev (sink)
 #Acs  = 1e2 # amplitude sdev (source)
 #Aks  = 1e1 # amplitude sdev (sink)
 
-## -- S8
-## -- even stacks
-nstack_s8mean = [
-[ngrd_s8.mean, ## N
- ngrd_s8.mean+  delt_s8.mean,
- ngrd_s8.mean+2*delt_s8.mean,
- ngrd_s8.mean+  delr_s8.mean,
- ngrd_s8.mean+  delr_s8.mean+  delt_s8.mean,
- ngrd_s8.mean+  delr_s8.mean+2*delt_s8.mean,
- ngrd_s8.mean+  delr_s8.mean+3*delt_s8.mean,
- ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean,
- ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+  delx_s8.mean,
- ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+2*delx_s8.mean,
- ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+3*delx_s8.mean,
- ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+4*delx_s8.mean,
- ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+5*delx_s8.mean],
-[ovrs_s8.mean, ## \Delta
- ovrs_s8.mean+  delt_s8.mean,
- ovrs_s8.mean+  delr_s8.mean,
- ovrs_s8.mean+  delr_s8.mean+  delt_s8.mean,
- ovrs_s8.mean+  delr_s8.mean+2*delt_s8.mean,
- ovrs_s8.mean+  delr_s8.mean+3*delt_s8.mean,
- ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean,
- ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean+  delx_s8.mean,
- ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean+2*delx_s8.mean,
- ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean+3*delx_s8.mean,
- ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean+4*delx_s8.mean,
- ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean+5*delx_s8.mean] ]
+## v5.2.3
+#lAm  = 5e0 # log amplitude mean
+#lAcs = 1e1 # log amplitude sdev (source)
+#lAks = 1e1 # log amplitude sdev (sink)
+#Am   = 0   # amplitude mean
+#Acs  = 1e1 # amplitude sdev (source)
+#Aks  = 1e1 # amplitude sdev (sink)
 
-nstack_s8sdev = [
-[ngrd_s8.sdev, ## N
- delt_s8.sdev, delt_s8.sdev,
- delr_s8.sdev,
- delt_s8.sdev, delt_s8.sdev, delt_s8.sdev, delt_s8.sdev,
- delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev],
-[ovrs_s8.sdev, ## \Delta
- delt_s8.sdev,
- delr_s8.sdev,
- delt_s8.sdev, delt_s8.sdev, delt_s8.sdev, delt_s8.sdev,
- delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev]
-]
+## v5.2.4
+#lAm  = 3e1 # log amplitude mean
+#lAcs = 1e2 # log amplitude sdev (source)
+#lAks = 1e2 # log amplitude sdev (sink)
+#Am   = 0   # amplitude mean
+#Acs  = 1e2 # amplitude sdev (source)
+#Aks  = 1e2 # amplitude sdev (sink)
 
-ostack_s8mean = [
-[ogrd_s8.mean, ## N
- ogrd_s8.mean+  delt_s8.mean,
- ogrd_s8.mean+2*delt_s8.mean,
- ogrd_s8.mean+  delr_s8.mean,
- ogrd_s8.mean+  delr_s8.mean+  delt_s8.mean,
- ogrd_s8.mean+  delr_s8.mean+2*delt_s8.mean,
- ogrd_s8.mean+  delr_s8.mean+3*delt_s8.mean,
- ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean,
- ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+  delx_s8.mean,
- ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+2*delx_s8.mean,
- ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+3*delx_s8.mean,
- ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+4*delx_s8.mean,
- ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+5*delx_s8.mean],
-[odel_s8.mean, ## \Delta
- odel_s8.mean+  delt_s8.mean,
- odel_s8.mean+  delr_s8.mean,
- odel_s8.mean+  delr_s8.mean+  delt_s8.mean,
- odel_s8.mean+  delr_s8.mean+2*delt_s8.mean,
- odel_s8.mean+  delr_s8.mean+3*delt_s8.mean,
- odel_s8.mean+  delr_s8.mean+4*delt_s8.mean,
- odel_s8.mean+  delr_s8.mean+4*delt_s8.mean+  delx_s8.mean,
- odel_s8.mean+  delr_s8.mean+4*delt_s8.mean+2*delx_s8.mean,
- odel_s8.mean+  delr_s8.mean+4*delt_s8.mean+3*delx_s8.mean,
- odel_s8.mean+  delr_s8.mean+4*delt_s8.mean+4*delx_s8.mean,
- odel_s8.mean+  delr_s8.mean+4*delt_s8.mean+5*delx_s8.mean]
-]
+## v5.2.5, v5.3
+#lAm  = 3e1 # log amplitude mean
+#lAcs = 1e2 # log amplitude sdev (source)
+#lAks = 1e1 # log amplitude sdev (sink)
+#Am   = 0   # amplitude mean
+#Acs  = 1e2 # amplitude sdev (source)
+#Aks  = 1e1 # amplitude sdev (sink)
+#Aes  = 1e0 # amplitude sdev for radial excitations (source)
 
-ostack_s8sdev = [
-[ogrd_s8.sdev, ## N
- delt_s8.sdev, delt_s8.sdev, delt_s8.sdev,
- delr_s8.sdev,
- delt_s8.sdev, delt_s8.sdev, delt_s8.sdev, delt_s8.sdev,
- delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev],
-[odel_s8.sdev, ## \Delta
- delt_s8.sdev,
- delr_s8.sdev,
- delt_s8.sdev, delt_s8.sdev, delt_s8.sdev, delt_s8.sdev,
- delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev]
-]
+## > v5.6.6
+lAm  = 1e1 # log amplitude mean
+lAcs = 1e2 # log amplitude sdev (source)
+lAks = 1e1 # log amplitude sdev (sink)
+Am   = 0   # amplitude mean
+Acs  = lAcs # amplitude sdev (source)
+Aks  = lAks # amplitude sdev (sink)
+Aes  = 1e0  # amplitude sdev for radial excitations
+
+### -- S8
+### -- even stacks
+#nstack_s8mean = [
+#[ngrd_s8.mean, ## N
+# ngrd_s8.mean+  delt_s8.mean,
+# ngrd_s8.mean+2*delt_s8.mean,
+# ngrd_s8.mean+  delr_s8.mean,
+# ngrd_s8.mean+  delr_s8.mean+  delt_s8.mean,
+# ngrd_s8.mean+  delr_s8.mean+2*delt_s8.mean,
+# ngrd_s8.mean+  delr_s8.mean+3*delt_s8.mean,
+# ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean,
+# ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+  delx_s8.mean,
+# ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+2*delx_s8.mean,
+# ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+3*delx_s8.mean,
+# ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+4*delx_s8.mean,
+# ngrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+5*delx_s8.mean],
+#[ovrs_s8.mean, ## \Delta
+# ovrs_s8.mean+  delt_s8.mean,
+# ovrs_s8.mean+  delr_s8.mean,
+# ovrs_s8.mean+  delr_s8.mean+  delt_s8.mean,
+# ovrs_s8.mean+  delr_s8.mean+2*delt_s8.mean,
+# ovrs_s8.mean+  delr_s8.mean+3*delt_s8.mean,
+# ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean,
+# ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean+  delx_s8.mean,
+# ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean+2*delx_s8.mean,
+# ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean+3*delx_s8.mean,
+# ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean+4*delx_s8.mean,
+# ovrs_s8.mean+  delr_s8.mean+4*delt_s8.mean+5*delx_s8.mean] ]
+#nstack_s8sdev = [
+#[ngrd_s8.sdev, ## N
+# delt_s8.sdev, delt_s8.sdev,
+# delr_s8.sdev,
+# delt_s8.sdev, delt_s8.sdev, delt_s8.sdev, delt_s8.sdev,
+# delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev],
+#[ovrs_s8.sdev, ## \Delta
+# delt_s8.sdev,
+# delr_s8.sdev,
+# delt_s8.sdev, delt_s8.sdev, delt_s8.sdev, delt_s8.sdev,
+# delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev]
+#]
+#ostack_s8mean = [
+#[ogrd_s8.mean, ## N
+# ogrd_s8.mean+  delt_s8.mean,
+# ogrd_s8.mean+2*delt_s8.mean,
+# ogrd_s8.mean+  delr_s8.mean,
+# ogrd_s8.mean+  delr_s8.mean+  delt_s8.mean,
+# ogrd_s8.mean+  delr_s8.mean+2*delt_s8.mean,
+# ogrd_s8.mean+  delr_s8.mean+3*delt_s8.mean,
+# ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean,
+# ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+  delx_s8.mean,
+# ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+2*delx_s8.mean,
+# ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+3*delx_s8.mean,
+# ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+4*delx_s8.mean,
+# ogrd_s8.mean+  delr_s8.mean+4*delt_s8.mean+5*delx_s8.mean],
+#[odel_s8.mean, ## \Delta
+# odel_s8.mean+  delt_s8.mean,
+# odel_s8.mean+  delr_s8.mean,
+# odel_s8.mean+  delr_s8.mean+  delt_s8.mean,
+# odel_s8.mean+  delr_s8.mean+2*delt_s8.mean,
+# odel_s8.mean+  delr_s8.mean+3*delt_s8.mean,
+# odel_s8.mean+  delr_s8.mean+4*delt_s8.mean,
+# odel_s8.mean+  delr_s8.mean+4*delt_s8.mean+  delx_s8.mean,
+# odel_s8.mean+  delr_s8.mean+4*delt_s8.mean+2*delx_s8.mean,
+# odel_s8.mean+  delr_s8.mean+4*delt_s8.mean+3*delx_s8.mean,
+# odel_s8.mean+  delr_s8.mean+4*delt_s8.mean+4*delx_s8.mean,
+# odel_s8.mean+  delr_s8.mean+4*delt_s8.mean+5*delx_s8.mean]
+#]
+#ostack_s8sdev = [
+#[ogrd_s8.sdev, ## N
+# delt_s8.sdev, delt_s8.sdev, delt_s8.sdev,
+# delr_s8.sdev,
+# delt_s8.sdev, delt_s8.sdev, delt_s8.sdev, delt_s8.sdev,
+# delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev],
+#[odel_s8.sdev, ## \Delta
+# delt_s8.sdev,
+# delr_s8.sdev,
+# delt_s8.sdev, delt_s8.sdev, delt_s8.sdev, delt_s8.sdev,
+# delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev, delx_s8.sdev]
+#]
 
 ## -- even states
 ## -- 0 N
@@ -300,7 +378,7 @@ gv.gvar(
 #[delr_s8.sdev,lAcs]+[As]*(len(nkey_s8)-2)))
 #[ovrs_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
 #[ovrs_s8.sdev,lAcs]+[As]*(len(nkey_s8)-2)))
-## -- 2 N[0]
+## -- 2 N[0] on for v5.5 and before
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
 [delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
@@ -308,7 +386,8 @@ gv.gvar(
 ## -- 3 Del[0]
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[ovrs_s8.mean-ngrd_s8.mean-2*delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[ovrs_s8.mean-ngrd_s8.mean-2*delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2), #v5.5 and before
+#[ovrs_s8.mean-ngrd_s8.mean-0*delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
 [ovrs_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
 ## -- 4 Del[0]
 utf.append_prior_state(define_prior_s8,nkey_s8,
@@ -317,74 +396,133 @@ gv.gvar(
 [delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
 [delt_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
 ## -- 5 N[1] - this state gives issues when subtracting sufficiently small ovrs_s8
-#utf.append_prior_state(define_prior_s8,nkey_s8,
-#gv.gvar(
-##[delr_s8.mean+ngrd_s8.mean-ovrs_s8.mean-delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
-##[delr_s8.mean+ngrd_s8.mean-ovrs_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
-#[delr_s8.mean+ngrd_s8.mean+delt_s8.mean-ovrs_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
-#[delr_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delr_s8.mean-dels_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
-[delr_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+##[delr_s8.mean+ngrd_s8.mean-ovrs_s8.mean-delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+##[delr_s8.mean+ngrd_s8.mean-ovrs_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+##[delr_s8.mean+ngrd_s8.mean+delt_s8.mean-ovrs_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+#[delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+#[delr_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+[nn1440_s8.mean-ovrs_s8.mean-1*delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[nn1440_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+## -- 5 N[1]
+utf.append_prior_state(define_prior_s8,nkey_s8,
+gv.gvar(
+[delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delt_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+## -- 5 N[1]
+utf.append_prior_state(define_prior_s8,nkey_s8,
+gv.gvar(
+[delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[delt_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+## -- 6a Del[1]
+utf.append_prior_state(define_prior_s8,nkey_s8,
+gv.gvar(
+#[delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+#[delt_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+[nd1600_s8.mean-nn1440_s8.mean-2*delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[nd1600_s8.sdev,Aes]+[Aes]*((len(nkey_s8)-3)/2)+[Aes]*((len(nkey_s8)-1)/2)))
+#[delr_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+#[delr_s8.sdev,Aes]+[Aes]*((len(nkey_s8)-3)/2)+[Aes]*((len(nkey_s8)-1)/2)))
 ## -- 6 N[1]
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
 [delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
 [delt_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+#[delt_s8.sdev,Acs]+[Aes]*((len(nkey_s8)-3)/2)+[Aes]*((len(nkey_s8)-1)/2)))
 ## -- 7 N[1]
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[nn1680_s8.mean-nd1600_s8.mean-1*delt_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+[nn1680_s8.sdev,Acs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+#[delt_s8.mean/2.,lAm]+[Am]*(len(nkey_s8)-2),
+#[delt_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+#[delt_s8.sdev,Aes]+[Aes]*((len(nkey_s8)-3)/2)+[Aes]*((len(nkey_s8)-1)/2)))
+## -- 8 N[1]
+utf.append_prior_state(define_prior_s8,nkey_s8,
+gv.gvar(
+[delt_s8.mean/2.,lAm]+[Am]*(len(nkey_s8)-2),
 [delt_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
 ## -- 8 N[1]
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
-[delx_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+[delt_s8.mean/2.,lAm]+[Am]*(len(nkey_s8)-2),
+[delt_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+## -- 8 N[1]
+utf.append_prior_state(define_prior_s8,nkey_s8,
+gv.gvar(
+[delt_s8.mean/2.,lAm]+[Am]*(len(nkey_s8)-2),
+[delt_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+## -- 8 N[1]
+utf.append_prior_state(define_prior_s8,nkey_s8,
+gv.gvar(
+[delt_s8.mean/2.,lAm]+[Am]*(len(nkey_s8)-2),
+[delt_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+#[delx_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
+#[delx_s8.sdev,Aes]+[Aes]*((len(nkey_s8)-3)/2)+[Aes]*((len(nkey_s8)-1)/2)))
 ## -- 9 \Delta[1]
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
 [delx_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+#[delx_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+[delx_s8.sdev,Aes]+[Aes]*((len(nkey_s8)-3)/2)+[Aes]*((len(nkey_s8)-1)/2)))
 ## -- 10 N[2]
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
 [delx_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+#[delx_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+[delx_s8.sdev,Aes]+[Aes]*((len(nkey_s8)-3)/2)+[Aes]*((len(nkey_s8)-1)/2)))
 ## -- 11
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
 [delx_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+#[delx_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+[delx_s8.sdev,Aes]+[Aes]*((len(nkey_s8)-3)/2)+[Aes]*((len(nkey_s8)-1)/2)))
 ## -- 12
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
 [delx_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+#[delx_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+[delx_s8.sdev,Aes]+[Aes]*((len(nkey_s8)-3)/2)+[Aes]*((len(nkey_s8)-1)/2)))
 ## -- 13
 utf.append_prior_state(define_prior_s8,nkey_s8,
 gv.gvar(
 [delx_s8.mean,lAm]+[Am]*(len(nkey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+#[delx_s8.sdev,lAcs]+[Acs]*((len(nkey_s8)-3)/2)+[Aks]*((len(nkey_s8)-1)/2)))
+[delx_s8.sdev,Aes]+[Aes]*((len(nkey_s8)-3)/2)+[Aes]*((len(nkey_s8)-1)/2)))
 
 ## -- odd states
-## -- 0
+## -- 0 N+\pi (100 momentum)
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
 [ogrd_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[ogrd_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+[ogrd_s8.sdev,lAcs/xnpi]+[Acs/xnpi]*((len(okey_s8)-3)/2)+[Aks/xnpi]*((len(okey_s8)-1)/2)))
+## -- 0a N+\pi (100 momentum + 1*taste)
+utf.append_prior_state(define_prior_s8,okey_s8,
+gv.gvar(
+[onpi100t_s8.mean-ogrd_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[onpi100t_s8.sdev,lAcs/xnpi]+[Acs/xnpi]*((len(okey_s8)-3)/2)+[Aks/xnpi]*((len(okey_s8)-1)/2)))
+## -- 0a N+\pi (110 momentum)
+utf.append_prior_state(define_prior_s8,okey_s8,
+gv.gvar(
+[onpi110_s8.mean-onpi100t_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[onpi110_s8.sdev,lAcs/xnpi]+[Acs/xnpi]*((len(okey_s8)-3)/2)+[Aks/xnpi]*((len(okey_s8)-1)/2)))
+## -- 0b N
+utf.append_prior_state(define_prior_s8,okey_s8,
+gv.gvar(
+[on1520_s8.mean-onpi110_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+#[on1520_s8.mean-ogrd_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+#[on1520_s8.mean-0*delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[on1520_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+#[ogrd_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+#[ogrd_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
 ## -- 1
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-#[delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[delr_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[delr_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
-## -- 2
-utf.append_prior_state(define_prior_s8,okey_s8,
-gv.gvar(
-[delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[delt_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+#[delt_s8.mean/2.,lAm]+[Am]*(len(okey_s8)-2),
+#[delt_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+[on1535_s8.mean-on1520_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[on1535_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
 ## -- 3
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
@@ -393,62 +531,215 @@ gv.gvar(
 ## -- 4
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delx_s8.mean-3*delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+[delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delt_s8.sdev,Acs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+## -- 4
+utf.append_prior_state(define_prior_s8,okey_s8,
+gv.gvar(
+[delt_s8.mean/2.,lAm]+[Am]*(len(okey_s8)-2), ## -- would otherwise be negative
+#[delt_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+#[od1620_s8.mean-on1535_s8.mean-2*delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[od1620_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
 #[dels_s8.mean-3*delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
 #[dels_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
 ## -- 5
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
-#[delu_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-#[delu_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+[on1650_s8.mean-od1620_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[on1650_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+## -- 5
+utf.append_prior_state(define_prior_s8,okey_s8,
+gv.gvar(
+[on1675_s8.mean-on1650_s8.mean-0*delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[on1675_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+#[delt_s8.mean/2.,lAm]+[Am]*(len(okey_s8)-2),
+#[delt_s8.sdev,Aes]+[Aes]*((len(okey_s8)-3)/2)+[Aes]*((len(okey_s8)-1)/2)))
 ## -- 6
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
-#[delr_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-#[delr_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+[delt_s8.mean/2.,lAm]+[Am]*(len(okey_s8)-2),
+[delt_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
 ## -- 7
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delt_s8.mean/2.,lAm]+[Am]*(len(okey_s8)-2),
 [delt_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
 ## -- 8
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+[delt_s8.mean/2.,lAm]+[Am]*(len(okey_s8)-2),
+[delt_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
 ## -- 9
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
-[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+[delt_s8.mean/2.,lAm]+[Am]*(len(okey_s8)-2),
+[delt_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
 ## -- 10
-utf.append_prior_state(define_prior_s8,okey_s8,
-gv.gvar(
-[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+#utf.append_prior_state(define_prior_s8,okey_s8,
+#gv.gvar(
+#[delr_s8.mean-2*delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+##[delr_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+#[delr_s8.sdev,Aes]+[Aes]*((len(okey_s8)-3)/2)+[Aes]*((len(okey_s8)-1)/2)))
 ## -- 11
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
 [delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+[delx_s8.sdev,Aes]+[Aes]*((len(okey_s8)-3)/2)+[Aes]*((len(okey_s8)-1)/2)))
+#[dels_s8.mean-3*delt_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+#[dels_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
 ## -- 12
 utf.append_prior_state(define_prior_s8,okey_s8,
 gv.gvar(
 [delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
-[delx_s8.sdev,lAcs]+[Acs]*((len(okey_s8)-3)/2)+[Aks]*((len(okey_s8)-1)/2)))
+[delx_s8.sdev,Aes]+[Aes]*((len(okey_s8)-3)/2)+[Aes]*((len(okey_s8)-1)/2)))
+## -- 13
+utf.append_prior_state(define_prior_s8,okey_s8,
+gv.gvar(
+[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delx_s8.sdev,Aes]+[Aes]*((len(okey_s8)-3)/2)+[Aes]*((len(okey_s8)-1)/2)))
+## -- 14
+utf.append_prior_state(define_prior_s8,okey_s8,
+gv.gvar(
+[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delx_s8.sdev,Aes]+[Aes]*((len(okey_s8)-3)/2)+[Aes]*((len(okey_s8)-1)/2)))
+## -- 15
+utf.append_prior_state(define_prior_s8,okey_s8,
+gv.gvar(
+[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delx_s8.sdev,Aes]+[Aes]*((len(okey_s8)-3)/2)+[Aes]*((len(okey_s8)-1)/2)))
+## -- 16
+utf.append_prior_state(define_prior_s8,okey_s8,
+gv.gvar(
+[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delx_s8.sdev,Aes]+[Aes]*((len(okey_s8)-3)/2)+[Aes]*((len(okey_s8)-1)/2)))
+## -- 17
+utf.append_prior_state(define_prior_s8,okey_s8,
+gv.gvar(
+[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delx_s8.sdev,Aes]+[Aes]*((len(okey_s8)-3)/2)+[Aes]*((len(okey_s8)-1)/2)))
+## -- 18
+utf.append_prior_state(define_prior_s8,okey_s8,
+gv.gvar(
+[delx_s8.mean,lAm]+[Am]*(len(okey_s8)-2),
+[delx_s8.sdev,Aes]+[Aes]*((len(okey_s8)-3)/2)+[Aes]*((len(okey_s8)-1)/2)))
 
-## -- S8'
-## -- even states S8'
-## -- test state
+### -- S8' v5.3.1
+### -- even states S8'
+### -- 0
 #utf.append_prior_state(define_prior_s8p,nkey_s8p,
 #gv.gvar(
-#[ntst_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
-#[ntst_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
+#[ngrd_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+#[ngrd_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
+### -- 1
+#utf.append_prior_state(define_prior_s8p,nkey_s8p,
+#gv.gvar(
+#[delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+#[delt_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
+### -- 2
+#utf.append_prior_state(define_prior_s8p,nkey_s8p,
+#gv.gvar(
+#[nd1600_s8p.mean-ngrd_s8p.mean-delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+#[nd1600_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
+### -- 3
+##utf.append_prior_state(define_prior_s8p,nkey_s8p,
+##gv.gvar(
+##[delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+##[delt_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
+### -- 4
+#utf.append_prior_state(define_prior_s8p,nkey_s8p,
+#gv.gvar(
+#[nd1680_s8p.mean-nd1600_s8p.mean-0*delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+#[nd1680_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+### -- 5
+##utf.append_prior_state(define_prior_s8p,nkey_s8p,
+##gv.gvar(
+##[delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+##[delt_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+### -- 6
+##utf.append_prior_state(define_prior_s8p,nkey_s8p,
+##gv.gvar(
+##[delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+##[delt_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+### -- 7
+#utf.append_prior_state(define_prior_s8p,nkey_s8p,
+#gv.gvar(
+#[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+#[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+### -- 8
+#utf.append_prior_state(define_prior_s8p,nkey_s8p,
+#gv.gvar(
+#[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+#[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+### -- 9
+#utf.append_prior_state(define_prior_s8p,nkey_s8p,
+#gv.gvar(
+#[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+#[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+### -- 10
+#utf.append_prior_state(define_prior_s8p,nkey_s8p,
+#gv.gvar(
+#[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+#[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+#
+### -- odd states S8'
+### -- 0
+#utf.append_prior_state(define_prior_s8p,okey_s8p,
+#gv.gvar(
+#[on1520_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+#[on1520_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+### -- 1
+#utf.append_prior_state(define_prior_s8p,okey_s8p,
+#gv.gvar(
+#[on1675_s8p.mean-on1520_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+#[on1675_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+### -- 2
+#utf.append_prior_state(define_prior_s8p,okey_s8p,
+#gv.gvar(
+#[delt_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+#[delt_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+### -- 3
+##utf.append_prior_state(define_prior_s8p,okey_s8p,
+##gv.gvar(
+##[delt_s8p.mean/2.,lAm]+[Am]*(len(okey_s8p)-2),
+##[delt_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+### -- 4
+##utf.append_prior_state(define_prior_s8p,okey_s8p,
+##gv.gvar(
+##[delt_s8p.mean/2.,lAm]+[Am]*(len(okey_s8p)-2),
+##[delt_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+### -- 5
+##utf.append_prior_state(define_prior_s8p,okey_s8p,
+##gv.gvar(
+##[delt_s8p.mean/2.,lAm]+[Am]*(len(okey_s8p)-2),
+##[delt_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+### -- 6
+##utf.append_prior_state(define_prior_s8p,okey_s8p,
+##gv.gvar(
+##[delt_s8p.mean/2.,lAm]+[Am]*(len(okey_s8p)-2),
+##[delt_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+### -- 7
+#utf.append_prior_state(define_prior_s8p,okey_s8p,
+#gv.gvar(
+#[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+#[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+### -- 8
+#utf.append_prior_state(define_prior_s8p,okey_s8p,
+#gv.gvar(
+#[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+#[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+### -- 9
+#utf.append_prior_state(define_prior_s8p,okey_s8p,
+#gv.gvar(
+#[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+#[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+### -- 10
+#utf.append_prior_state(define_prior_s8p,okey_s8p,
+#gv.gvar(
+#[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+#[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+
+## -- S8' v5.3.0
+## -- even states S8'
 ## -- 0
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
@@ -459,181 +750,177 @@ utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
 [delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
 [delt_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
-#[2*delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
-#[delt_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
 ## -- 2
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
-[delr_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
-[delr_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
-#[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
-#[delx_s8p.sdev,lAcs]+[As]*(len(nkey_s8p)-2)))
+[nd1600_s8p.mean-ngrd_s8p.mean-delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+[nd1600_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
 ## -- 3
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
 [delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
 [delt_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
-#v4
-#utf.append_prior_state(define_prior_s8p,nkey_s8p,
-#gv.gvar(
-#[delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
-#[delx_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
 ## -- 4
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
-[delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
-[delt_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
+[nd1680_s8p.mean-nd1600_s8p.mean-delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
+[nd1680_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
 ## -- 5
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
 [delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
-[delt_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
+[delt_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
 ## -- 6
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
 [delt_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
-[delt_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
+[delt_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
 ## -- 7
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
 [delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
-[delx_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
+[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
 ## -- 8
 utf.append_prior_state(define_prior_s8p,nkey_s8p,
 gv.gvar(
 [delx_s8p.mean,lAm]+[Am]*(len(nkey_s8p)-2),
-[delx_s8p.sdev,lAcs]+[Acs]*((len(nkey_s8p)-3)/2)+[Aks]*((len(nkey_s8p)-1)/2)))
+[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
 
 ## -- odd states S8'
 ## -- 0
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[ogrd_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
-[ogrd_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+[on1520_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[on1520_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
 ## -- 1
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delr_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
-[delr_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+[on1675_s8p.mean-on1520_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[on1675_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
 ## -- 2
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delt_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delt_s8p.mean/2.,lAm]+[Am]*(len(okey_s8p)-2),
 [delt_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
-#v4
-#utf.append_prior_state(define_prior_s8p,okey_s8p,
-#gv.gvar(
-#[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
-#[delx_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
 ## -- 3
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delt_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delt_s8p.mean/2.,lAm]+[Am]*(len(okey_s8p)-2),
 [delt_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
 ## -- 4
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delt_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delt_s8p.mean/2.,lAm]+[Am]*(len(okey_s8p)-2),
 [delt_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
 ## -- 5
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
-[delx_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+[delt_s8p.mean/2.,lAm]+[Am]*(len(okey_s8p)-2),
+[delt_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
 ## -- 6
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
-[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
-[delx_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+[delt_s8p.mean/2.,lAm]+[Am]*(len(okey_s8p)-2),
+[delt_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
 ## -- 7
 utf.append_prior_state(define_prior_s8p,okey_s8p,
 gv.gvar(
 [delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
-[delx_s8p.sdev,lAcs]+[Acs]*((len(okey_s8p)-3)/2)+[Aks]*((len(okey_s8p)-1)/2)))
+[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+## -- 8
+utf.append_prior_state(define_prior_s8p,okey_s8p,
+gv.gvar(
+[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
+## -- 9
+utf.append_prior_state(define_prior_s8p,okey_s8p,
+gv.gvar(
+[delx_s8p.mean,lAm]+[Am]*(len(okey_s8p)-2),
+[delx_s8p.sdev,Aes]+[Aes]*((len(nkey_s8p)-3)/2)+[Aes]*((len(nkey_s8p)-1)/2)))
 
-## -- S16
-## -- even stacks
-nstack_s16mean = [
-[ngrd_s16.mean, ## N
- ngrd_s16.mean+  delr_s16.mean,
- ngrd_s16.mean+  delr_s16.mean+  delt_s16.mean,
- ngrd_s16.mean+  delr_s16.mean+2*delt_s16.mean,
- ngrd_s16.mean+  delr_s16.mean+3*delt_s16.mean,
- ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean,
- ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+  delx_s16.mean,
- ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+2*delx_s16.mean,
- ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+3*delx_s16.mean,
- ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+4*delx_s16.mean,
- ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+5*delx_s16.mean],
-[ovrs_s16.mean, ## \Delta
- ovrs_s16.mean+  delt_s16.mean,
- ovrs_s16.mean+2*delt_s16.mean,
- ovrs_s16.mean+  delr_s16.mean,
- ovrs_s16.mean+  delr_s16.mean+  delt_s16.mean,
- ovrs_s16.mean+  delr_s16.mean+2*delt_s16.mean,
- ovrs_s16.mean+  delr_s16.mean+3*delt_s16.mean,
- ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean,
- ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean+  delx_s16.mean,
- ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean+2*delx_s16.mean,
- ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean+3*delx_s16.mean,
- ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean+4*delx_s16.mean,
- ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean+5*delx_s16.mean]
- ]
-
-nstack_s16sdev = [
-[ngrd_s16.sdev, ## N
- delr_s16.sdev,
- delt_s16.sdev, delt_s16.sdev, delt_s16.sdev, delt_s16.sdev,
- delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev],
-[ovrs_s16.sdev, ## \Delta
- delt_s16.sdev, delt_s16.sdev,
- delr_s16.sdev,
- delt_s16.sdev, delt_s16.sdev, delt_s16.sdev, delt_s16.sdev,
- delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev]
-]
-
-ostack_s16mean = [
-[ogrd_s16.mean, ## N
- ogrd_s16.mean+  delt_s16.mean,
- ogrd_s16.mean+2*delt_s16.mean,
- ogrd_s16.mean+  delr_s16.mean,
- ogrd_s16.mean+  delr_s16.mean+  delt_s16.mean,
- ogrd_s16.mean+  delr_s16.mean+2*delt_s16.mean,
- ogrd_s16.mean+  delr_s16.mean+3*delt_s16.mean,
- ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean,
- ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+  delx_s16.mean,
- ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+2*delx_s16.mean,
- ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+3*delx_s16.mean,
- ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+4*delx_s16.mean,
- ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+5*delx_s16.mean],
-[ogrd_s16.mean+  dels_s16.mean, ## \Delta
- ogrd_s16.mean+  dels_s16.mean+  delt_s16.mean,
- ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean,
- ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+  delt_s16.mean,
- ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+2*delt_s16.mean,
- ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+3*delt_s16.mean,
- ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean,
- ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean+  delx_s16.mean,
- ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean+2*delx_s16.mean,
- ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean+3*delx_s16.mean,
- ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean+4*delx_s16.mean,
- ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean+5*delx_s16.mean]
-]
-
-ostack_s16sdev = [
-[ogrd_s16.sdev, ## N
- delt_s16.sdev, delt_s16.sdev,
- delr_s16.sdev,
- delt_s16.sdev, delt_s16.sdev, delt_s16.sdev, delt_s16.sdev,
- delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev],
-[ogrd_s16.sdev, ## \Delta
- delt_s16.sdev,
- delr_s16.sdev,
- delt_s16.sdev, delt_s16.sdev, delt_s16.sdev, delt_s16.sdev,
- delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev]
-]
-#utf.stack_prior_states(define_prior_s16,nkey_s16,nstack_s16mean,nstack_s16sdev)
-#utf.stack_prior_states(define_prior_s16,okey_s16,ostack_s16mean,ostack_s16sdev)
+### -- S16
+### -- even stacks
+#nstack_s16mean = [
+#[ngrd_s16.mean, ## N
+# ngrd_s16.mean+  delr_s16.mean,
+# ngrd_s16.mean+  delr_s16.mean+  delt_s16.mean,
+# ngrd_s16.mean+  delr_s16.mean+2*delt_s16.mean,
+# ngrd_s16.mean+  delr_s16.mean+3*delt_s16.mean,
+# ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean,
+# ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+  delx_s16.mean,
+# ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+2*delx_s16.mean,
+# ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+3*delx_s16.mean,
+# ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+4*delx_s16.mean,
+# ngrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+5*delx_s16.mean],
+#[ovrs_s16.mean, ## \Delta
+# ovrs_s16.mean+  delt_s16.mean,
+# ovrs_s16.mean+2*delt_s16.mean,
+# ovrs_s16.mean+  delr_s16.mean,
+# ovrs_s16.mean+  delr_s16.mean+  delt_s16.mean,
+# ovrs_s16.mean+  delr_s16.mean+2*delt_s16.mean,
+# ovrs_s16.mean+  delr_s16.mean+3*delt_s16.mean,
+# ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean,
+# ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean+  delx_s16.mean,
+# ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean+2*delx_s16.mean,
+# ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean+3*delx_s16.mean,
+# ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean+4*delx_s16.mean,
+# ovrs_s16.mean+  delr_s16.mean+4*delt_s16.mean+5*delx_s16.mean]
+# ]
+#
+#nstack_s16sdev = [
+#[ngrd_s16.sdev, ## N
+# delr_s16.sdev,
+# delt_s16.sdev, delt_s16.sdev, delt_s16.sdev, delt_s16.sdev,
+# delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev],
+#[ovrs_s16.sdev, ## \Delta
+# delt_s16.sdev, delt_s16.sdev,
+# delr_s16.sdev,
+# delt_s16.sdev, delt_s16.sdev, delt_s16.sdev, delt_s16.sdev,
+# delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev]
+#]
+#
+#ostack_s16mean = [
+#[ogrd_s16.mean, ## N
+# ogrd_s16.mean+  delt_s16.mean,
+# ogrd_s16.mean+2*delt_s16.mean,
+# ogrd_s16.mean+  delr_s16.mean,
+# ogrd_s16.mean+  delr_s16.mean+  delt_s16.mean,
+# ogrd_s16.mean+  delr_s16.mean+2*delt_s16.mean,
+# ogrd_s16.mean+  delr_s16.mean+3*delt_s16.mean,
+# ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean,
+# ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+  delx_s16.mean,
+# ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+2*delx_s16.mean,
+# ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+3*delx_s16.mean,
+# ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+4*delx_s16.mean,
+# ogrd_s16.mean+  delr_s16.mean+4*delt_s16.mean+5*delx_s16.mean],
+#[ogrd_s16.mean+  dels_s16.mean, ## \Delta
+# ogrd_s16.mean+  dels_s16.mean+  delt_s16.mean,
+# ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean,
+# ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+  delt_s16.mean,
+# ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+2*delt_s16.mean,
+# ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+3*delt_s16.mean,
+# ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean,
+# ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean+  delx_s16.mean,
+# ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean+2*delx_s16.mean,
+# ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean+3*delx_s16.mean,
+# ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean+4*delx_s16.mean,
+# ogrd_s16.mean+  dels_s16.mean+  delr_s16.mean+4*delt_s16.mean+5*delx_s16.mean]
+#]
+#
+#ostack_s16sdev = [
+#[ogrd_s16.sdev, ## N
+# delt_s16.sdev, delt_s16.sdev,
+# delr_s16.sdev,
+# delt_s16.sdev, delt_s16.sdev, delt_s16.sdev, delt_s16.sdev,
+# delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev],
+#[ogrd_s16.sdev, ## \Delta
+# delt_s16.sdev,
+# delr_s16.sdev,
+# delt_s16.sdev, delt_s16.sdev, delt_s16.sdev, delt_s16.sdev,
+# delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev, delx_s16.sdev]
+#]
+##utf.stack_prior_states(define_prior_s16,nkey_s16,nstack_s16mean,nstack_s16sdev)
+##utf.stack_prior_states(define_prior_s16,okey_s16,ostack_s16mean,ostack_s16sdev)
 
 ## -- S16
 ## -- even states
@@ -641,158 +928,187 @@ ostack_s16sdev = [
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
 [ngrd_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[ngrd_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
 [ngrd_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 1 -> override with delta prior from S(3/2,16)_0 fit
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
-[ovrs_s16.mean-ngrd_s16.mean-1*delt_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[ovrs_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
+[ovrs_s16.mean-ngrd_s16.mean-0*delt_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
 [ovrs_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 2
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
 [delt_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delt_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
 [delt_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 3
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
+#[delt_s16.mean/2.,lAm]+[Am]*(len(nkey_s16)-2), ## v5.4a
 [delt_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delt_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
 [delt_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 4
-utf.append_prior_state(define_prior_s16,nkey_s16,
-gv.gvar(
-[delr_s16.mean-2*delt_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delr_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
-[delr_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
+#utf.append_prior_state(define_prior_s16,nkey_s16,
+#gv.gvar(
+#[delt_s16.mean/2.,lAm]+[Am]*(len(nkey_s16)-2), ## v5.4a
+#[delt_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
+#[nn1440_s16.mean-ovrs_s16.mean-2*delt_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
+#[nn1440_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 5
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
-[delt_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delt_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
-[delt_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
+#[nd1600_s16.mean-nn1440_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
+[nd1600_s16.mean-ovrs_s16.mean-2*delt_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
+[nd1600_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 6
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
 [delt_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delt_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
-[delt_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
+[delt_s16.sdev,Aes]+[Aes]*((len(nkey_s16)-3)/2)+[Aes]*((len(nkey_s16)-1)/2)))
 ## -- 7
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
-[delx_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
-[delx_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
+[delt_s16.mean/2.,lAm]+[Am]*(len(nkey_s16)-2),
+[delt_s16.sdev,Aes]+[Aes]*((len(nkey_s16)-3)/2)+[Aes]*((len(nkey_s16)-1)/2)))
+#[delt_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 8
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
-[delx_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
-[delx_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
+[delt_s16.mean/2.,lAm]+[Am]*(len(nkey_s16)-2),
+[delt_s16.sdev,Aes]+[Aes]*((len(nkey_s16)-3)/2)+[Aes]*((len(nkey_s16)-1)/2)))
+#[delt_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 9
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
-[delx_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
-[delx_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
+[delt_s16.mean/2.,lAm]+[Am]*(len(nkey_s16)-2),
+[delt_s16.sdev,Aes]+[Aes]*((len(nkey_s16)-3)/2)+[Aes]*((len(nkey_s16)-1)/2)))
+#[delt_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 10
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
-[delx_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
-[delx_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
+[delt_s16.mean/2.,lAm]+[Am]*(len(nkey_s16)-2),
+[delt_s16.sdev,Aes]+[Aes]*((len(nkey_s16)-3)/2)+[Aes]*((len(nkey_s16)-1)/2)))
+#[delt_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 11
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
-[delx_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
-[delx_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
+[delt_s16.mean/2.,lAm]+[Am]*(len(nkey_s16)-2),
+[delt_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 12
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
-[delx_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
-[delx_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
+[delt_s16.mean/2.,lAm]+[Am]*(len(nkey_s16)-2),
+[delt_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 ## -- 13
 utf.append_prior_state(define_prior_s16,nkey_s16,
 gv.gvar(
 [delx_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(nkey_s16)-3)))
+[delx_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
+## -- 14
+utf.append_prior_state(define_prior_s16,nkey_s16,
+gv.gvar(
+[delx_s16.mean,lAm]+[Am]*(len(nkey_s16)-2),
 [delx_s16.sdev,lAcs]+[Acs]*((len(nkey_s16)-3)/2)+[Aks]*((len(nkey_s16)-1)/2)))
 
 ## -- odd states
 ## -- 0
 utf.append_prior_state(define_prior_s16,okey_s16,
 gv.gvar(
-[ogrd_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
-[ogrd_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+[on1520_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+[on1520_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#[ogrd_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+#[ogrd_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
 ## -- 1
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
-[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#utf.append_prior_state(define_prior_s16,okey_s16,
+#gv.gvar(
+#[delt_s16.mean/3.,lAm]+[Am]*(len(okey_s16)-2), #v5.4, v5.4.1, v5.4.2
+#[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
 ## -- 2
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
-[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#utf.append_prior_state(define_prior_s16,okey_s16,
+#gv.gvar(
+#[delt_s16.mean/3.,lAm]+[Am]*(len(okey_s16)-2), #v5.4, v5.4.1, v5.4.2
+#[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
 ## -- 3
 utf.append_prior_state(define_prior_s16,okey_s16,
 gv.gvar(
-[dels_s16.mean-2*delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2), # 2tastes
-#[dels_s16.mean,lAm]+[Am]*(len(okey_s16)-2), # 0tastes
-[dels_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#[delt_s16.mean/3.,lAm]+[Am]*(len(okey_s16)-2), #v5.4, v5.4.1, v5.4.2
+[delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
 ## -- 4
 utf.append_prior_state(define_prior_s16,okey_s16,
 gv.gvar(
-[delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+#[delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+[delt_s16.mean/2.,lAm]+[Am]*(len(okey_s16)-2), #v5.4, v5.4.1, v5.4.2
 [delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
 ## -- 5
 utf.append_prior_state(define_prior_s16,okey_s16,
 gv.gvar(
-[delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
-[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#[delt_s16.mean/2.,lAm]+[Am]*(len(okey_s16)-2),
+#[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+[od1620_s16.mean-on1520_s16.mean-1.5*delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+[od1620_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
 ## -- 6
 utf.append_prior_state(define_prior_s16,okey_s16,
 gv.gvar(
+#[delt_s16.mean/3.,lAm]+[Am]*(len(okey_s16)-2), #v5.4, v5.4.1, v5.4.2
 [delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
 [delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
 ## -- 7
 utf.append_prior_state(define_prior_s16,okey_s16,
 gv.gvar(
-[delr_s16.mean-3*delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
-[delr_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#[delt_s16.mean/3.,lAm]+[Am]*(len(okey_s16)-2), #v5.4, v5.4.1, v5.4.2
+[delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+#[delx_s16.sdev,Aes]+[Aes]*((len(okey_s16)-3)/2)+[Aes]*((len(okey_s16)-1)/2)))
 ## -- 8
 utf.append_prior_state(define_prior_s16,okey_s16,
 gv.gvar(
-[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(okey_s16)-3)))
-[delx_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#[delt_s16.mean/3.,lAm]+[Am]*(len(okey_s16)-2), #v5.4, v5.4.1, v5.4.2
+[delt_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+#[delx_s16.sdev,Aes]+[Aes]*((len(okey_s16)-3)/2)+[Aes]*((len(okey_s16)-1)/2)))
 ## -- 9
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(okey_s16)-3)))
-[delx_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#utf.append_prior_state(define_prior_s16,okey_s16,
+#gv.gvar(
+#[delt_s16.mean/2.,lAm]+[Am]*(len(okey_s16)-2), #v5.4, v5.4.1, v5.4.2
+#[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+#[delx_s16.sdev,Aes]+[Aes]*((len(okey_s16)-3)/2)+[Aes]*((len(okey_s16)-1)/2)))
 ## -- 10
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(okey_s16)-3)))
-[delx_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#utf.append_prior_state(define_prior_s16,okey_s16,
+#gv.gvar(
+#[delt_s16.mean/2.,lAm]+[Am]*(len(okey_s16)-2), #v5.4, v5.4.1, v5.4.2
+#[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+#[delx_s16.sdev,Aes]+[Aes]*((len(okey_s16)-3)/2)+[Aes]*((len(okey_s16)-1)/2)))
 ## -- 11
-utf.append_prior_state(define_prior_s16,okey_s16,
-gv.gvar(
-[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(okey_s16)-3)))
-[delx_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#utf.append_prior_state(define_prior_s16,okey_s16,
+#gv.gvar(
+#[delt_s16.mean/2.,lAm]+[Am]*(len(okey_s16)-2), #v5.4, v5.4.1, v5.4.2
+#[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+#[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+#[delx_s16.sdev,Aes]+[Aes]*((len(okey_s16)-3)/2)+[Aes]*((len(okey_s16)-1)/2)))
 ## -- 12
 utf.append_prior_state(define_prior_s16,okey_s16,
 gv.gvar(
+#[delt_s16.mean/2.,lAm]+[Am]*(len(okey_s16)-2),
+#[delt_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
 [delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
-#[delx_s16.sdev,lAcs,lAcs]+[As]*(len(okey_s16)-3)))
+[delx_s16.sdev,Aes]+[Aes]*((len(okey_s16)-3)/2)+[Aes]*((len(okey_s16)-1)/2)))
+## -- 13
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+[delx_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+## -- 14
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
+[delx_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
+## -- 15
+utf.append_prior_state(define_prior_s16,okey_s16,
+gv.gvar(
+[delx_s16.mean,lAm]+[Am]*(len(okey_s16)-2),
 [delx_s16.sdev,lAcs]+[Acs]*((len(okey_s16)-3)/2)+[Aks]*((len(okey_s16)-1)/2)))
 
 ## -- construct models quickly using loops

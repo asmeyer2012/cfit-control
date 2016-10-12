@@ -6,6 +6,9 @@ import util_plots as utp
 import defines      as df
 import define_prior as dfp
 
+import matplotlib as mpl
+mpl.use('TkAgg')
+
 ## -- handle which input is being varied
 fix_tmin = False # only a single value of tmin
 fix_tmax = True # only a single value of tmin

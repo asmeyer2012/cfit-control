@@ -9,6 +9,9 @@ import defines as df
 import matplotlib as mpl
 mpl.use('TkAgg')
 
+print_quality = True
+sn_ratio = True
+
 def plot_corr_effective_mass(models,data,fit=None,**kwargs):
  """
  Get all data ready so that it can be plotted on command
@@ -41,14 +44,23 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
  _emFitMin = 0
  _emFitMax = 0
  _emSep    = 0
- fig,ax = plt.subplots(1)
+ fig,ax = plt.subplots(1,figsize=(10,8))
  #
  ## -- setup plot function
  def do_plot_corr_effective_mass(idx,fig=fig):
    fig.clear()
+   #fig.set_size_inches(10,10) #doesn't work
    ax = fig.add_subplot(111)
+   if print_quality:
+    plt.subplots_adjust(bottom=0.15,left=0.18,right=0.97,top=0.95)
+   else:
+    #plt.subplots_adjust(bottom=0.15,left=0.15,right=0.97,top=0.95)
+    pass
+   #fig.set_figheight(20) #doesn't work
+   #fig.set_figwidth(20)
    key = models[idx[0]].datatag
-   ax.set_ylim(utp.get_option("y_limit",[0.0,2.0],**kwargs[key]))
+   ax.set_xlim([-1,df.cor_len/2])
+   ax.set_ylim(utp.get_option("y_limit",[0.0,1.4],**kwargs[key]))
    #
    # -- plot correlator data
    if utp.get_option("meff_do_fold",False,**kwargs[key]):
@@ -68,11 +80,11 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
      color=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
      ls=utp.get_option("linestyle1",'None',**kwargs[key]),
      marker=utp.get_option("marker1",'o',**kwargs[key]),
-     ms=utp.get_option("markersize",6,**kwargs[key]))
+     ms=utp.get_option("markersize",10,**kwargs[key]))
     ax.scatter(_emTPosFoldFit[idx[0]],gv.mean(_emFoldRatioFit[idx[0]]),
      color=utp.get_option("color1",'r',**kwargs[key]),
      marker=utp.get_option("marker",'o',**kwargs[key]),
-     s=utp.get_option("markersize",36,**kwargs[key]))
+     s=utp.get_option("markersize",100,**kwargs[key]))
    else:
     ## -- plot fit
     ax.plot(_emTPosFit[idx[0]],_emFitCentral[idx[0]],
@@ -90,20 +102,33 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
      color=utp.get_option("markeredgecolor1",'k',**kwargs[key]),
      ls=utp.get_option("linestyle1",'None',**kwargs[key]),
      marker=utp.get_option("marker1",'o',**kwargs[key]),
-     ms=utp.get_option("markersize",6,**kwargs[key]))
+     ms=utp.get_option("markersize",8,**kwargs[key]))
     ax.scatter(_emTPosFit[idx[0]],gv.mean(_emLogRatioFit[idx[0]]),
      color=utp.get_option("color1",'r',**kwargs[key]),
      marker=utp.get_option("marker",'o',**kwargs[key]),
-     s=utp.get_option("markersize",36,**kwargs[key]))
+     s=utp.get_option("markersize",64,**kwargs[key]))
    fig.suptitle(utp.get_option("plottitleem",str(idx[0])+" default title "+str(key),**kwargs[key]),
     fontsize=utp.get_option("titlesize",20,**kwargs[key]))
    # -- modify some options 
-   ax.set_xlabel(r'$t$')
-   ax.set_ylabel(utp.get_option("yaxistitle",
-    r"$-\frac{1}{"+str(_emSep)+r"}\,log\frac{C(t+"+str(_emSep)+r")}{C(t)}$",**kwargs[key]))
-   for item in ([ax.xaxis.label,ax.yaxis.label]):
-    # must be after setting label content (LaTeX ruins it)
-    item.set_fontsize(fontsize=utp.get_option("fontsize",20,**kwargs[key]))
+   if print_quality:
+    ax.set_xlabel(r'$t$',fontsize=40)
+    if sn_ratio:
+     ax.set_ylabel(utp.get_option("yaxistitle",
+      r"$-\frac{1}{"+str(_emSep)+r"}v_{i}^{T}\,log\frac{C_{ij}(t+"+str(_emSep)+r")}{C_{ij}(t)}w_{j}$",
+      **kwargs[key]),fontsize=40)
+    else:
+     ax.set_ylabel(utp.get_option("yaxistitle",
+      r"$-\frac{1}{"+str(_emSep)+r"}\,log\frac{C_{ii}(t+"+str(_emSep)+r")}{C_{ii}(t)}$",
+      **kwargs[key]),fontsize=40)
+    plt.xticks(plt.xticks()[0],fontsize=24)
+    plt.yticks(plt.yticks()[0],fontsize=24)
+   else:
+    ax.set_xlabel(r'$t$')
+    ax.set_ylabel(utp.get_option("yaxistitle",
+     r"$-\frac{1}{"+str(_emSep)+r"}\,log\frac{C(t+"+str(_emSep)+r")}{C(t)}$",**kwargs[key]))
+    for item in ([ax.xaxis.label,ax.yaxis.label]):
+     # must be after setting label content (LaTeX ruins it)
+     item.set_fontsize(fontsize=utp.get_option("fontsize",20,**kwargs[key]))
    rect =fig.patch
    rect.set_facecolor('white')
    if utp.get_option("to_file",False,**kwargs[key]):

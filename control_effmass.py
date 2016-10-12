@@ -18,7 +18,7 @@ from make_plot                import make_plot
 from make_plot                import make_plot_corr_neg
 from make_plot                import make_plot_1plus1
 from plot_corr_double_log     import plot_corr_double_log
-from plot_corr_effective_mass import plot_corr_effective_mass
+from plot_corr_effective_mass_clean import plot_corr_effective_mass
 from plot_corr_effective_mass_check import plot_corr_effective_mass_check
 from plot_corr_normalized     import plot_corr_normalized
 from plot_corr_3pt            import plot_corr_3pt
@@ -34,6 +34,8 @@ import numpy             as np
 import argparse
 import hashlib
 import sys
+
+print_quality = True
 
 parser = argparse.ArgumentParser(description='fit 3-point correlators') # description of what?
 parser.add_argument('-d','--dump',dest='dump_gvar',action='store_true')
@@ -58,13 +60,43 @@ elif df.do_irrep == "8":
   irrepStr = '16p'
 
 taglist = list() # for gvar.dump hash key
-filekey = 'm'
-taglist.append(('l32v4.bar2pt.'+irrepStr,'2pt'))
+#filekey = 'm'
+#taglist.append(('l32v4.bar2pt.'+irrepStr,'2pt'))
+filekey = 'a'  ## -- standard choice, no filters
+#filekey = 'm'  ## -- munich filter
+#print "Using munich filter"
+#taglist.append(('l32v5.mes2pt','mes'))
+taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
+if not(df.do_irrep == "16"):
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
+else:
+ ## -- both 16+ and 16-
+ irrepStr = '16p'
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16p'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16p'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16p'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16p'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16p'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16p'))
+ irrepStr = '16m'
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16m'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16m'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16m'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
+ taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
 
 dall = standard_load(taglist,filekey,argsin)
 if df.do_sn_minimize:
  defm = {}
  for key in dall:
+  if 't' in key: 
+   continue
   tlen = len(dall[key])
   #if dall[key][2]/dall[key][0] > 0.\
   #and dall[key][tlen-2]/dall[key][0] > 0.:
@@ -87,6 +119,8 @@ if df.do_sn_minimize:
  clist = list()
  klist = list()
  for key in dall:
+  if 't' in key: 
+   continue
   ## -- deconstruct key based on current conventions
   k = int(key[-1])
   if not(k in klist):
@@ -155,7 +189,7 @@ pass
 
 ## -- plot
 plot_corr_effective_mass      (models2,ddia,None,**df.fitargs)
-plot_corr_effective_mass_check(models2,ddia,None,**df.fitargs)
+#plot_corr_effective_mass_check(models2,ddia,None,**df.fitargs)
 #plot_corr_effective_mass      (models2,dall,None,**df.fitargs)
 #plot_corr_effective_mass_check(models2,dall,None,**df.fitargs)
 if df.do_plot_terminal:

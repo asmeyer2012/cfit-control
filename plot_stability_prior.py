@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 import gvar as gv
 import util_funcs as utf
@@ -6,6 +7,9 @@ import util_plots as utp
 import defines      as df
 import define_prior as dfp
 from lsqfit._utilities import gammaQ
+
+## -- works better for X11 forwarding
+mpl.use('TkAgg')
 
 def plot_stability(fit_collector,**kwargs):
  """
@@ -46,10 +50,11 @@ def plot_stability(fit_collector,**kwargs):
     Qval = gammaQ(fit_collector[tkey]['rdof']/2.,fit_collector[tkey]['chi2']/2.)
     #if Qval < 0.001:
     # continue
-    hQval.append(Qval)
+    print tkey,fit_collector[tkey]['rdof'],fit_collector[tkey]['chi2'],Qval
+    hQval.append(' (%.2g)' % Qval)
    except:
-    continue
-    #hQval.append(0)
+    #continue
+    hQval.append(' (?)')
    hVal.append(fitCount+0.5)
    if fit_collector[tkey]['rdof'] > 0:
     hName.append(str(nst) +'+'+ str(ost)
@@ -77,7 +82,7 @@ def plot_stability(fit_collector,**kwargs):
  ax = fig.add_subplot(111)
  plt.xticks(hVal,hName,rotation='vertical')
  ax.set_xlim([0,fitCount])
- ax.set_ylim([0.6,1.5])
+ ax.set_ylim([0.5,1.5])
  for i,en,den in zip(range(len(df.define_prior['logEn'])),
   utf.sum_dE(df.define_prior['logEn']),df.define_prior['logEn']):
    if i==0:
@@ -106,4 +111,12 @@ def plot_stability(fit_collector,**kwargs):
   color='b',marker='o',linestyle='')
  for x in range(1,fitCount):
   ax.axvline(x,color='k')
- plt.show()
+ if True:
+  plt.show()
+ else:
+  mng = plt.get_current_fig_manager()
+  mng.resize(*mng.window.maxsize())
+  fig.set_size_inches(8,5)
+  plt.subplots_adjust(bottom=0.30)
+  fig.savefig('/home/asm58/stability_out_tmp.pdf',dpi=400)
+  #plt.savefig('/home/asm58/stability_out_tmp.pdf')

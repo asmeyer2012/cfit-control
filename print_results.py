@@ -4,12 +4,18 @@ import defines as df
 import util_funcs as ut
 from lsqfit._utilities import gammaQ
 
-def reduced_dof(fit):
+def reduced_dof(fit,do_v_symm=False):
  try:
-  n3 = len(fit.transformed_p[df.current_key[0]+'nn'])
-  o3 = len(fit.transformed_p[df.current_key[0]+'oo'])
+  if do_v_symm:
+   ## -- use 'no' instead, faster
+   n3 = len(fit.transformed_p[df.current_key[0]+'no'])
+   o3 = len(fit.transformed_p[df.current_key[0]+'no'][0])
+  else:
+   n3 = len(fit.transformed_p[df.current_key[0]+'nn'])
+   o3 = len(fit.transformed_p[df.current_key[0]+'oo'])
  except KeyError:
   ## -- 2pt fit
+  #print "2 point reduced dof"
   n3 = 0
   o3 = 0
  klen = len(df.define_prior['nkey'])
@@ -20,7 +26,7 @@ def reduced_dof(fit):
  else:
   return fit.dof - ( klen*(n2+o2) + (n3+o3)*(n3+o3) )
 
-def fmt_reduced_chi2(fit):
+def fmt_reduced_chi2(fit,do_v_symm=False):
  rstr = 'reduced chi2/dof = '
  #try:
  # n3 = len(fit.transformed_p[df.current_key[0]+'nn'])
@@ -33,7 +39,7 @@ def fmt_reduced_chi2(fit):
  #n2 = len(fit.transformed_p['En'])
  #o2 = len(fit.transformed_p['Eo'])
  #newdof = fit.dof - ( klen*(n2+o2) + (n3+o3)*(n3+o3) )
- newdof = reduced_dof(fit)
+ newdof = reduced_dof(fit,do_v_symm)
  if newdof < 1:
   newchi2 = np.nan
   rstr = rstr + 'nan [' + str(newdof) + ']    Q = ?'
@@ -43,7 +49,7 @@ def fmt_reduced_chi2(fit):
     + ']    Q = %.2g' % gammaQ(newdof/2.,fit.chi2/2.)
  return rstr
 
-def print_fit(fit, prior):
+def print_fit(fit, prior,do_v_symm=False):
  ## -- print the fit parameters neatly
  ## -- give both summed and differential energies
  ## -- if variables fit as logs, give both log and linear
@@ -52,7 +58,7 @@ def print_fit(fit, prior):
  do_sigdigit=True
  #
  print '        '+gv.fmt_chi2(fit)
- print fmt_reduced_chi2(fit)
+ print fmt_reduced_chi2(fit,do_v_symm)
  print
  print "Printing best fit parameters : "
  #
@@ -113,8 +119,9 @@ def print_fit(fit, prior):
   for j in range(len(fit.transformed_p[skey])):
    if skey[-2:] == 'nn' or skey[-2:] == 'no' or\
       skey[-2:] == 'on' or skey[-2:] == 'oo':
-     for k in range(len(fit.transformed_p[skey][0])):
-       sigstr=get_sigma_str(skey,fit,prior,(j,k),do_unicode)
+     #for k in range(len(fit.transformed_p[skey][0])):
+     #  sigstr=get_sigma_str(skey,fit,prior,(j,k),do_unicode)
+     pass
    else:
      sigstr=get_sigma_str(skey,fit,prior,j,do_unicode)
    if (skey[len(skey)-2:] == 'En' or \
@@ -134,11 +141,23 @@ def print_fit(fit, prior):
    else:
     if skey[-2:] == 'nn' or skey[-2:] == 'no' or\
        skey[-2:] == 'on' or skey[-2:] == 'oo':
-      ## -- print 3-point factors
-      for k in range(len(fit.transformed_p[skey][0])):
-        print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']'+'['+'{:>2}'.format(k)+']  :  '\
-              +ut.fmt_num(fit.transformed_p[skey][j][k],do_sigdigit,do_unicode)\
-              +'  '+sigstr
+      if df.do_v_symmetric and (skey[-2:] == 'nn' or skey[-2:] == 'oo'):
+       ## -- upper triangle matrix 3-point factors
+       vlen = int(np.sqrt(8*len(fit.transformed_p[skey])+1)-1)/2
+       ui = np.triu_indices(vlen)
+       i = ui[0][j]
+       k = ui[1][j]
+       sigstr=get_sigma_str(skey,fit,prior,j,do_unicode)
+       print '{:>10}'.format(skey)+'['+'{:>2}'.format(i)+']'+'['+'{:>2}'.format(k)+']  :  '\
+             +ut.fmt_num(fit.transformed_p[skey][j],do_sigdigit,do_unicode)\
+             +'  '+sigstr
+      else:
+       ## -- print 3-point factors
+       for k in range(len(fit.transformed_p[skey][0])):
+         sigstr=get_sigma_str(skey,fit,prior,(j,k),do_unicode)
+         print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']'+'['+'{:>2}'.format(k)+']  :  '\
+               +ut.fmt_num(fit.transformed_p[skey][j][k],do_sigdigit,do_unicode)\
+               +'  '+sigstr
     else:
       print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']      :  '\
             +ut.fmt_num(fit.transformed_p[skey][j],do_sigdigit,do_unicode)\

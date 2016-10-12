@@ -25,6 +25,7 @@ from plot_corr_effective_mass_check import plot_corr_effective_mass_check
 from plot_corr_normalized     import plot_corr_normalized
 #from plot_corr_3pt            import plot_corr_3pt
 from plot_corr_stacked_3pt    import plot_corr_3pt
+#from plot_corr_stacked_3pt_clean    import plot_corr_3pt
 from meta_data                import *
 from util_files               import read_fit_file
 import defines           as df
@@ -34,9 +35,13 @@ import gvar              as gv
 import gvar.dataset      as gvd
 import matplotlib.pyplot as plt
 import numpy             as np
+import util_funcs        as utf
 import argparse
 import hashlib
 import sys
+
+import matplotlib as mpl
+mpl.use('TkAgg')
 
 parser = argparse.ArgumentParser(description='fit 3-point correlators') # description of what?
 parser.add_argument('-r','--reset',dest='override_init',action='store_true')
@@ -58,7 +63,9 @@ elif df.do_irrep == "16":
 
 ## 8+ representation
 taglist = list() # for gvar.dump hash key
-filekey = 'a'  ## -- 4218b279
+filekey = 'a'  ## -- standard choice, no filters
+#filekey = 'm'  ## -- munich filter
+#print "Using munich filter"
 #taglist.append(('l32v5.mes2pt','mes'))
 taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
 if not(df.do_irrep == "16"):
@@ -124,13 +131,19 @@ if df.do_init3:
   else:
    for key in df.define_init_3pt:
      if key[-2:] == 'nn':
-      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst,df.num_nst))
-     elif key[-2:] == 'no':
-      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst,df.num_ost))
-     elif key[-2:] == 'on':
-      init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost,df.num_nst))
+      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_nst_3pt))
+      if df.do_v_symmetric:
+       init3[key] = utf.truncate_upper_triangle(init3[key],df.num_nst_3pt)
      elif key[-2:] == 'oo':
-      init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost,df.num_ost))
+      init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_ost_3pt))
+      if df.do_v_symmetric:
+       init3[key] = utf.truncate_upper_triangle(init3[key],df.num_ost_3pt)
+     elif key[-2:] == 'no':
+      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_ost_3pt))
+     elif key[-2:] == 'on':
+      ## -- is this correct for symmetric v?
+      #init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_nst_3pt))
+      pass
      elif key[-1] == 'n':
       init3[key] = df.define_init_3pt[key][:df.num_nst]
      elif key[-1] == 'o':
@@ -146,18 +159,29 @@ if df.do_2pt:
  fit2 = fitter2.lsqfit(data=dall,prior=priors2,p0=init2,svdcut=df.svdcut)
  ## -- fits take a long time, so print prematurely
  print_fit(fit2,priors2)
-print "starting 3pt fit..."
-fit3 = fitter3.lsqfit(data=dall,prior=priors,p0=init3,svdcut=df.svdcut)
-#print fmt_reduced_chi2(fit3)
+if df.do_3pt:
+ print "starting 3pt fit..."
+ fit3 = fitter3.lsqfit(data=dall,prior=priors,p0=init3,svdcut=df.svdcut)
+else:
+ print "Ignoring 3pt fit!"
+ fit3=None
+
+#fit3 = fitter3.lsqfit(data=dall,prior=priors,svdcut=df.svdcut)
+print fmt_reduced_chi2(fit3)
 #save_data('./test.fit.out',fit,dall)
 
 ## -- print
 #if df.do_2pt:
 # print_fit(fit2,priors2)
-print_fit(fit3,priors)
+print_fit(fit3,priors,df.do_v_symmetric)
 
 ## -- save fit as an initial value dictionary
-save_init_from_fit(fit3,'fit_dict.py')
+if df.do_irrep == "16":
+ irrepStr = '16'
+if df.do_2pt:
+ save_init_from_fit(fit2,'fit_dict'+irrepStr+'_2pt.py')
+if df.do_3pt:
+ save_init_from_fit(fit3,'fit_dict'+irrepStr+'_3pt.py')
 
 ## -- test routines
 #import util_plots as utp
@@ -178,10 +202,10 @@ if df.do_plot or argsin['override_plot']:
  #plot_corr_effective_mass_check(models2,dall,None,**df.fitargs)
  #plot_corr_effective_mass(models2,dall,None,**df.fitargs)
  #plot_corr_double_log(models2,dall,fit3,**df.fitargs)
- #plot_corr_double_log_folded(models2,dall,fit3,**df.fitargs)
- #plot_corr_normalized(models2,dall,fit3,**df.fitargs)
- #plot_corr_3pt(models3,dall,fit3,**df.fitargs)
- plot_corr_3pt(models3,dall,fit3,**df.fitargs)
+ plot_corr_double_log_folded(models2,dall,fit3,**df.fitargs)
+ plot_corr_normalized(models2,dall,fit3,**df.fitargs)
+ if df.do_3pt:
+  plot_corr_3pt(models3,dall,fit3,**df.fitargs)
  if df.do_plot_terminal:
   plt.show()
 
@@ -230,5 +254,6 @@ if df.do_sn_minimize:
    df.fitargs[tkey]["p3_save_name"] = \
     "s3-s8p-l3248-coul-"+tkey+".pdf"
    df.fitargs[tkey]["y_scale"] = [-.2,.6]
-   df.fitargs[tkey]["yaxistitle"] = r"$\beta v_{i}C_{ij}w_{j}(t,T)$"
+   df.fitargs[tkey]["yaxistitle"] = r"$\beta v_{i}^{T}C_{ij}w_{j}(t,T)$"
  plot_corr_3pt(models3,dall,fit3,**df.fitargs)
+ plt.show()

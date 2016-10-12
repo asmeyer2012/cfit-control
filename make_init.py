@@ -2,11 +2,20 @@ import gvar as gv
 import defines as df
 import numpy as np
 import os
+import importlib
 
 def load_dict_from_fit_file_3pt(directory,filename):
+ #initdir = os.getcwd()
+ #print initdir,filename
+ #os.chdir(directory)
+ #print os.getcwd()
+ #infile = __import__(filename) ## weird behavior
+ #infile = __import__('fit-stability.'+filename) ## not working
+ #rdict = infile.init_val_import
+ #os.chdir(initdir)
  initdir = os.getcwd()
  os.chdir(directory)
- infile = __import__(filename)
+ infile = importlib.import_module(filename,'init_val_import') ## still weird behavior
  rdict = infile.init_val_import
  os.chdir(initdir)
  return rdict

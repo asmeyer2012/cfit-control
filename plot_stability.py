@@ -7,6 +7,9 @@ import defines      as df
 import define_prior as dfp
 from lsqfit._utilities import gammaQ
 
+import matplotlib as mpl
+mpl.use('TkAgg')
+
 def plot_stability(fit_collector,**kwargs):
  """
  """

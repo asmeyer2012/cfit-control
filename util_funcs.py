@@ -106,6 +106,27 @@ def neg_err(dmean,dsdev,val=None):
     for i in range(len(dsdev))]
    return [dmp_sdev,dmm_sdev]
 
+def truncate_upper_triangle(mat,n):
+ """
+ Turn a matrix of size n*n into an array of just the upper-triangular elements
+ Will truncate matrix if larger than n*n
+ Convienient numpy indexing routine for just this purpose
+ """
+ iu1 = np.triu_indices(n)
+ return mat[iu1]
+
+def reconstruct_upper_triangle(fmat,n):
+ """
+ The inverse of truncate_upper_triangle
+ Turns a flat matrix of size n*(n+1)/2 into a square matrix
+ """
+ iu1 = np.triu_indices(n)
+ tmp = np.array(n*[n*[gv.gvar(0,1)]])
+ for i,x in zip(range(len(iu1[0])),np.transpose(iu1)):
+  tmp[tuple(x)]       = fmat[i] ## upper triangle
+  tmp[tuple(x)[::-1]] = fmat[i] ## lower triangle
+ return tmp
+
 def create_prior_dict(nkey,okey):
  """
  Create an empty prior dictionary for use
@@ -118,7 +139,7 @@ def create_prior_dict(nkey,okey):
   rprior[key] = []
  return rprior
 
-def get_prior_dict(prior,nkey,okey,nn,no,vkey=tuple(),nn3=1,no3=1):
+def get_prior_dict(prior,nkey,okey,nn,no,vkey=tuple(),nn3=1,no3=1,do_v_symm=False):
  """
  Get a prior dictionary which has many states in it and extract only
  the first nn+no states
@@ -184,9 +205,19 @@ def get_prior_dict(prior,nkey,okey,nn,no,vkey=tuple(),nn3=1,no3=1):
      else:
       raise ValueError("Unparseable key:",key)
      #rprior[key][xkey] = np.resize(prior[key][xkey],(n1,n2))
-     rprior[key][xkey] = prior[key][xkey][:n1,:n2]
-     if (len(rprior[key][xkey]) < n1 or len(rprior[key][xkey][0]) < n2):
-      raise ValueError("Not enough prior states to fill prior dictionary")
+     if do_v_symm and (xkey[-2:] == 'nn' or xkey[-2:] == 'oo'):
+      #rprior[key][xkey] = prior[key][xkey][:(n1*(n1+1)/2)] ## -- outdated
+      try:
+       rprior[key][xkey] = truncate_upper_triangle(prior[key][xkey],n1)
+      except:
+       rprior[key][xkey] = prior[key][xkey]
+     elif do_v_symm and (xkey[-2:] == 'on'):
+      continue ## -- use priors for 'no' instead
+      #rprior[key][xkey] = prior[key][xkey][:(n1*(n1+1)/2)]
+     else:
+      rprior[key][xkey] = prior[key][xkey][:n1,:n2]
+      if (len(rprior[key][xkey]) < n1 or len(rprior[key][xkey][0]) < n2):
+       raise ValueError("Not enough prior states to fill prior dictionary")
     except KeyError:
      pass # probably 2-point function
  return rprior

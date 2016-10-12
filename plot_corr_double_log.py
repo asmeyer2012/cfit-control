@@ -5,6 +5,9 @@ import util_funcs as utf
 import util_plots as utp
 import defines as df
 
+import matplotlib as mpl
+mpl.use('TkAgg')
+
 #def plot_corr_double_log(models,data,fit,fig,**kwargs):
 def plot_corr_double_log(models,data,fit,**kwargs):
  """

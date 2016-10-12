@@ -8,6 +8,10 @@ import defines as df
 import matplotlib as mpl
 mpl.use('TkAgg')
 
+print_quality = True
+#plotLimit = [-0.2,0.6,0.2]
+plotLimit = [-0.2,1.2,0.2]
+
 def plot_corr_3pt(models,data,fit,**kwargs):
  """
  Get all data ready so that it can be plotted on command
@@ -32,7 +36,11 @@ def plot_corr_3pt(models,data,fit,**kwargs):
  _p3TFit  = []
  _p3TDataSub = []
  _p3TFitSub  = []
- fig,axp = plt.subplots(1,figsize=(13,10))
+ fig,axp = plt.subplots(1,figsize=(10,8))
+ if print_quality:
+  plt.subplots_adjust(bottom=0.18,left=0.18,right=0.97,top=0.95)
+ else:
+  plt.subplots_adjust(bottom=0.15,left=0.15,right=0.97,top=0.95)
  #
  ## -- setup plot function
  def do_plot_3pt(idx,fig=fig):
@@ -44,7 +52,7 @@ def plot_corr_3pt(models,data,fit,**kwargs):
    tbd = np.max([x[-1] for x in _p3TData[idx[0]]])
    axp.set_xlim([-float(tbd)/2-1,float(tbd)/2+1])
    #axp.set_ylim(utp.get_option("y_scale",[-2,2],**kwargs[key]))
-   axp.set_ylim(utp.get_option("y_scale",[-0.3,0.3],**kwargs[key]))
+   axp.set_ylim(utp.get_option("y_scale",[plotLimit[0],plotLimit[1]],**kwargs[key]))
    #
    ## -- plot fit
    if utp.get_option("p3_do_fit",True,**kwargs[key]):
@@ -80,18 +88,28 @@ def plot_corr_3pt(models,data,fit,**kwargs):
     handles.append(handle)
    fig.suptitle(utp.get_option("plottitlep3",str(idx[0])+" default title "+str(key),**kwargs[key]),
     fontsize=utp.get_option("titlesize",20,**kwargs[key]))
-   axp.set_xlabel(r'$t-\frac{T}{2}$',fontsize=30)
-   axp.set_ylabel(utp.get_option("yaxistitle",r"$C(t,T)$",**kwargs[key]),
-    #fontsize=30,rotation=0,position=(0.05,0.98))
-    fontsize=30,rotation=0)
-   #axp.yaxis.set_label_coords(-0.02,0.28)
-   axp.yaxis.set_label_coords(0.0,1.03)
-   axp.tick_params(axis='both', which='major', labelsize=24)
+   if print_quality:
+    axp.set_xlabel(r'$t-\frac{T}{2}$',fontsize=40)
+    axp.set_ylabel(utp.get_option("yaxistitle",r"$C(t,T)$",**kwargs[key]),
+     #fontsize=30,rotation=0,position=(0.05,0.98))
+     fontsize=40,rotation='vertical')
+    axp.yaxis.set_label_coords(-0.10,0.5)
+    axp.tick_params(axis='both', which='major', labelsize=30)
+    plt.yticks(list(np.arange(plotLimit[0],plotLimit[1]+1e-8,plotLimit[2])),
+     fontsize=30)
+   else:
+    axp.set_xlabel(r'$t-\frac{T}{2}$',fontsize=30)
+    axp.set_ylabel(utp.get_option("yaxistitle",r"$C(t,T)$",**kwargs[key]),
+     #fontsize=30,rotation=0,position=(0.05,0.98))
+     fontsize=30,rotation=0)
+    #axp.yaxis.set_label_coords(-0.02,0.28)
+    axp.yaxis.set_label_coords(0.0,1.03)
+    axp.tick_params(axis='both', which='major', labelsize=24)
    ## -- modify some options 
-   for item in ([axp.xaxis.label,axp.yaxis.label]):
-    # must be after setting label content (LaTeX ruins it)
-    item.set_fontsize(fontsize=utp.get_option("fontsize",36,**kwargs[key]))
-   plt.legend(handles,["T = "+str(t) for t in _p3Tsp],fontsize=20)
+   #for item in ([axp.xaxis.label,axp.yaxis.label]):
+   # # must be after setting label content (LaTeX ruins it)
+   # item.set_fontsize(fontsize=utp.get_option("fontsize",36,**kwargs[key]))
+   plt.legend(handles,["T = "+str(t) for t in _p3Tsp],fontsize=30)
    rect =fig.patch
    rect.set_facecolor('white')
    
@@ -158,13 +176,14 @@ def plot_corr_3pt(models,data,fit,**kwargs):
    _p3TFitSub[tidx].append([t-float(len(_p3TFit[tidx][-1])+1)/2 for t in _p3TFit[tidx][-1]])
    _p3TDataSub[tidx].append([t-float(len(_p3TFit[tidx][-1])+1)/2 for t in _p3TData[tidx][-1]])
    ## -- fit
-   _p3FitFunc = utp.create_fit_func_3pt(model,fit) ## not defined yet!
-   _p3FitMean = gv.mean(_p3FitFunc(_p3TFit[tidx][-1]))
-   _p3FitSdev = gv.sdev(_p3FitFunc(_p3TFit[tidx][-1]))
-   _p3FitCentral[tidx].append(_p3FitMean)
-   _p3FitError[tidx].append([
-     np.array(_p3FitMean)-np.array(_p3FitSdev),
-     np.array(_p3FitMean)+np.array(_p3FitSdev)])
+   if False:
+    _p3FitFunc = utp.create_fit_func_3pt(model,fit) ## not defined yet!
+    _p3FitMean = gv.mean(_p3FitFunc(_p3TFit[tidx][-1]))
+    _p3FitSdev = gv.sdev(_p3FitFunc(_p3TFit[tidx][-1]))
+    _p3FitCentral[tidx].append(_p3FitMean)
+    _p3FitError[tidx].append([
+      np.array(_p3FitMean)-np.array(_p3FitSdev),
+      np.array(_p3FitMean)+np.array(_p3FitSdev)])
    ## -- data
    _p3DatMean = gv.mean([data[key][t] for t in _p3TData[tidx][-1]])
    _p3DatSdev = gv.sdev([data[key][t] for t in _p3TData[tidx][-1]])

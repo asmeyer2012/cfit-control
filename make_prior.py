@@ -27,8 +27,16 @@ def make_prior(models,prior_dict=None,nst=-1,ost=-1):
        not(pkey[4:] in model.a+model.b+model.dE):
      continue
     if pkey[:3] == 'log':
+     negcheck = filter(lambda x: x[1].mean < 0,enumerate(prior[pkey]))
+     if len(negcheck) > 0:
+      raise ValueError("Prior indices ",list(np.array(negcheck)[:,0]),
+       " have negative values, key ",pkey)
      prior[pkey] = gv.log(prior[pkey])
     elif pkey[:4] == 'sqrt':
+     negcheck = filter(lambda x: x[1].mean < 0,enumerate(prior[pkey]))
+     if len(negcheck) > 0:
+      raise ValueError("Prior indices ",list(np.array(negcheck)[:,0]),
+       " have negative values, key ",pkey)
      prior[pkey] = gv.sqrt(prior[pkey])
   else: ## -- allow passing of new prior, for chained operations
    if (nst > -1 and ost > -1):

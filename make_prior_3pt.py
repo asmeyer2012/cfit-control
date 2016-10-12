@@ -65,11 +65,11 @@ def make_prior_3pt(models,prior_dict=None,nst=-1,ost=-1,n3st=-1,o3st=-1):
    if (nst > -1 and ost > -1):
     dprior = utf.get_prior_dict(df.define_prior_3pt,
      df.define_prior_3pt['nkey'],df.define_prior_3pt['okey'],nst,ost,
-     df.define_prior_3pt['vkey'],n3st,o3st)
+     df.define_prior_3pt['vkey'],n3st,o3st,df.do_v_symmetric)
    else:
     dprior = utf.get_prior_dict(df.define_prior_3pt,
      df.define_prior_3pt['nkey'],df.define_prior_3pt['okey'],df.num_nst,df.num_ost,
-     df.define_prior_3pt['vkey'],df.num_nst_3pt,df.num_ost_3pt)
+     df.define_prior_3pt['vkey'],df.num_nst_3pt,df.num_ost_3pt,df.do_v_symmetric)
    for pkey in dprior[skey]:
     prior[pkey]=dprior[skey][pkey]
 
@@ -80,17 +80,18 @@ def make_prior_3pt(models,prior_dict=None,nst=-1,ost=-1,n3st=-1,o3st=-1):
        not(pkey[4:] in model.a+model.b+model.dEa+model.dEb):
      continue
     if pkey[:3] == 'log':
+     #print pkey,prior[pkey]
      prior[pkey] = gv.log(prior[pkey])
     elif pkey[:4] == 'sqrt':
      prior[pkey] = gv.sqrt(prior[pkey])
   else: ## -- allow passing of new prior, for chained operations
    if (nst > -1 and ost > -1):
     dprior = utf.get_prior_dict(prior_dict,
-     prior_dict['nkey'],prior_dict['okey'],nst,ost,prior_dict['vkey'],n3st,o3st)
+     prior_dict['nkey'],prior_dict['okey'],nst,ost,prior_dict['vkey'],n3st,o3st,df.do_v_symmetric)
    else:
     dprior = utf.get_prior_dict(prior_dict,
      prior_dict['nkey'],prior_dict['okey'],df.num_nst,df.num_ost,
-     prior_dict['vkey'],df.num_nst_3pt,df.num_ost_3pt)
+     prior_dict['vkey'],df.num_nst_3pt,df.num_ost_3pt,df.do_v_symmetric)
    for pkey in dprior[skey]:
     prior[pkey]=dprior[skey][pkey]
 

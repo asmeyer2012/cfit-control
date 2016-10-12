@@ -6,6 +6,9 @@ import util_plots as utp
 import defines as df
 from extract_3pt_info import *
 
+import matplotlib as mpl
+mpl.use('TkAgg')
+
 def plot_corr_diagonalized(models,data,fit,idx,**kwargs):
  """
  Plot a set of correlators on the same axis to compare
