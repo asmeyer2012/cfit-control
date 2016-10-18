@@ -138,8 +138,8 @@ for cur in current_key:
   #define_prior3_s8 [cur+'nn'] = utf.truncate_upper_triangle(gv.gvar([[Vm]*nlen8 ]*nlen8 ,[[Vx]*nlen8 ]*nlen8),nlen8)
   #define_prior3_s8 [cur+'oo'] = utf.truncate_upper_triangle(gv.gvar([[Vm]*olen8 ]*olen8 ,[[Vx]*olen8 ]*olen8),olen8)
   define_prior3_s8[cur+'on'] = np.transpose(define_prior3_s8[cur+'no'])
-  define_prior3_s8[cur+'nn'] = gv.gvar([[Vm]*nlen8]*nlen8,[[Vs]*nlen8]*nlen8)
-  define_prior3_s8[cur+'oo'] = gv.gvar([[Vm]*olen8]*olen8,[[Vs]*olen8]*olen8)
+  define_prior3_s8[cur+'nn'] = gv.gvar([[Vm]*nlen8]*nlen8,[[Vx]*nlen8]*nlen8)
+  define_prior3_s8[cur+'oo'] = gv.gvar([[Vm]*olen8]*olen8,[[Vx]*olen8]*olen8)
   for i in range(nlen8):
    define_prior3_s8[cur+'nn'][i][i] = gv.gvar(Vm,Vx)
   for i in range(olen8):
@@ -148,6 +148,17 @@ for cur in current_key:
   define_prior3_s8 [cur+'nn'] = gv.gvar([[Vm]*nlen8 ]*nlen8 ,[[Vx]*nlen8 ]*nlen8)
   define_prior3_s8 [cur+'oo'] = gv.gvar([[Vm]*olen8 ]*olen8 ,[[Vx]*olen8 ]*olen8)
   define_prior3_s8 [cur+'on'] = gv.gvar([[Vm]*olen8 ]*nlen8 ,[[Vs]*olen8 ]*nlen8)
+  ## -- add extra constraints on diagonal entries
+  define_prior3_s8 [cur+'nn'][1][1] = define_prior3_s8 [cur+'nn'][0][0]+gv.gvar(0,0.1) 
+  define_prior3_s8 [cur+'nn'][2][2] = define_prior3_s8 [cur+'nn'][0][0]+gv.gvar(0,0.1) 
+  define_prior3_s8 [cur+'nn'][4][4] = define_prior3_s8 [cur+'nn'][3][3]+gv.gvar(0,0.1) 
+  define_prior3_s8 [cur+'nn'][6][6] = define_prior3_s8 [cur+'nn'][5][5]+gv.gvar(0,0.1) 
+  define_prior3_s8 [cur+'nn'][7][7] = define_prior3_s8 [cur+'nn'][5][5]+gv.gvar(0,0.1) 
+  define_prior3_s8 [cur+'nn'][9][9] = define_prior3_s8 [cur+'nn'][8][8]+gv.gvar(0,0.1) 
+  #define_prior3_s8 [cur+'oo'][2][2] = define_prior3_s8 [cur+'oo'][1][1]+gv.gvar(0,0.1) 
+  #define_prior3_s8 [cur+'oo'][3][3] = define_prior3_s8 [cur+'oo'][1][1]+gv.gvar(0,0.1) 
+  define_prior3_s8 [cur+'oo'][5][5] = define_prior3_s8 [cur+'oo'][4][4]+gv.gvar(0,0.1) 
+  define_prior3_s8 [cur+'oo'][6][6] = define_prior3_s8 [cur+'oo'][4][4]+gv.gvar(0,0.1) 
  #for i in range(len(define_prior3_s8[cur+'nn'][0])):
  # define_prior3_s8[cur+'nn'][i][i] = gv.gvar(Vm,Vd)
  # if do_v_symmetric:
@@ -161,36 +172,45 @@ for cur in current_key:
 
  define_prior3_s8p[cur+'no'] = gv.gvar([[Vm]*nlen8p]*olen8p,[[Vs]*nlen8p]*olen8p)
  if do_v_symmetric:
-  #define_prior3_s8p[cur+'nn'] = utf.truncate_upper_triangle(
-  # gv.gvar([[Vm]*nlen8p]*nlen8p,[[Vx]*nlen8p]*nlen8p),nlen8p)
-  #define_prior3_s8p[cur+'oo'] = utf.truncate_upper_triangle(
-  # gv.gvar([[Vm]*olen8p]*olen8p,[[Vx]*olen8p]*olen8p),olen8p)
   define_prior3_s8p[cur+'on'] = np.transpose(define_prior3_s8p[cur+'no'])
-  define_prior3_s8p[cur+'nn'] = gv.gvar([[Vm]*nlen8p]*nlen8p,[[Vs]*nlen8p]*nlen8p)
-  define_prior3_s8p[cur+'oo'] = gv.gvar([[Vm]*olen8p]*olen8p,[[Vs]*olen8p]*olen8p)
+  define_prior3_s8p[cur+'nn'] = gv.gvar([[Vm]*nlen8p]*nlen8p,[[Vx]*nlen8p]*nlen8p)
+  define_prior3_s8p[cur+'oo'] = gv.gvar([[Vm]*olen8p]*olen8p,[[Vx]*olen8p]*olen8p)
   for i in range(nlen8p):
    define_prior3_s8p[cur+'nn'][i][i] = gv.gvar(Vm,Vx)
   for i in range(olen8p):
    define_prior3_s8p[cur+'oo'][i][i] = gv.gvar(Vm,Vx)
+  ## -- add extra constraints on diagonal entries
+  define_prior3_s8p[cur+'nn'][1][1] = define_prior3_s8p[cur+'nn'][0][0]+gv.gvar(0,0.1) 
+  define_prior3_s8p[cur+'nn'][3][3] = define_prior3_s8p[cur+'nn'][2][2]+gv.gvar(0,0.1) 
+  define_prior3_s8p[cur+'oo'][2][2] = define_prior3_s8p[cur+'oo'][1][1]+gv.gvar(0,0.1) 
+  define_prior3_s8p[cur+'oo'][3][3] = define_prior3_s8p[cur+'oo'][1][1]+gv.gvar(0,0.1) 
+  define_prior3_s8p[cur+'oo'][4][4] = define_prior3_s8p[cur+'oo'][1][1]+gv.gvar(0,0.1) 
+  ## -- add extra constraints on off-diagonal entries
+  #define_prior3_s8p[cur+'nn'][0][1] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'nn'][1][0] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'nn'][2][3] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'nn'][3][2] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][1][2] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][1][3] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][1][4] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][2][1] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][2][3] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][2][4] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][3][1] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][3][2] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][3][4] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][4][1] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][4][2] = gv.gvar(Vm,Vs)
+  #define_prior3_s8p[cur+'oo'][4][3] = gv.gvar(Vm,Vs)
  else:
   define_prior3_s8p[cur+'nn'] = gv.gvar([[Vm]*nlen8p]*nlen8p,[[Vx]*nlen8p]*nlen8p)
   define_prior3_s8p[cur+'oo'] = gv.gvar([[Vm]*olen8p]*olen8p,[[Vx]*olen8p]*olen8p)
   define_prior3_s8p[cur+'on'] = gv.gvar([[Vm]*olen8p]*nlen8p,[[Vs]*olen8p]*nlen8p)
- #for i in range(len(define_prior3_s8p[cur+'nn'][0])):
- # define_prior3_s8p[cur+'nn'][i][i] = gv.gvar(Vm,Vd)
- # if do_v_symmetric: ## -- use same gvars for values; makes values identical in fits
- #  for j in range(i,len(define_prior3_s8p[cur+'nn'][0])):
- #   define_prior3_s8p[cur+'nn'][i][j] = define_prior3_s8p[cur+'nn'][j][i]
- #for i in range(len(define_prior3_s8p[cur+'oo'][0])):
- # define_prior3_s8p[cur+'oo'][i][i] = gv.gvar(Vm,Vd)
- # if do_v_symmetric:
- #  for j in range(i,len(define_prior3_s8p[cur+'oo'][0])):
- #   define_prior3_s8p[cur+'oo'][i][j] = define_prior3_s8p[cur+'oo'][j][i]
 
  define_prior3_s16[cur+'no'] = gv.gvar([[Vm]*nlen16]*olen16,[[Vs]*nlen16]*olen16)
  if do_v_symmetric:
-  define_prior3_s16[cur+'nn'] = gv.gvar([[Vm]*nlen16]*nlen16,[[Vs]*nlen16]*nlen16)
-  define_prior3_s16[cur+'oo'] = gv.gvar([[Vm]*olen16]*olen16,[[Vs]*olen16]*olen16)
+  define_prior3_s16[cur+'nn'] = gv.gvar([[Vm]*nlen16]*nlen16,[[Vx]*nlen16]*nlen16)
+  define_prior3_s16[cur+'oo'] = gv.gvar([[Vm]*olen16]*olen16,[[Vx]*olen16]*olen16)
   for i in range(nlen16):
    define_prior3_s16[cur+'nn'][i][i] = gv.gvar(Vm,Vx)
   for i in range(olen16):

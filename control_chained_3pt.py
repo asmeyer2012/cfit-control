@@ -154,6 +154,7 @@ pass
 
 fitter2 = CorrFitter(models=models2,maxit=df.maxit)
 fitter3 = CorrFitter(models=models,maxit=df.maxit)
+fitterc = CorrFitter(models=[models2,models],maxit=df.maxit)
 if df.do_2pt:
  print "starting 2pt fit..."
  fit2 = fitter2.lsqfit(data=dall,prior=priors2,p0=init2,svdcut=df.svdcut)
@@ -168,12 +169,23 @@ else:
 
 #fit3 = fitter3.lsqfit(data=dall,prior=priors,svdcut=df.svdcut)
 print fmt_reduced_chi2(fit3)
+print_fit(fit3,priors,df.do_v_symmetric)
 #save_data('./test.fit.out',fit,dall)
+
+print "starting chained fit..."
+fitc = fitterc.chained_lsqfit(data=dall,prior=priors,p0=init3,svdcut=df.svdcut)
+print fmt_reduced_chi2(fitc)
+print_fit(fitc,priors,df.do_v_symmetric)
 
 ## -- print
 #if df.do_2pt:
 # print_fit(fit2,priors2)
-print_fit(fit3,priors,df.do_v_symmetric)
+#print_fit(fitc,priors,df.do_v_symmetric)
+
+#print "starting full fit..."
+#fitc2 = fitter3.lsqfit(data=dall,prior=fitc.p,svdcut=df.svdcut)
+#print fmt_reduced_chi2(fitc2)
+#print_fit(fitc2,priors,df.do_v_symmetric)
 
 ## -- save fit as an initial value dictionary
 if df.do_irrep == "16":
@@ -182,6 +194,7 @@ if df.do_2pt:
  save_init_from_fit(fit2,'fit_dict'+irrepStr+'_2pt.py')
 if df.do_3pt:
  save_init_from_fit(fit3,'fit_dict'+irrepStr+'_3pt.py',df.do_v_symmetric)
+save_init_from_fit(fitc,'fit_dict'+irrepStr+'_chn.py',df.do_v_symmetric)
 
 ## -- test routines
 #import util_plots as utp

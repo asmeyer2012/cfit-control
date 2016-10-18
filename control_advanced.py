@@ -5,9 +5,11 @@ from make_data                import make_data,import_corfit_file
 from make_data_db             import make_data_db
 from make_init                import make_init_from_fit_file_3pt
 from make_models              import make_models
-from make_models_3pt          import make_models_3pt
+from make_models_3pt          import make_models_3pt,make_models_advanced
 from make_prior               import make_prior
 from make_prior_3pt           import make_prior_3pt
+#from make_prior_advanced      import make_prior_advanced
+from make_prior_advanced      import truncate_prior_states
 from make_bootstrap           import make_bootstrap
 from manipulate_dataset       import *
 from print_results            import fmt_reduced_chi2
@@ -28,14 +30,15 @@ from plot_corr_stacked_3pt    import plot_corr_3pt
 #from plot_corr_stacked_3pt_clean    import plot_corr_3pt
 from meta_data                import *
 from util_files               import read_fit_file
-import defines           as df
-import define_prior      as dfp
-import define_prior_3pt  as dfp3
-import gvar              as gv
-import gvar.dataset      as gvd
-import matplotlib.pyplot as plt
-import numpy             as np
-import util_funcs        as utf
+import defines               as df
+import define_prior          as dfp
+import define_prior_3pt      as dfp3
+import define_prior_advanced as dfpa
+import gvar                  as gv
+import gvar.dataset          as gvd
+import matplotlib.pyplot     as plt
+import numpy                 as np
+import util_funcs            as utf
 import argparse
 import hashlib
 import sys
@@ -95,10 +98,13 @@ else:
 ## -- consolidated all loading into a single file:
 dall = standard_load(taglist,filekey,argsin)
   
-models2 = make_models    (data=dall,lkey=df.lkey)
-models3 = make_models_3pt(data=dall,lkey=df.lkey3)
+models2 = make_models    (data=dall,lkey=df.lkey,use_advanced=True)
+#models3 = make_models_3pt(data=dall,lkey=df.lkey3)
+models3 = make_models_advanced(data=dall,lkey=df.lkey3)
 priors2 = make_prior    (models2)
 priors3 = make_prior_3pt(models3)
+priorsa = truncate_prior_states(df.define_prior_adv,df.num_nst,df.num_ost)
+#raise ValueError('test')
 
 models = list()
 for model in models2:
@@ -108,52 +114,60 @@ for model in models3:
 priors = gv.BufferDict()
 for key in priors2:
  priors[key] = priors2[key]
-for key in priors3:
- if key in priors2:
-  continue
- priors[key] = priors3[key]
-if df.do_init2:
-  init2={}
-  if argsin['override_init']:
-   init2 = make_init_from_fit_file_3pt(models2,'fit_dict')
-  else:
-   for key in df.define_init:
-     if key[-1] == 'n':
-      init2[key] = df.define_init[key][:df.num_nst]
-     elif key[-1] == 'o':
-      init2[key] = df.define_init[key][:df.num_ost]
-else:
-  init2=None
-if df.do_init3:
-  init3={}
-  if argsin['override_init']:
-   init3 = make_init_from_fit_file_3pt(models3,'fit_dict')
-  else:
-   for key in df.define_init_3pt:
-     if key[-2:] == 'nn':
-      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_nst_3pt))
-      if df.do_v_symmetric:
-       init3[key] = utf.truncate_upper_triangle(init3[key],df.num_nst_3pt)
-     elif key[-2:] == 'oo':
-      init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_ost_3pt))
-      if df.do_v_symmetric:
-       init3[key] = utf.truncate_upper_triangle(init3[key],df.num_ost_3pt)
-     elif key[-2:] == 'no':
-      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_ost_3pt))
-     elif key[-2:] == 'on':
-      ## -- is this correct for symmetric v?
-      #init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_nst_3pt))
-      pass
-     elif key[-1] == 'n':
-      init3[key] = df.define_init_3pt[key][:df.num_nst]
-     elif key[-1] == 'o':
-      init3[key] = df.define_init_3pt[key][:df.num_ost]
-else:
-  init3=None
-pass 
+#for key in priors3:
+# if key in priors2:
+#  continue
+# priors[key] = priors3[key]
+priors = priorsa
+
+#if df.do_init2:
+#  init2={}
+#  if argsin['override_init']:
+#   init2 = make_init_from_fit_file_3pt(models2,'fit_dict')
+#  else:
+#   for key in df.define_init:
+#     if key[-1] == 'n':
+#      init2[key] = df.define_init[key][:df.num_nst]
+#     elif key[-1] == 'o':
+#      init2[key] = df.define_init[key][:df.num_ost]
+#else:
+#  init2=None
+#if df.do_init3:
+#  init3={}
+#  if argsin['override_init']:
+#   init3 = make_init_from_fit_file_3pt(models3,'fit_dict')
+#  else:
+#   for key in df.define_init_3pt:
+#     if key[-2:] == 'nn':
+#      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_nst_3pt))
+#      if df.do_v_symmetric:
+#       init3[key] = utf.truncate_upper_triangle(init3[key],df.num_nst_3pt)
+#     elif key[-2:] == 'oo':
+#      init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_ost_3pt))
+#      if df.do_v_symmetric:
+#       init3[key] = utf.truncate_upper_triangle(init3[key],df.num_ost_3pt)
+#     elif key[-2:] == 'no':
+#      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_ost_3pt))
+#     elif key[-2:] == 'on':
+#      ## -- is this correct for symmetric v?
+#      #init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_nst_3pt))
+#      pass
+#     elif key[-1] == 'n':
+#      init3[key] = df.define_init_3pt[key][:df.num_nst]
+#     elif key[-1] == 'o':
+#      init3[key] = df.define_init_3pt[key][:df.num_ost]
+#else:
+#  init3=None
+#pass 
+
+## -- temporary
+init2=None
+init3=None
 
 fitter2 = CorrFitter(models=models2,maxit=df.maxit)
 fitter3 = CorrFitter(models=models,maxit=df.maxit)
+#print models
+#raise ValueError('test')
 if df.do_2pt:
  print "starting 2pt fit..."
  fit2 = fitter2.lsqfit(data=dall,prior=priors2,p0=init2,svdcut=df.svdcut)
@@ -161,10 +175,32 @@ if df.do_2pt:
  print_fit(fit2,priors2)
 if df.do_3pt:
  print "starting 3pt fit..."
+ #print 'init',init3
  fit3 = fitter3.lsqfit(data=dall,prior=priors,p0=init3,svdcut=df.svdcut)
 else:
  print "Ignoring 3pt fit!"
  fit3=None
+
+#print 'transformed ',fit3.transformed_p
+#print
+#print 'params      ',fit3.p
+#print
+#print 'fit0 ',models[0].datatag,models[0].fitfcn(fit3.p)
+#print
+#print 'fit44 ',models[0].datatag
+#test = models[0].testfitfcn(fit3.transformed_p)
+#print "final:"
+#print list(np.transpose([-fit3.p['logc4o_0']*fit3.p['k4o_0']*((-1)**t)*gv.exp(-(48-t)*fit3.p['logEo_0']) for t in range(2,10)])[0])
+#print 
+#print list(np.transpose([gv.exp(fit3.p['logc4n_0'])*fit3.p['k4n_0']*gv.exp(-t*gv.exp(fit3.p['logEn_0']))+gv.exp(fit3.p['logc4o_0'])*fit3.p['k4o_0']*((-1)**t)*gv.exp(-t*gv.exp(fit3.p['logEo_0'])) for t in range(2,10)])[0])
+#print
+#print list(np.transpose([-fit3.p['logc4n_0']*fit3.p['k4n_0']*gv.exp(-t*fit3.p['logEn_0'])+fit3.p['logc4o_0']*fit3.p['k4o_0']*((-1)**t)*gv.exp(-t*fit3.p['logEo_0']) for t in range(2,10)])[0])
+
+#print
+#print 'fit44 ',models[4].datatag
+#print models[4].fitfcn(fit3.p)
+#print 
+#print [gv.exp(fit3.p['logc4n_0'])*fit3.p['k4n_0']*gv.exp(-t*fit3.p['logEn_0'])+gv.exp(fit3.p['logc4o_0'])*fit3.p['k4o_0']*((-1)**t)*gv.exp(-t*fit3.p['logEo_0']) for t in range(2,10)]
 
 #fit3 = fitter3.lsqfit(data=dall,prior=priors,svdcut=df.svdcut)
 print fmt_reduced_chi2(fit3)
@@ -209,51 +245,51 @@ if df.do_plot or argsin['override_plot']:
  if df.do_plot_terminal:
   plt.show()
 
-if df.do_sn_minimize:
- ## -- shortcut
- cvec6,kvec6,_ = sn_minimize_postload_3pt(dall,6,'aiai')
- cvec7,kvec7,_ = sn_minimize_postload_3pt(dall,7,'aiai')
- print "source vectors:"
- print cvec6
- print cvec7
- print "sink vectors:"
- print kvec6
- print kvec7
- clist = list()
- klist = list()
- for key in dall:
-  ## -- deconstruct key based on current conventions
-  tkey = 't'.join(key.split('t')[:-1])
-  if len(tkey) == 0:
-   continue
-  k = int(tkey[-1])
-  if not(k in klist):
-   klist.append(k)
-  c = int(tkey[-2])
-  if not(c in clist):
-   clist.append(c)
- call6 = list()
- call7 = list()
- for i,c in zip(range(len(clist)),sorted(clist)):
-  call6.append(list(np.zeros(len(klist))))
-  call7.append(list(np.zeros(len(klist))))
-  for j,k in zip(range(len(klist)),sorted(klist)):
-   call6[i][j] = dall['aiais'+str(c)+str(k)+'t6']
-   call7[i][j] = dall['aiais'+str(c)+str(k)+'t7']
- cdia6 = diagonalize_correlator(call6,cvec6,kvec6)
- cdia7 = diagonalize_correlator(call7,cvec6,kvec6)
- #ddia = {}
- for i,c in zip(range(len(clist)),sorted(clist)):
-  for j,k in zip(range(len(klist)),sorted(klist)):
-   dall['aiais'+str(c)+str(k)+'t6'] = cdia6[i][j]
-   dall['aiais'+str(c)+str(k)+'t7'] = cdia7[i][j]
- #kwargs = df.fitargs
- for key in dall:
-  tkey = 't'.join(key.split('t')[:-1]) 
-  if len(tkey) > 0:
-   df.fitargs[tkey]["p3_save_name"] = \
-    "s3-s8p-l3248-coul-"+tkey+".pdf"
-   df.fitargs[tkey]["y_scale"] = [-.2,.6]
-   df.fitargs[tkey]["yaxistitle"] = r"$\beta v_{i}^{T}C_{ij}w_{j}(t,T)$"
- plot_corr_3pt(models3,dall,fit3,**df.fitargs)
- plt.show()
+#if df.do_sn_minimize:
+# ## -- shortcut
+# cvec6,kvec6,_ = sn_minimize_postload_3pt(dall,6,'aiai')
+# cvec7,kvec7,_ = sn_minimize_postload_3pt(dall,7,'aiai')
+# print "source vectors:"
+# print cvec6
+# print cvec7
+# print "sink vectors:"
+# print kvec6
+# print kvec7
+# clist = list()
+# klist = list()
+# for key in dall:
+#  ## -- deconstruct key based on current conventions
+#  tkey = 't'.join(key.split('t')[:-1])
+#  if len(tkey) == 0:
+#   continue
+#  k = int(tkey[-1])
+#  if not(k in klist):
+#   klist.append(k)
+#  c = int(tkey[-2])
+#  if not(c in clist):
+#   clist.append(c)
+# call6 = list()
+# call7 = list()
+# for i,c in zip(range(len(clist)),sorted(clist)):
+#  call6.append(list(np.zeros(len(klist))))
+#  call7.append(list(np.zeros(len(klist))))
+#  for j,k in zip(range(len(klist)),sorted(klist)):
+#   call6[i][j] = dall['aiais'+str(c)+str(k)+'t6']
+#   call7[i][j] = dall['aiais'+str(c)+str(k)+'t7']
+# cdia6 = diagonalize_correlator(call6,cvec6,kvec6)
+# cdia7 = diagonalize_correlator(call7,cvec6,kvec6)
+# #ddia = {}
+# for i,c in zip(range(len(clist)),sorted(clist)):
+#  for j,k in zip(range(len(klist)),sorted(klist)):
+#   dall['aiais'+str(c)+str(k)+'t6'] = cdia6[i][j]
+#   dall['aiais'+str(c)+str(k)+'t7'] = cdia7[i][j]
+# #kwargs = df.fitargs
+# for key in dall:
+#  tkey = 't'.join(key.split('t')[:-1]) 
+#  if len(tkey) > 0:
+#   df.fitargs[tkey]["p3_save_name"] = \
+#    "s3-s8p-l3248-coul-"+tkey+".pdf"
+#   df.fitargs[tkey]["y_scale"] = [-.2,.6]
+#   df.fitargs[tkey]["yaxistitle"] = r"$\beta v_{i}^{T}C_{ij}w_{j}(t,T)$"
+# plot_corr_3pt(models3,dall,fit3,**df.fitargs)
+# plt.show()

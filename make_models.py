@@ -1,32 +1,34 @@
 import gvar    as gv
 import defines as df
 from corrfitter  import Corr2
+from corr3_advanced import Corr2Test
+from corr3_advanced import Corr2Adv
 #from util_class  import coef_handle
 #from model_maker import model_object
 #from model_maker import use_model_definition
 
-def make_models(data=None,mdp=None,lkey=None,mdef=None):
+def make_models(data,lkey=None,mdef=None,use_advanced=False):
  """
  -- mdp is meta_data parameters, contains everything for a generic fit
  -- data is the averaged data, used to construct default models for each key
  """
- if data is None:
-  ## -- nothing to do
-  return None
+ #if data is None:
+ # ## -- nothing to do
+ # return None
+ #else:
+ if mdef is None:
+   ## -- standard operation/stability loop
+   models = use_model_definition(data,df.define_model,lkey,use_advanced=use_advanced)
+   return models
  else:
-  if mdef is None:
-    ## -- standard operation/stability loop
-    models = use_model_definition(data,df.define_model,lkey)
-    return models
-  else:
-    ## -- time vary loop
-    models = use_model_definition(data,mdef,lkey)
-    return models
+   ## -- time vary loop
+   models = use_model_definition(data,mdef,lkey)
+   return models
 ## ------
 ##
 
 class model_object:
- def __init__(self,datatag,tdata,tfit,tp,akey,bkey,ekey,skey):
+ def __init__(self,datatag,tdata,tfit,tp,akey,bkey,ekey,skey,use_advanced=False):
   self.datatag=datatag
   self.tdata=tdata
   self.tfit=tfit
@@ -35,17 +37,24 @@ class model_object:
   self.bkey=bkey
   self.ekey=ekey
   self.skey=skey
+  self.useadv=use_advanced
  #
  def generate(self):
-  model_obj = Corr2(datatag=self.datatag, tdata=self.tdata,\
-                    tfit=self.tfit,       tp=self.tp,      \
-                    a=self.akey,          b=self.bkey,  \
-                    dE=self.ekey,         s=self.skey)
+  if self.useadv:
+   model_obj = Corr2Adv(datatag=self.datatag, tdata=self.tdata,\
+                     tfit=self.tfit,       tp=self.tp,      \
+                     a=self.akey,          b=self.bkey,  \
+                     dE=self.ekey,         s=self.skey)
+  else:
+   model_obj = Corr2(datatag=self.datatag, tdata=self.tdata,\
+                     tfit=self.tfit,       tp=self.tp,      \
+                     a=self.akey,          b=self.bkey,  \
+                     dE=self.ekey,         s=self.skey)
   return model_obj
 ## ------
 ##
 
-def use_model_definition(data,model_define,lkey=None):
+def use_model_definition(data,model_define,lkey=None,use_advanced=False):
  models=[]
  if lkey is None:
   keysrc=data
@@ -69,7 +78,8 @@ def use_model_definition(data,model_define,lkey=None):
     model_object(datatag=key, tdata=tdata,\
                  tfit=tfit,   tp=tp,\
                  akey=akey,   bkey=bkey,\
-                 ekey=ekey,   skey=skey)
+                 ekey=ekey,   skey=skey,\
+                 use_advanced=use_advanced)
   models.append(model_obj.generate())
  return models
 ## ------

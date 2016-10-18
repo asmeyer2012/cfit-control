@@ -5,6 +5,7 @@ import gvar             as gv
 import util_funcs       as utf
 import define_prior     as dfp
 import define_prior_3pt as dfp3
+import define_prior_advanced as dfpa
 
 ## ------
 ## FROM CONTROL.PY
@@ -28,7 +29,7 @@ do_irrep="8'"
 #do_irrep="16"
 do_symm="s"
 #do_symm="m"
-do_2pt=True
+do_2pt=False
 do_3pt=True
 
 ## ------
@@ -37,32 +38,15 @@ do_3pt=True
 cor_len=48 # parse this from filename?
 ## --
 
-# 8  = 3N 2D / 4N 1D 1?
-# 8' = 0N 2D / 0N 1D 0?
-# 16 = 1N 3D / 3N 4D 0?
-#num_nst_s8p=3 #2pt
-#num_ost_s8p=2 #2pt
-#num_nst_s8p=5 #3pt?
-#num_ost_s8p=4 #3pt?
-#num_nst_s8=7
-#num_ost_s8=6
-#num_nst_s16=6
-#num_ost_s16=5
-
-#num_nst_s8p=2
-#num_ost_s8p=3
-num_nst_s8p=3
-num_ost_s8p=4
+num_nst_s8p=2
+num_ost_s8p=2
 num_nst_s8=7
 num_ost_s8=7
 num_nst_s16=8
 num_ost_s16=10
 
 ## -- control size of matrices here!
-#num_n3_s8p=2
-#num_o3_s8p=2
-
-## -- symmetric puts a restriction that 3pt #states = 2pt #states
+##    symmetric puts a restriction that 3pt #states = 2pt #states
 if do_v_symmetric:
  num_n3_s8p=num_nst_s8p
  num_o3_s8p=num_ost_s8p
@@ -78,10 +62,8 @@ else:
  num_n3_s16=min(5,num_nst_s16)
  num_o3_s16=min(5,num_ost_s16)
 
-rangeMin=2 #8- used this
+rangeMin=2
 rangeMax=10
-#rangeMin=6
-#rangeMax=12
 mesonAvgMin=12
 mesonAvgMax=18
 #
@@ -143,7 +125,6 @@ pass
 
 maxit      =10000   # maximum iterations
 #svdcut     =None
-#svdcut     =1e-2
 svdcut     =1e-3
 ctol       =None # tolerance for consecutive correlator points, depricated
 
@@ -197,6 +178,9 @@ define_model_s16={}
 define_model3_s8={}
 define_model3_s8p={}
 define_model3_s16={}
+define_modela_s8={}
+define_modela_s8p={}
+define_modela_s16={}
 ## -- construct models quickly using loops
 key_list_s8 = list()
 key_list_s8p = list()
@@ -237,17 +221,15 @@ if dfp3.do_v_symmetric: ## -- if symmetric, use same string for both
 else:
  von_str = 'on'
 for key in key_list_s8:
-  #continue ## -- HERE: TODO: TEMPORARY
   model_range = range(rangeMin,rangeMax)
   define_model_s8[key[0]]={\
    'tdata':range(cor_len), 'tfit':model_range, 'tp':-cor_len,\
    'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),\
- #  'ekey':('En','Eo'), 'skey':(1.,-1.) }
+   'ekey':('En','Eo'), 'skey':(1.,1.) }
  # if (key[1] == '1' and key[2] == '3') or (key[1] == '1' and key[2] == '3')\
  # or (key[1] == '2' and key[2] == '5') or (key[1] == '5' and key[2] == '2')\
  # or (key[1] == '2' and key[2] == '6') or (key[1] == '6' and key[2] == '2'):
- #  define_model_s8[key[0]]['skey'] = (1.,1.)
-   'ekey':('En','Eo'), 'skey':(1.,1.) }
+ #  define_model_s8[key[0]]['skey'] = (1.,-1.)
 pass
 for key in key_list3_s8:
   model_range = range(1,key[3])
@@ -259,11 +241,19 @@ for key in key_list3_s8:
    'sakey':(1.,1.), 'sbkey':(1.,1.),
    'vnn':key[5]+'nn', 'vno':key[5]+'no', 'von':key[5]+von_str, 'voo':key[5]+'oo',
    'symmetric_V':dfp3.do_v_symmetric }
-  if (key[1] == '1' and key[2] == '3') or (key[1] == '1' and key[2] == '3')\
-  or (key[1] == '2' and key[2] == '5') or (key[1] == '5' and key[2] == '2')\
-  or (key[1] == '2' and key[2] == '6') or (key[1] == '6' and key[2] == '2'):
-   define_model3_s8[key[0]]['sakey'] = (1.,-1.)
-   define_model3_s8[key[0]]['sbkey'] = (1.,-1.)
+  define_modela_s8[key[0]]={
+   'tdata':range(cor_len), 'tfit':model_range, 'T':key[3], 
+   'tpa':-cor_len, 'tpb':-cor_len,
+   'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),
+   'eakey':('En','Eo'), 'ebkey':('En','Eo'),
+   'sakey':(1.,1.), 'sbkey':(1.,1.), 'gn':key[5]+'gn','go':key[5]+'go',
+   'vnn':key[5]+'nn', 'vno':key[5]+'no', 'von':key[5]+von_str, 'voo':key[5]+'oo',
+   'symmetric_V':dfp3.do_v_symmetric }
+  #if (key[1] == '1' and key[2] == '3') or (key[1] == '1' and key[2] == '3')\
+  #or (key[1] == '2' and key[2] == '5') or (key[1] == '5' and key[2] == '2')\
+  #or (key[1] == '2' and key[2] == '6') or (key[1] == '6' and key[2] == '2'):
+  # define_model3_s8[key[0]]['sakey'] = (1.,-1.)
+  # define_model3_s8[key[0]]['sbkey'] = (1.,-1.)
 pass
 
 for key in key_list_s8p:
@@ -282,6 +272,14 @@ for key in key_list3_s8p:
    'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),
    'eakey':('En','Eo'), 'ebkey':('En','Eo'),
    'sakey':(1.,1.), 'sbkey':(1.,1.),
+   'vnn':key[5]+'nn', 'vno':key[5]+'no', 'von':key[5]+von_str, 'voo':key[5]+'oo',
+   'symmetric_V':dfp3.do_v_symmetric }
+  define_modela_s8p[key[0]]={
+   'tdata':range(cor_len), 'tfit':model_range, 'T':key[3], 
+   'tpa':-cor_len, 'tpb':-cor_len,
+   'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),
+   'eakey':('En','Eo'), 'ebkey':('En','Eo'),
+   'sakey':(1.,1.), 'sbkey':(1.,1.), 'gn':key[5]+'gn', 'go':key[5]+'go',
    'vnn':key[5]+'nn', 'vno':key[5]+'no', 'von':key[5]+von_str, 'voo':key[5]+'oo',
    'symmetric_V':dfp3.do_v_symmetric }
   ## -- only 44 has freedom in both sakey and sbkey;
@@ -325,6 +323,14 @@ for key in key_list3_s16:
    'sakey':(1.,1.), 'sbkey':(1.,1.),
    'vnn':key[5]+'nn', 'vno':key[5]+'no', 'von':key[5]+von_str, 'voo':key[5]+'oo',
    'symmetric_V':dfp3.do_v_symmetric }
+  define_modela_s16[key[0]]={
+   'tdata':range(cor_len), 'tfit':model_range, 'T':key[3], 
+   'tpa':-cor_len, 'tpb':-cor_len,
+   'akey':('c'+key[1]+'n','c'+key[1]+'o'), 'bkey':('k'+key[2]+'n','k'+key[2]+'o'),
+   'eakey':('En','Eo'), 'ebkey':('En','Eo'),
+   'sakey':(1.,1.), 'sbkey':(1.,1.), 'gn':key[5]+'gn', 'go':key[5]+'go',
+   'vnn':key[5]+'nn', 'vno':key[5]+'no', 'von':key[5]+von_str, 'voo':key[5]+'oo',
+   'symmetric_V':dfp3.do_v_symmetric }
   #if (key[1] == '2' and key[2] == '3') or (key[1] == '3' and key[2] == '2')\
   #or (key[1] == '2' and key[2] == '4') or (key[1] == '4' and key[2] == '2')\
   #or (key[1] == '3' and key[2] == '4') or (key[1] == '4' and key[2] == '3')\
@@ -348,20 +354,9 @@ if do_irrep == "8":
   stab_min_ost=3
   stab_mid_ost=3
   stab_max_ost=14
-  #nost_3pt = ((5,5),)
-  #nost_3pt = ((4,4),(5,4),(5,5),(6,4),(6,5),(6,6),(7,5),(7,6))
-  #nost_3pt = ((3,2),(3,3),(4,3),(4,4),(5,4),(5,5),(6,5),(7,5),(6,6),(7,6))
-  #nost_3pt = ((6,5),(6,6),(7,5),(7,6),(5,5),(5,4),(4,4)) ## ordered by importance
   nost_3pt = ((3,3),(3,6),(4,4),(4,6),(4,7),(5,5),(6,7),(6,8),(5,6),(5,7),(5,8),(7,8),(7,7),(7,6),(7,9))
   plot_n_maxprior = 3
   plot_o_maxprior = 2
-  #stab_min_nst=1
-  #stab_mid_nst=1
-  #stab_max_nst=4
-  #stab_min_ost=1
-  #stab_mid_ost=1
-  #stab_max_ost=2
-  #nost_3pt = ((1,1),)
   tmvr_tmax=range(9,14)
   num_nst=num_nst_s8
   num_ost=num_ost_s8
@@ -372,7 +367,9 @@ if do_irrep == "8":
   num_ost_3pt=num_o3_s8
   define_prior_3pt=dfp3.define_prior3_s8
   define_init_3pt =dfp3.define_init3_s8
+  define_prior_adv=dfpa.define_prior_s8
   define_model_3pt=define_model3_s8
+  define_model_adv=define_modela_s8
   for key in lkey:
    suppressKey(key,'dl_save_name',"dl-s8p-l3248-coul-"+key+".pdf")
    suppressKey(key,'df_save_name',"df-s8p-l3248-coul-"+key+".pdf")
@@ -399,9 +396,9 @@ elif do_irrep == "8'":
   stab_min_ost=1
   stab_mid_ost=1
   stab_max_ost=7
-  stab_max_states=10
+  stab_max_states=7
   nost_3pt = ((1,1),(1,2),(1,3),(2,1),(2,2),(2,3),(3,2),(3,3))
-  plot_n_maxprior = 3
+  plot_n_maxprior = 2
   plot_o_maxprior = 1
   tmvr_tmax=range(9,10)
   num_nst=num_nst_s8p
@@ -413,7 +410,9 @@ elif do_irrep == "8'":
   num_ost_3pt=num_o3_s8p
   define_prior_3pt=dfp3.define_prior3_s8p
   define_init_3pt =dfp3.define_init3_s8p
+  define_prior_adv=dfpa.define_prior_s8p
   define_model_3pt=define_model3_s8p
+  define_model_adv=define_modela_s8p
   for key in lkey:
    suppressKey(key,'dl_save_name',"dl-s8m-l3248-coul-"+key+".pdf")
    suppressKey(key,'df_save_name',"df-s8m-l3248-coul-"+key+".pdf")
@@ -441,8 +440,6 @@ elif do_irrep == "16":
   stab_mid_ost=4
   stab_max_ost=12
   stab_max_states=18
-  #nost_3pt = ((5,5),)#,(7,5),(7,6))
-  #nost_3pt = ((3,3),(4,3),(4,4),(5,4),(5,5),(6,4),(6,5),(6,6))#,(7,5),(7,6))
   nost_3pt = ((6,5),(6,6),(6,4),(7,5),(7,6),(5,4),(5,5),(4,5),(4,4))
   plot_n_maxprior = 2
   plot_o_maxprior = 1
@@ -456,7 +453,9 @@ elif do_irrep == "16":
   num_ost_3pt=num_o3_s16
   define_prior_3pt=dfp3.define_prior3_s16
   define_init_3pt =dfp3.define_init3_s16
+  define_prior_adv=dfpa.define_prior_s16
   define_model_3pt=define_model3_s16
+  define_model_adv=define_modela_s16
   for key in lkey:
    suppressKey(key,'dl_save_name',"dl-s16-l3248-coul-"+key+".pdf")
    suppressKey(key,'df_save_name',"df-s16-l3248-coul-"+key+".pdf")
@@ -497,28 +496,6 @@ if do_irrep == "8":
     #if (int(key[1]) == 1 and int(key[2]) == 1):
     # suppressKey(key[0],"y_scale",[0,1.5])
     # suppressKey(tkey,"y_scale",[0,1.5])
-    #if (int(key[1]) == 1 and int(key[2]) == 2)\
-    #or (int(key[1]) == 2 and int(key[2]) == 1):
-    # suppressKey(key[0],"y_scale",[-0.2,0.6])
-    # suppressKey(tkey,"y_scale",[-0.2,0.6])
-    #if (int(key[1]) == 1 and int(key[2]) == 5)\
-    #or (int(key[1]) == 1 and int(key[2]) == 6)\
-    #or (int(key[1]) == 3 and int(key[2]) == 5)\
-    #or (int(key[1]) == 3 and int(key[2]) == 6)\
-    #or (int(key[1]) == 5 and int(key[2]) == 5)\
-    #or (int(key[1]) == 5 and int(key[2]) == 6)\
-    #or (int(key[1]) == 6 and int(key[2]) == 3)\
-    #or (int(key[1]) == 6 and int(key[2]) == 5)\
-    #or (int(key[1]) == 6 and int(key[2]) == 6):
-    # suppressKey(key[0],"y_scale",[-0.1,0.1])
-    # suppressKey(tkey,"y_scale",[-0.1,0.1])
-    #if (int(key[1]) == 2 and int(key[2]) == 3)\
-    #or (int(key[1]) == 2 and int(key[2]) == 5)\
-    #or (int(key[1]) == 2 and int(key[2]) == 6)\
-    #or (int(key[1]) == 3 and int(key[2]) == 3)\
-    #or (int(key[1]) == 5 and int(key[2]) == 3):
-    # suppressKey(key[0],"y_scale",[-0.3,0.3])
-    # suppressKey(tkey,"y_scale",[-0.3,0.3])
     suppressKey(key[0],"yaxistitle",r"$\beta C_{ij}(t,T)$")
     suppressKey(tkey,"yaxistitle",r"$\beta C_{ij}(t,T)$")
     suppressKey(key[0],"p3_do_fit",True)
