@@ -39,6 +39,9 @@ def format_entries(f,obj,key,addc=True):
    else:
     f.write('\''+str(key)+\
      '\': gv.gvar([\''+'\', \''.join(['{:>10}'.format(x).strip() for x in obj])+'\'])\\\n')
+ except IndexError:
+  ## -- probably empty matrix
+  pass
  pass
 
 def save_init_from_fit(fit,file_name,do_v_symm=False):
@@ -49,7 +52,7 @@ def save_init_from_fit(fit,file_name,do_v_symm=False):
  f.write(',\'rdof\':'+str(reduced_dof(fit,do_v_symm))+'\\\n')
  f.write(',\'chi2\':'+str(fit.chi2)+',\\\n')
  ltfp = len(fit.transformed_p)
- for i,key in zip(range(ltfp),fit.transformed_p):
+ for i,key in zip(range(ltfp),sorted(fit.transformed_p)):
   format_entries(f,fit.transformed_p[key],key,not(i==ltfp-1))
  f.write('}\n')
  f.close()

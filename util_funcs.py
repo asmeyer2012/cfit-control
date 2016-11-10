@@ -314,3 +314,20 @@ def stack_prior_states(prior,lkey,mstk,estk):
   append_prior_state(prior,lkey,np.insert(pAmp,0,p))
  pass
 
+## -- keys have underscores and numbers appended to indicate blocks
+##    pull all keys which start with a specific string, group them
+def retrieve_block_keys(prior, key):
+    keyList = []
+    for pkey in prior:
+      #print key,pkey
+      if key in pkey:
+        if   pkey[3:] == 'log':
+          #print "appending key ",pkey
+          keyList.append(pkey[3:])
+        elif pkey[4:] == 'sqrt':
+          keyList.append(pkey[4:])
+        else:
+          #print "appending key ",pkey
+          keyList.append(pkey)
+    return sorted(keyList)
+

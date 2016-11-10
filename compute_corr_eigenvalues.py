@@ -67,6 +67,81 @@ print "making correlation: start ",start
 #corall = gv.evalcorr(dall) ## -- super slow
 corall = gv.evalcorr(dall.buf) ## -- uses precomputed data, need to slice data manually
 print "end ",(time.time() - start)
+print "making covariance : start ",start
+covall = gv.evalcov(dall.buf) ## -- uses precomputed data, need to slice data manually
+print "end ",(time.time() - start)
+
+## -- test routines, print correlation eigenvalues, eigenvectors to file
+#for testkey in ['s12','s21','s13','s31','s15','s51','s16','s61']:
+#for testkey in ['aiais11t6','aiais22t6','aiais33t6','aiais55t6','aiais66t6']:
+#for testkey in ['aiais11t7','aiais22t7','aiais33t7','aiais55t7','aiais66t7']:
+#for testkey in ['s11','s22','s33','s55','s66']:
+# evec = gvl.eigvalsh(corall[dall.slice(testkey),dall.slice(testkey)],True)
+# f = open('corr.'+testkey+'.dat','w')
+# f.write('#key         : '+testkey+'\n')
+# f.write('#eigenvalues :\n')
+# seval = str(evec[0][0])
+# for v in evec[0][1:]:
+#  seval += ', ' +str(v)
+# f.write(seval+'\n')
+# f.write('#eigenvectors:\n')
+# for vc in evec[1]:
+#  seval = str(vc[0])
+#  for v in vc[1:]:
+#   seval += ', ' +str(v)
+#  f.write(seval+'\n')
+# f.close()
+#print "done with correlation eigenvalue files"
+
+#for tk1 in ['s11','s22','s33','s55','s66']:
+# for tk2 in ['s11','s22','s33','s55','s66']:
+#  if tk1 == tk2:
+#   continue
+#  cmat = corall[dall.slice(tk1),dall.slice(tk2)]
+#  f = open('cmat.'+tk1+'.'+tk2+'.dat','w')
+#  f.write('#key   : '+tk1+','+tk2+'\n')
+#  f.write('#matrix:\n')
+#  for vc in cmat:
+#   seval = str(vc[0])
+#   for v in vc[1:]:
+#    seval += ', ' +str(v)
+#   f.write(seval+'\n')
+#  f.close()
+#print "done with correlation matrix files"
+
+for i,tk1 in enumerate(['s12','s13','s15','s16','s23','s25','s26','s35','s36','s56']):
+ for j,tk2 in enumerate(['s12','s13','s15','s16','s23','s25','s26','s35','s36','s56']):
+  if i <= j:
+   continue
+  cmat = corall[dall.slice(tk1),dall.slice(tk2)]
+  f = open('cmat.'+tk1+'.'+tk2+'.dat','w')
+  f.write('#key   : '+tk1+','+tk2+'\n')
+  f.write('#matrix:\n')
+  for vc in cmat:
+   seval = str(vc[0])
+   for v in vc[1:]:
+    seval += ', ' +str(v)
+   f.write(seval+'\n')
+  f.close()
+print "done with correlation matrix files"
+
+for i,tk1 in enumerate(['s11','s22','s33','s55','s66']):
+ for j,tk2 in enumerate(['s12','s13','s15','s16','s23','s25','s26','s35','s36','s56']):
+  if i <= j:
+   continue
+  cmat = corall[dall.slice(tk1),dall.slice(tk2)]
+  f = open('cmat.'+tk1+'.'+tk2+'.dat','w')
+  f.write('#key   : '+tk1+','+tk2+'\n')
+  f.write('#matrix:\n')
+  for vc in cmat:
+   seval = str(vc[0])
+   for v in vc[1:]:
+    seval += ', ' +str(v)
+   f.write(seval+'\n')
+  f.close()
+print "done with correlation matrix files"
+
+#raise ValueError("temporary quit")
 
 ## -- defines
 tmin2 = df.rangeMin

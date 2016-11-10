@@ -3,6 +3,8 @@ foo*
 bar*
 baz*
 *.pyc
+gvar.dump.*
+out.*
 bash_scripts/*
 data-files/*
 depricated/*

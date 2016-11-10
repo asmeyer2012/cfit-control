@@ -151,6 +151,7 @@ if df.do_init3:
 else:
   init3=None
 pass 
+init3 = None ## -- test
 
 fitter2 = CorrFitter(models=models2,maxit=df.maxit)
 fitter3 = CorrFitter(models=models,maxit=df.maxit)
@@ -167,7 +168,7 @@ else:
  fit3=None
 
 #fit3 = fitter3.lsqfit(data=dall,prior=priors,svdcut=df.svdcut)
-print fmt_reduced_chi2(fit3)
+print fmt_reduced_chi2(fit3,df.do_v_symmetric)
 #save_data('./test.fit.out',fit,dall)
 
 ## -- print

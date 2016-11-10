@@ -103,7 +103,8 @@ models2 = make_models    (data=dall,lkey=df.lkey,use_advanced=True)
 models3 = make_models_advanced(data=dall,lkey=df.lkey3)
 priors2 = make_prior    (models2)
 priors3 = make_prior_3pt(models3)
-priorsa = truncate_prior_states(df.define_prior_adv,df.num_nst,df.num_ost)
+priorsa = truncate_prior_states(df.define_prior_adv,
+ df.num_nst,df.num_ost,df.num_nst_3pt,df.num_ost_3pt)
 #raise ValueError('test')
 
 models = list()
@@ -176,6 +177,7 @@ if df.do_2pt:
 if df.do_3pt:
  print "starting 3pt fit..."
  #print 'init',init3
+ #print 'prior',priors
  fit3 = fitter3.lsqfit(data=dall,prior=priors,p0=init3,svdcut=df.svdcut)
 else:
  print "Ignoring 3pt fit!"
@@ -202,6 +204,14 @@ else:
 #print 
 #print [gv.exp(fit3.p['logc4n_0'])*fit3.p['k4n_0']*gv.exp(-t*fit3.p['logEn_0'])+gv.exp(fit3.p['logc4o_0'])*fit3.p['k4o_0']*((-1)**t)*gv.exp(-t*fit3.p['logEo_0']) for t in range(2,10)]
 
+## -- save fit as an initial value dictionary
+if df.do_irrep == "16":
+ irrepStr = '16'
+if df.do_2pt:
+ save_init_from_fit(fit2,'fit_dict'+irrepStr+'_2pt.py')
+if df.do_3pt:
+ save_init_from_fit(fit3,'fit_dict'+irrepStr+'_3pt.py',df.do_v_symmetric)
+
 #fit3 = fitter3.lsqfit(data=dall,prior=priors,svdcut=df.svdcut)
 print fmt_reduced_chi2(fit3)
 #save_data('./test.fit.out',fit,dall)
@@ -211,13 +221,13 @@ print fmt_reduced_chi2(fit3)
 # print_fit(fit2,priors2)
 print_fit(fit3,priors,df.do_v_symmetric)
 
-## -- save fit as an initial value dictionary
-if df.do_irrep == "16":
- irrepStr = '16'
-if df.do_2pt:
- save_init_from_fit(fit2,'fit_dict'+irrepStr+'_2pt.py')
-if df.do_3pt:
- save_init_from_fit(fit3,'fit_dict'+irrepStr+'_3pt.py',df.do_v_symmetric)
+### -- save fit as an initial value dictionary
+#if df.do_irrep == "16":
+# irrepStr = '16'
+#if df.do_2pt:
+# save_init_from_fit(fit2,'fit_dict'+irrepStr+'_2pt.py')
+#if df.do_3pt:
+# save_init_from_fit(fit3,'fit_dict'+irrepStr+'_3pt.py',df.do_v_symmetric)
 
 ## -- test routines
 #import util_plots as utp

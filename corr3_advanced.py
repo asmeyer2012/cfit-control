@@ -132,7 +132,7 @@ class Corr2Test(BaseModel):
     
     def fitfcn(self, p, nterm=None, t=None):
         """ Return fit function for parameters ``p``. """
-        stime = time.time()
+        #stime = time.time()
         if t is None:
             t = self.tfit
         if self.tp is None:
@@ -412,7 +412,7 @@ class Corr3Test(BaseModel):
     
     def fitfcn(self, p, nterm=None, t=None):
         """ Return fit function for parameters ``p``. """
-        stime = time.time()
+        #stime = time.time()
         # setup
         if t is None:
             t = self.tfit
@@ -530,7 +530,7 @@ class Corr3Test(BaseModel):
                     for bl, Vkl in zip(bpropj, Vk):
                         acc += Vkl*bl
                     ans += ak*acc
-        print "iteration time 3pt: ",time.time()-stime
+        #print "iteration time 3pt: ",time.time()-stime
         return ans                
 
 ## -- 
@@ -609,6 +609,11 @@ class Corr2Adv(BaseModel):
             self.esufx.append([])
             for eik in ekl:
               eik = self._priorkey(prior,eik) ## -- this will change when gvar updated
+              #print 'prior',prior
+              #print eik,prior[eik]
+              #print len(prior[eik])
+              if prior[eik] is None:
+               continue
               ntermx[i].append(len(prior[eik]))
               newsuf = '_'+eik.split('_')[1]
               if not(newsuf in self.esufx[i]):
@@ -619,6 +624,8 @@ class Corr2Adv(BaseModel):
             for x in [ai, bi, dEi]:
                 xkl = retrieve_block_keys(prior,x)
                 for xk in xkl:
+                 if prior[xk] is None:
+                  continue
                  k = int(xk.split('_')[1])
                  xk = self._priorkey(prior,xk) ## -- this will change when gvar updated
                  #xk = self.basekey(prior, xk)
@@ -658,7 +665,7 @@ class Corr2Adv(BaseModel):
 
     def fitfcn(self, p, nterm=None, t=None):
         """ Return fit function for parameters ``p``. """
-        stime = time.time()
+        #stime = time.time()
         if t is None:
             t = self.tfit
         if self.tp is None:
@@ -690,18 +697,26 @@ class Corr2Adv(BaseModel):
             #_bikl = retrieve_block_keys(p, _bi)
             #_dEakl = retrieve_block_keys(p, _dEi)
             #for ak,bk,ek in zip(_aikl,_bikl,_dEakl):
+            einc = 0
+            #print _ai,_bi,_dEi,ofaci,esuf
             for sfx in esuf:
               ai = p[_ai+sfx]
               bi = p[_bi+sfx]
               dEi = p[_dEi+sfx]
+              Ei = [x for x in dEi]
+              einc += dEi[0]
+              Ei[0] = einc
+              #print einc,numpy.cumsum(Ei)
               if tp_t is None:
                   exp_t = _gvar.exp(-t)
-                  for aij, bij, sumdE in zip(ai, bi, numpy.cumsum(dEi)):
+                  #for aij, bij, sumdE in zip(ai, bi, numpy.cumsum(dEi)):
+                  for aij, bij, sumdE in zip(ai, bi, numpy.cumsum(Ei)):
                       ans += ofaci * aij * bij * exp_t ** sumdE
               else:
                   exp_t = _gvar.exp(-t)
                   exp_tp_t = _gvar.exp(-tp_t)
-                  for aij, bij, sumdE in zip(ai, bi, numpy.cumsum(dEi)):
+                  #for aij, bij, sumdE in zip(ai, bi, numpy.cumsum(dEi)):
+                  for aij, bij, sumdE in zip(ai, bi, numpy.cumsum(Ei)):
                       ans += ofaci * aij * bij * (exp_t ** sumdE + pfac * exp_tp_t ** sumdE)
         #print "iteration time: ",time.time()-stime
         return ans
@@ -863,6 +878,8 @@ class Corr3Adv(BaseModel):
             gkl = retrieve_block_keys(prior,gii)
             #nblockx.append(len(gkl))
             for giik in gkl:
+              if prior[giik] is None:
+               continue
               #print giik,prior[giik]
               #print "ntermx",len(prior[giik])
               ntermx[i].append(len(prior[giik]))
@@ -872,6 +889,8 @@ class Corr3Adv(BaseModel):
             gii = self.g[i]
             gkl = retrieve_block_keys(prior,gii)
             for giik in gkl:
+             if prior[giik] is None:
+              continue
              giik = self._priorkey(prior, giik)
              #giik = self.basekey(prior, giik)
              k = int(giik.split('_')[1])
@@ -884,6 +903,7 @@ class Corr3Adv(BaseModel):
                 if self.symmetric_V and i < j:
                     continue ## -- ignore repeats for symmetric matrix
                 vkl = retrieve_block_keys(prior,vij)
+                #print 'vij',vij,vkl
                 for vklk in vkl:
                  k = int(vklk.split('_')[1])
                  l = int(vklk.split('_')[2])
@@ -893,13 +913,24 @@ class Corr3Adv(BaseModel):
                  if k == l and i == j and self.symmetric_V:
                      ans[vklk] = resize_sym(prior[vklk], ntermx, k)
                  else:
-                     ans[vklk] = prior[vklk][slice(None, ntermx[i][k]),
-                                             slice(None, ntermx[j][l])]
+                     ## -- be explicit, because Vij set to whatever if symmetric
+                     if   vklk.split('_')[0][-2:] == 'no': 
+                      nx = ntermx[0][k]
+                      ny = ntermx[1][l]
+                     elif vklk.split('_')[0][-2:] == 'on':
+                      nx = ntermx[1][k]
+                      ny = ntermx[0][l]
+                     else:
+                      nx = ntermx[i][k]
+                      ny = ntermx[j][l]
+                     ans[vklk] = prior[vklk][slice(None, nx), slice(None, ny)]
         for x in [self.a, self.dEa, self.b, self.dEb]:
             if (x is self.dEa) or (x is self.dEb):
              for i, xi in enumerate(x):
               xkl = retrieve_block_keys(prior, xi)
               for xk in xkl:
+                 if prior[xk] is None:
+                  continue
                  newsuf = '_'+xk.split('_')[1] ## -- store suffices for faster lookup
                  if   (x is self.dEa) and not(newsuf in self.easufx[i]):
                    self.easufx[i].append(newsuf)
@@ -909,12 +940,22 @@ class Corr3Adv(BaseModel):
              if xi is not None:
               xkl = retrieve_block_keys(prior, xi)
               for xk in xkl:
+                 if prior[xk] is None:
+                  continue
                  xk = self._priorkey(prior, xk)
                  #xk = self.basekey(prior, xk)
                  k = int(xk.split('_')[1])
                  if not(k in nidxx[i]):
                   continue
-                 ans[xk] = prior[xk][None:ntermx[i][k]]
+                 ## -- here?
+                 #print xk,ntermx[i][k],prior[xk][None:ntermx[i][k]]
+                 #try:
+                 # print 
+                 # print ans
+                 #except:
+                 # pass
+                 #ans[xk] = prior[xk][None:ntermx[i][k]]
+                 ans[xk] = prior[xk]
         #print "build prior",ans
         return ans
 
@@ -944,8 +985,10 @@ class Corr3Adv(BaseModel):
 
     def fitfcn(self, p, nterm=None, t=None):
         """ Return fit function for parameters ``p``. """
-        stime = time.time()
+        #stime = time.time()
         # setup
+        #print "iteration parameters: ",p
+        #print "variables: ",p['logEo_0'],p['aiaigo_0']
         if t is None:
             t = self.tfit
         ta = t
@@ -985,6 +1028,7 @@ class Corr3Adv(BaseModel):
             #_dEakl = retrieve_block_keys(p, _dEai)
             aprop.append([])
             #for ak,ek in zip(_aikl,_dEakl):
+            eainc = 0
             for asuf in easuf:
               k = int(asuf.split('_')[1])
               #print 'test',i,_ai,_dEai
@@ -992,18 +1036,24 @@ class Corr3Adv(BaseModel):
               ans = []
               ai =  p[_ai+asuf]
               dEai = p[_dEai+asuf]
+              Eai = [x for x in dEai]
+              eainc += dEai[0]
+              #print i,eainc
+              Eai[0] = eainc
               if tp_ta is None:
                   exp_ta = _gvar.exp(-ta)
                   ans = [
                       ofaci * aij * exp_ta ** sumdE
-                      for aij, sumdE in zip(ai, numpy.cumsum(dEai))
+                      #for aij, sumdE in zip(ai, numpy.cumsum(dEai))
+                      for aij, sumdE in zip(ai, numpy.cumsum(Eai))
                       ]
               else:
                   exp_ta = _gvar.exp(-ta)
                   exp_tp_ta = _gvar.exp(-tp_ta)
                   ans = [
                       ofaci * aij * (exp_ta ** sumdE + pafac * exp_tp_ta ** sumdE)
-                      for aij, sumdE in zip(ai, numpy.cumsum(dEai))
+                      #for aij, sumdE in zip(ai, numpy.cumsum(dEai))
+                      for aij, sumdE in zip(ai, numpy.cumsum(Eai))
                       ]
               aprop[i].append(ans)
               #aprop.append(ans)
@@ -1017,22 +1067,32 @@ class Corr3Adv(BaseModel):
             #_dEbkl = retrieve_block_keys(p, _dEbi)
             bprop.append([])
             #for bk,ek in zip(_bikl,_dEbkl):
+            ebinc = 0
             for bsuf in ebsuf:
               ans = []
               bi = p[_bi+bsuf]
               dEbi = p[_dEbi+bsuf]
+              Ebi = [x for x in dEbi]
+              ebinc += dEbi[0]
+              #print i,ebinc
+              Ebi[0] = ebinc
               if tp_tb is None:
                   exp_tb = _gvar.exp(-tb)
                   ans = [
                       ofaci * bij * exp_tb ** sumdE
-                      for bij, sumdE in zip(bi, numpy.cumsum(dEbi))
+                      #for bij, sumdE in zip(bi, numpy.cumsum(dEbi))
+                      for bij, sumdE in zip(bi, numpy.cumsum(Ebi))
                       ]
               else:
                   exp_tb = _gvar.exp(-tb)
                   exp_tp_tb = _gvar.exp(-tp_tb)
+                  #if i == 1:
+                  # print ofaci
+                  # print [ sumdE for sumdE in numpy.cumsum(Ebi) ]
                   ans = [
                       ofaci * bij * (exp_tb ** sumdE + pbfac * exp_tp_tb ** sumdE)
-                      for bij, sumdE in zip(bi, numpy.cumsum(dEbi))
+                      #for bij, sumdE in zip(bi, numpy.cumsum(dEbi))
+                      for bij, sumdE in zip(bi, numpy.cumsum(Ebi))
                       ]
               bprop[i].append(ans)
               #bprop.append(ans)
@@ -1053,8 +1113,8 @@ class Corr3Adv(BaseModel):
               else:
                 eaxsuf = easuf
                 ebxsuf = ebsuf
-              for (asuf,ak) in zip(eaxsuf,apropi):
-               for (bsuf,bl) in zip(ebxsuf,bpropj):
+              for ix,(asuf,ak) in enumerate(zip(eaxsuf,apropi)):
+               for jx,(bsuf,bl) in enumerate(zip(ebxsuf,bpropj)):
                 #vkl = retrieve_block_keys(p, Vij)
                 #for vklk in vkl:
                 #k = int(vklk.split('_')[1])
@@ -1063,7 +1123,18 @@ class Corr3Adv(BaseModel):
                 #lj = nidxx[j].index(l)
                 #print nidxx,i,j,ki,lj
                 #V = p[vklk]
-                V = p[Vij+asuf+bsuf]
+                try:
+                 #print Vij,asuf,bsuf,ix,jx
+                 if self.symmetric_V and i > j:
+                  #print "symmetric"
+                  V = numpy.transpose(p[Vij+bsuf+asuf])
+                 else:
+                  #print "normal"
+                  V = p[Vij+asuf+bsuf]
+                except KeyError:
+                 ## -- probably truncated away
+                 #print "keyerror: ",Vij+asuf+bsuf
+                 continue
                 #if k == l and i == j and self.symmetric_V:
                 if asuf == bsuf and i == j and self.symmetric_V:
                     # unpack symmetric matrix V
@@ -1075,8 +1146,10 @@ class Corr3Adv(BaseModel):
                     #nb = len(bpropj[lj])
                     #na = len(apropi)
                     #nb = len(bpropj)
-                    na = len(apropi[k])
-                    nb = len(bpropj[k])
+                    Vsz = int(numpy.round(numpy.sqrt(1+8*len(V)))-1)/2 +1
+                    na = min(len(apropi[k]),Vsz)
+                    nb = min(len(bpropj[k]),Vsz)
+                    #print 'test', Vij,asuf,bsuf,k,len(apropi[k]),numpy.shape(V),Vsz,na,nb
                     ##print vklk,na,nb
                     assert na == nb, \
                         "Vnn/Voo must be square matrix if symmetric"
@@ -1111,5 +1184,5 @@ class Corr3Adv(BaseModel):
                         #print acc,Vln,bln
                         acc += Vln*bln
                     ans += akm*acc
-        print "iteration time: ",time.time()-stime
+        #print "iteration time: ",time.time()-stime
         return ans

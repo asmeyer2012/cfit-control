@@ -24,8 +24,8 @@ do_initial=True
 do_init2=True
 do_init3=False
 do_v_symmetric=dfp3.do_v_symmetric
-do_irrep="8'"
-#do_irrep="8"
+#do_irrep="8'"
+do_irrep="8"
 #do_irrep="16"
 do_symm="s"
 #do_symm="m"
@@ -38,8 +38,8 @@ do_3pt=True
 cor_len=48 # parse this from filename?
 ## --
 
-num_nst_s8p=2
-num_ost_s8p=2
+num_nst_s8p=4
+num_ost_s8p=5
 num_nst_s8=7
 num_ost_s8=7
 num_nst_s16=8
@@ -48,8 +48,10 @@ num_ost_s16=10
 ## -- control size of matrices here!
 ##    symmetric puts a restriction that 3pt #states = 2pt #states
 if do_v_symmetric:
- num_n3_s8p=num_nst_s8p
- num_o3_s8p=num_ost_s8p
+ num_n3_s8p=min(3,num_nst_s8p)
+ num_o3_s8p=min(4,num_ost_s8p)
+ #num_n3_s8p=num_nst_s8p
+ #num_o3_s8p=num_ost_s8p
  num_n3_s8 =num_nst_s8
  num_o3_s8 =num_ost_s8
  num_n3_s16=num_nst_s16
@@ -63,7 +65,9 @@ else:
  num_o3_s16=min(5,num_ost_s16)
 
 rangeMin=2
-rangeMax=10
+rangeMax=14
+#rangeMin=5
+#rangeMax=10
 mesonAvgMin=12
 mesonAvgMax=18
 #

@@ -5,22 +5,46 @@ import util_funcs as ut
 from lsqfit._utilities import gammaQ
 
 def reduced_dof(fit,do_v_symm=False):
+ for key in fit.p:
+  do_adv = False
+  if 'gn' in key:
+   do_adv = True
+   break
  try:
-  if do_v_symm:
-   ## -- use 'no' instead, faster
-   n3 = len(fit.transformed_p[df.current_key[0]+'no'])
-   o3 = len(fit.transformed_p[df.current_key[0]+'no'][0])
+  n3 = 0
+  o3 = 0
+  if do_adv:
+   for key in fit.p:
+    if   'gn' in key:
+     n3 += len(fit.transformed_p[key])
+    elif 'go' in key:
+     o3 += len(fit.transformed_p[key])
   else:
-   n3 = len(fit.transformed_p[df.current_key[0]+'nn'])
-   o3 = len(fit.transformed_p[df.current_key[0]+'oo'])
+   if do_v_symm:
+    ## -- use 'no' instead, faster
+    n3 = len(fit.transformed_p[df.current_key[0]+'no'])
+    o3 = len(fit.transformed_p[df.current_key[0]+'no'][0])
+   else:
+    n3 = len(fit.transformed_p[df.current_key[0]+'nn'])
+    o3 = len(fit.transformed_p[df.current_key[0]+'oo'])
  except KeyError:
   ## -- 2pt fit
   #print "2 point reduced dof"
-  n3 = 0
-  o3 = 0
- klen = len(df.define_prior['nkey'])
- n2 = len(fit.transformed_p['En'])
- o2 = len(fit.transformed_p['Eo'])
+  pass
+ if do_adv:
+  klen = len(df.define_prior['nkey']) ## -- still same?
+  n2 = 0
+  o2 = 0
+  for key in fit.p:
+   if   key.split('_')[0][-2:] == 'En':
+    n2 += len(fit.transformed_p[key])
+   elif key.split('_')[0][-2:] == 'Eo':
+    o2 += len(fit.transformed_p[key])
+ else:
+  klen = len(df.define_prior['nkey'])
+  n2 = len(fit.transformed_p['En'])
+  o2 = len(fit.transformed_p['Eo'])
+ #print klen,n2,o2,n3,o3
  if df.do_v_symmetric:
   return fit.dof - ( klen*(n2+o2) + (n3+o3)*(n3+o3+1)/2 )
  else:
@@ -62,26 +86,43 @@ def print_fit(fit, prior,do_v_symm=False):
  print
  print "Printing best fit parameters : "
  #
- for skey in fit.p:
+ for skey in sorted(fit.p):
   ## -- if variable was fit as a log, print log first
   if skey[:3] == 'log':
-   print "------"
+   #print "------"
    efirst=0.
    lkey=skey[3:]
    for j in range(len(fit.transformed_p[lkey])):
     sigstr=get_sigma_str(lkey,fit,prior,j,do_unicode)
-    if (lkey[len(lkey)-2:] == 'En' or \
-        lkey[len(lkey)-2:] == 'Eo' or \
-        lkey[len(lkey)-1 ] == 'E'):
+    if (lkey[-2:] == 'En' or \
+        lkey[-2:] == 'Eo' or \
+        lkey[-1 ] == 'E'):
      if j > 0:
       print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']      :  '\
             +ut.fmt_num(sum(fit.transformed_p[lkey][:j+1]),do_sigdigit,do_unicode)\
             +'  '+sigstr+' |    delE'+'['+'{:>2}'.format(j)+']  :  '\
             +ut.fmt_num(fit.transformed_p[lkey][j],do_sigdigit,do_unicode)
-    ##else j==0 for energy
+     ##else j==0 for energy
      else:
       print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']      :  '\
             +ut.fmt_num(sum(fit.transformed_p[lkey][:j+1]),do_sigdigit,do_unicode)\
+            +'  '+sigstr
+    elif(lkey.split('_')[0][-2:] == 'En' or \
+         lkey.split('_')[0][-2:] == 'Eo' or \
+         lkey.split('_')[0][-1 ] == 'E'):
+     efst = 0
+     for i in range(int(skey.split('_')[1])):
+      efst += fit.transformed_p[lkey.split('_')[0]+'_'+str(i)][0]
+      #print i,efst,lkey.split('_')[0]+'_'+str(i)
+     if j > 0:
+      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']      :  '\
+            +ut.fmt_num(efst+sum(fit.transformed_p[lkey][:j+1]),do_sigdigit,do_unicode)\
+            +'  '+sigstr+' |    delE'+'['+'{:>2}'.format(j)+']  :  '\
+            +ut.fmt_num(fit.transformed_p[lkey][j],do_sigdigit,do_unicode)
+     ##else j==0 for energy
+     else:
+      print '{:>10}'.format(lkey)+'['+'{:>2}'.format(j)+']      :  '\
+            +ut.fmt_num(efst+sum(fit.transformed_p[lkey][:j+1]),do_sigdigit,do_unicode)\
             +'  '+sigstr
     ##else not energy
     else:
@@ -90,7 +131,7 @@ def print_fit(fit, prior,do_v_symm=False):
             +'  '+sigstr
   ##endif log
   elif skey[:4] == 'sqrt':
-   print "------"
+   #print "------"
    efirst=0.
    lkey=skey[4:]
    for j in range(len(fit.transformed_p[lkey])):
@@ -114,19 +155,21 @@ def print_fit(fit, prior,do_v_symm=False):
             +ut.fmt_num(fit.transformed_p[lkey][j],do_sigdigit,do_unicode)\
             +'  '+sigstr
   ##endif sqrt
-  print "------"
+  #print "------"
   efirst=0.
   for j in range(len(fit.transformed_p[skey])):
    if skey[-2:] == 'nn' or skey[-2:] == 'no' or\
-      skey[-2:] == 'on' or skey[-2:] == 'oo':
+      skey[-2:] == 'on' or skey[-2:] == 'oo' or\
+      skey.split('_')[0][-2:] == 'nn' or skey.split('_')[0][-2:] == 'no' or\
+      skey.split('_')[0][-2:] == 'on' or skey.split('_')[0][-2:] == 'oo':
      #for k in range(len(fit.transformed_p[skey][0])):
      #  sigstr=get_sigma_str(skey,fit,prior,(j,k),do_unicode)
      pass
    else:
      sigstr=get_sigma_str(skey,fit,prior,j,do_unicode)
-   if (skey[len(skey)-2:] == 'En' or \
-       skey[len(skey)-2:] == 'Eo' or \
-       skey[len(skey)-1 ] == 'E'):
+   if (skey[-2:] == 'En' or \
+       skey[-2:] == 'Eo' or \
+       skey[-1 ] == 'E'):
     if j > 0:
      print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']      :  '\
            +ut.fmt_num(sum(fit.transformed_p[skey][:j+1]),do_sigdigit,do_unicode)\
@@ -137,16 +180,51 @@ def print_fit(fit, prior,do_v_symm=False):
      print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']      :  '\
            +ut.fmt_num(sum(fit.transformed_p[skey][:j+1]),do_sigdigit,do_unicode)\
            +'  '+sigstr
+   elif(skey.split('_')[0][-2:] == 'En' or \
+        skey.split('_')[0][-2:] == 'Eo' or \
+        skey.split('_')[0][-1 ] == 'E'):
+    if j > 0:
+     print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']      :  '\
+           +ut.fmt_num(sum(fit.transformed_p[skey][:j+1]),do_sigdigit,do_unicode)\
+           +'  '+sigstr+' |    delE'+'['+'{:>2}'.format(j)+']  :  '\
+           +ut.fmt_num(fit.transformed_p[skey][j],do_sigdigit,do_unicode)
+    ##else j==0 for energy
+    else:
+     print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']      :  '\
+           +ut.fmt_num(sum(fit.transformed_p[skey][:j+1]),do_sigdigit,do_unicode)\
+           +'  '+sigstr
+   elif(skey.split('_')[0][-2:] == 'gn' or \
+        skey.split('_')[0][-2:] == 'go'):
+    if j > 0:
+     print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']      :  '\
+           +ut.fmt_num(fit.transformed_p[skey][0]+fit.transformed_p[skey][j],\
+            do_sigdigit,do_unicode)\
+           +'  '+sigstr+' |    delg'+'['+'{:>2}'.format(j)+']  :  '\
+           +ut.fmt_num(fit.transformed_p[skey][j],do_sigdigit,do_unicode)
+    ##else j==0 for energy
+    else:
+     print '{:>10}'.format(skey)+'['+'{:>2}'.format(j)+']      :  '\
+           +ut.fmt_num(fit.transformed_p[skey][0],do_sigdigit,do_unicode)\
+           +'  '+sigstr
    ##else not energy
    else:
     if skey[-2:] == 'nn' or skey[-2:] == 'no' or\
-       skey[-2:] == 'on' or skey[-2:] == 'oo':
-      if df.do_v_symmetric and (skey[-2:] == 'nn' or skey[-2:] == 'oo'):
+       skey[-2:] == 'on' or skey[-2:] == 'oo' or\
+       skey.split('_')[0][-2:] == 'nn' or skey.split('_')[0][-2:] == 'no' or\
+       skey.split('_')[0][-2:] == 'on' or skey.split('_')[0][-2:] == 'oo':
+      if df.do_v_symmetric and\
+       ((skey[-2:] == 'nn' or skey[-2:] == 'oo') or\
+       ((skey.split('_')[0][-2:] == 'nn' or skey.split('_')[0][-2:] == 'oo') and\
+        (int(skey.split('_')[1]) == int(skey.split('_')[2])) )):
+       if (len(skey.split('_')) > 0):
+        xi = 1
+       else:
+        xi = 0
        ## -- upper triangle matrix 3-point factors
        vlen = int(np.sqrt(8*len(fit.transformed_p[skey])+1)-1)/2
        ui = np.triu_indices(vlen)
-       i = ui[0][j]
-       k = ui[1][j]
+       i = ui[0][j]+xi
+       k = ui[1][j]+xi
        sigstr=get_sigma_str(skey,fit,prior,j,do_unicode)
        print '{:>10}'.format(skey)+'['+'{:>2}'.format(i)+']'+'['+'{:>2}'.format(k)+']  :  '\
              +ut.fmt_num(fit.transformed_p[skey][j],do_sigdigit,do_unicode)\
@@ -200,6 +278,7 @@ def get_sigma_str(key,fit,prior,j,do_unicode=True):
         /(prior['sqrt'+key][j]).sdev)))
  except TypeError:
   ## -- Vnn, Vno, etc...
+  #print key,j
   sig=int(np.abs(np.trunc(\
       (fit.p[key][j[0]][j[1]].mean-prior[key][j[0]][j[1]].mean)\
        /(prior[key][j[0]][j[1]]).sdev)))
