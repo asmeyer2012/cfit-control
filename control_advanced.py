@@ -3,7 +3,8 @@ from data_manipulations       import standard_load,sn_minimize_postload_3pt
 from extract_3pt_info         import *
 from make_data                import make_data,import_corfit_file
 from make_data_db             import make_data_db
-from make_init                import make_init_from_fit_file_3pt
+#from make_init                import make_init_from_fit_file_3pt
+from make_init                import make_adv_init_from_fit_file_3pt
 from make_models              import make_models
 from make_models_3pt          import make_models_3pt,make_models_advanced
 from make_prior               import make_prior
@@ -21,7 +22,8 @@ from save_prior               import save_prior_from_fit
 from make_plot                import make_plot
 from make_plot                import make_plot_corr_neg
 from make_plot                import make_plot_1plus1
-from plot_corr_double_log_folded import plot_corr_double_log_folded
+#from plot_corr_double_log_folded import plot_corr_double_log_folded
+from plot_corr_adv_dl_folded  import plot_corr_adv_dl_folded
 #from plot_corr_effective_mass import plot_corr_effective_mass
 from plot_corr_effective_mass_check import plot_corr_effective_mass_check
 from plot_corr_normalized     import plot_corr_normalized
@@ -68,7 +70,9 @@ elif df.do_irrep == "16":
 taglist = list() # for gvar.dump hash key
 filekey = 'a'  ## -- standard choice, no filters
 #filekey = 'm'  ## -- munich filter
+#filekey = 'n'  ## -- standard choice, no filters
 #print "Using munich filter"
+#print "*** USING -1^t FILTER ***"
 #taglist.append(('l32v5.mes2pt','mes'))
 taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
 if not(df.do_irrep == "16"):
@@ -103,6 +107,67 @@ models2 = make_models    (data=dall,lkey=df.lkey,use_advanced=True)
 models3 = make_models_advanced(data=dall,lkey=df.lkey3)
 priors2 = make_prior    (models2)
 priors3 = make_prior_3pt(models3)
+priorsa = df.define_prior_adv
+np.set_printoptions(precision=4,linewidth=100)
+d1 = {}
+d1['en0'] = list()
+d1['enc'] = list() 
+d1['enb'] = list()
+d1['ens'] = list()
+d1['enr'] = list()
+d1['eo0'] = list()
+d1['eoc'] = list() 
+d1['eob'] = list()
+d1['eos'] = list()
+d1['eor'] = list()
+for i in range(6):
+ try:
+  d1['en0'].append(gv.mean(gv.exp(priorsa['logEn_'+str(i)][0])))
+  d1['enc'].append(gv.mean(gv.exp(priorsa['logEn_'+str(i)])))
+  d1['enc'][-1][0] = 0
+  d1['enb'].append(gv.mean(gv.exp(priorsa['logEn_'+str(i)])))
+  d1['ens'].append(gv.sdev(gv.exp(priorsa['logEn_'+str(i)])))
+  d1['enr'].append(gv.sdev(gv.exp(priorsa['logEn_'+str(i)]))\
+   /gv.mean(gv.exp(priorsa['logEn_'+str(i)])))
+ except KeyError:
+  pass
+ try:
+  d1['eo0'].append(gv.mean(gv.exp(priorsa['logEo_'+str(i)][0])))
+  d1['eoc'].append(gv.mean(gv.exp(priorsa['logEo_'+str(i)])))
+  d1['eoc'][-1][0] = 0
+  d1['eob'].append(gv.mean(gv.exp(priorsa['logEo_'+str(i)])))
+  d1['eos'].append(gv.sdev(gv.exp(priorsa['logEo_'+str(i)])))
+  d1['eor'].append(gv.sdev(gv.exp(priorsa['logEo_'+str(i)]))\
+   /gv.mean(gv.exp(priorsa['logEo_'+str(i)])))
+ except KeyError:
+  continue
+
+conv = .197/.15
+f = open('s'+irrepStr+'.aprior','w')
+#for i,x,y in enumerate(zip(np.array(d1).T,np.array(d2).T)):
+f.write('#i block taste sumE dE sigE sumE[GeV] dE[GeV] sigE[GeV] sigE/dE \n')
+f.write('#even\n')
+k = 0
+for i,(e0,ec,eb,es,er) in enumerate(zip(np.cumsum(d1['en0']),\
+  d1['enc'],d1['enb'],d1['ens'],d1['enr'])):
+ for j,(ecx,ebx,esx,erx) in enumerate(zip(e0+np.cumsum(ec),eb,es,er)):
+  #f.write( str(i)+' '+str(j)+' '+str(ecx)+' '+str(ebx)+' '+str(esx)+' '+str(erx)+'\n' )
+  #f.write('%d %d %d %1.3f %1.3f %1.3f %1.3f \n' % (k, i, j, ecx, ebx, esx, erx))
+  f.write('%d %d %d %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f\n' %\
+   (k, i, j, ecx, ebx, esx, conv*ecx, conv*ebx, conv*esx, erx))
+  k+=1
+f.write('#odd\n')
+k = 0
+for i,(e0,ec,eb,es,er) in enumerate(zip(np.cumsum(d1['eo0']),\
+  d1['eoc'],d1['eob'],d1['eos'],d1['eor'])):
+ for j,(ecx,ebx,esx,erx) in enumerate(zip(e0+np.cumsum(ec),eb,es,er)):
+  #f.write( str(i)+' '+str(j)+' '+str(ecx)+' '+str(ebx)+' '+str(esx)+' '+str(erx)+'\n' )
+  f.write('%d %d %d %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f \n' %\
+   (k, i, j, ecx, ebx, esx, conv*ecx, conv*ebx, conv*esx, erx))
+  k+=1
+f.close()
+
+raise ValueError('test')
 priorsa = truncate_prior_states(df.define_prior_adv,
  df.num_nst,df.num_ost,df.num_nst_3pt,df.num_ost_3pt)
 #raise ValueError('test')
@@ -133,42 +198,36 @@ priors = priorsa
 #      init2[key] = df.define_init[key][:df.num_ost]
 #else:
 #  init2=None
-#if df.do_init3:
-#  init3={}
-#  if argsin['override_init']:
-#   init3 = make_init_from_fit_file_3pt(models3,'fit_dict')
-#  else:
-#   for key in df.define_init_3pt:
-#     if key[-2:] == 'nn':
-#      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_nst_3pt))
-#      if df.do_v_symmetric:
-#       init3[key] = utf.truncate_upper_triangle(init3[key],df.num_nst_3pt)
-#     elif key[-2:] == 'oo':
-#      init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_ost_3pt))
-#      if df.do_v_symmetric:
-#       init3[key] = utf.truncate_upper_triangle(init3[key],df.num_ost_3pt)
-#     elif key[-2:] == 'no':
-#      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_ost_3pt))
-#     elif key[-2:] == 'on':
-#      ## -- is this correct for symmetric v?
-#      #init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_nst_3pt))
-#      pass
-#     elif key[-1] == 'n':
-#      init3[key] = df.define_init_3pt[key][:df.num_nst]
-#     elif key[-1] == 'o':
-#      init3[key] = df.define_init_3pt[key][:df.num_ost]
-#else:
-#  init3=None
-#pass 
+
+## -- temporary fix
+if df.do_init3:
+  #init3={}
+  #if argsin['override_init']:
+  init3 = make_adv_init_from_fit_file_3pt(models3,'fit_adv_'+irrepStr+'_3pt',\
+   fresh_overlap=True,fresh_amplitude=True)
+else:
+  init3=None
+pass 
 
 ## -- temporary
 init2=None
-init3=None
+#init3=None
+print init3
+
 
 fitter2 = CorrFitter(models=models2,maxit=df.maxit)
 fitter3 = CorrFitter(models=models,maxit=df.maxit)
 #print models
 #raise ValueError('test')
+print
+print 'prior: '
+for key in sorted(priors):
+ print key,priors[key]
+#print
+#print 'init : ',init3
+#for key in init3:
+# print key,init3[key]
+print
 if df.do_2pt:
  print "starting 2pt fit..."
  fit2 = fitter2.lsqfit(data=dall,prior=priors2,p0=init2,svdcut=df.svdcut)
@@ -208,9 +267,9 @@ else:
 if df.do_irrep == "16":
  irrepStr = '16'
 if df.do_2pt:
- save_init_from_fit(fit2,'fit_dict'+irrepStr+'_2pt.py')
+ save_init_from_fit(fit2,'fit_adv_'+irrepStr+'_2pt.py')
 if df.do_3pt:
- save_init_from_fit(fit3,'fit_dict'+irrepStr+'_3pt.py',df.do_v_symmetric)
+ save_init_from_fit(fit3,'fit_adv_'+irrepStr+'_3pt.py',df.do_v_symmetric)
 
 #fit3 = fitter3.lsqfit(data=dall,prior=priors,svdcut=df.svdcut)
 print fmt_reduced_chi2(fit3)
@@ -248,10 +307,16 @@ if df.do_plot or argsin['override_plot']:
  #plot_corr_effective_mass_check(models2,dall,None,**df.fitargs)
  #plot_corr_effective_mass(models2,dall,None,**df.fitargs)
  #plot_corr_double_log(models2,dall,fit3,**df.fitargs)
- plot_corr_double_log_folded(models2,dall,fit3,**df.fitargs)
- plot_corr_normalized(models2,dall,fit3,**df.fitargs)
+ #plot_corr_adv_dl_folded(models2,dall,fit3,req=None,**df.fitargs)
+ #plot_corr_adv_dl_folded(models2,dall,fit3,req=[[0],list()],**df.fitargs)
+ #plot_corr_adv_dl_folded(models2,dall,fit3,req=[[1],list()],**df.fitargs)
+ #plot_corr_adv_dl_folded(models2,dall,fit3,req=[list(),[0]],**df.fitargs)
+ #plot_corr_adv_dl_folded(models2,dall,fit3,req=[list(),[1]],**df.fitargs)
+ #plot_corr_adv_dl_folded(models2,dall,fit3,req=[list(),[0,1]],**df.fitargs)
+ #plot_corr_normalized(models2,dall,fit3,**df.fitargs)
  if df.do_3pt:
-  plot_corr_3pt(models3,dall,fit3,**df.fitargs)
+  #plot_corr_3pt(models3,dall,fit3,**df.fitargs)
+  pass
  if df.do_plot_terminal:
   plt.show()
 

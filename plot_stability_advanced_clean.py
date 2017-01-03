@@ -11,10 +11,10 @@ import os
 import matplotlib as mpl
 mpl.use('TkAgg')
 
-nst = 6
-ost = 4
-#n3st = 6
-#o3st = 5
+nst = 2
+ost = 2
+n3st = 2
+o3st = 2
 max_nst = 10
 max_ost = 10
 fix_even = True
@@ -24,8 +24,7 @@ fix_odd = not(fix_even)
 num_symbols = 3
 symbList = ['o','^','s']
 numN = [3,2,0,4] #Ns, Ds, unknowns
-numO = [4,1,0,6]
-#numO = [4,1,1,6] ## -- actually this one
+numO = [4,1,1,6]
 #numN = [1,3,0,4] #Ns, Ds, unknowns
 #numO = [3,4,0,6]
 mark_nst = [([y+1>sum(numN[:x]) for x in range(len(numN))].count(True)-1)%num_symbols
@@ -59,47 +58,64 @@ def plot_stability(fit_collector,**kwargs):
  ## -- tkey should be tuple: nst,ost, and 'fit' or 'prior' or other descriptor
  for stin in range(1,10):
    if fix_even:
-    #tkey=(nst,stin,n3st,o3st)
-    tkey=(nst,stin,nst,ost)
+    tkey=(nst,stin,n3st,o3st)
    else:
-    #tkey=(stin,ost,n3st,o3st)
-    tkey=(stin,ost,nst,ost)
+    tkey=(stin,ost,n3st,o3st)
    nin = tkey[0]
    oin = tkey[1]
    ## -- ignore fits with large chi2
    try:
     fit_collector[tkey]
    except KeyError:
-    print '3 continue'
     continue
    ## -- collect only important info
    hVal.append(fitCount+0.5)
    name = str(nin)+'N+'+str(oin)+'O'
    hName.append(name)
-   #hChi2.append(fit_collector[tkey]['chi2'])
-   for key in fit_collector[tkey]:
-    sum=0
-    it=0 #iterator, decides on nucleon vs delta vs unknown
-    if key[:2] == 'En' and not(key[3:] == 'log'):
-     for x in fit_collector[tkey][key]:
-      sum += x.mean
-      hValDatn[mark_nst[it]].append(fitCount+0.5-parity_offset)
-      enCentral[mark_nst[it]].append(sum)
-      enError[mark_nst[it]].append(x.sdev)
-      it+=1
-      if it > max_nst-1:
-       break
-       pass
-    elif key[:2] == 'Eo' and not(key[3:] == 'log'):
-     for x in fit_collector[tkey][key]:
-      sum += x.mean
-      hValDato[mark_ost[it]].append(fitCount+0.5+parity_offset)
-      eoCentral[mark_ost[it]].append(sum)
-      eoError[mark_ost[it]].append(x.sdev)
-      it+=1
-      if it > max_ost-1:
-       break
-       pass
+   ## -- here
+   tspec = utf.retrieve_spectrum_advanced(fit_collector[tkey])
+   print tspec
+   for key in tspec:
+    it = 0
+    if key[-2:] == 'En' and not(key[3:] == 'log' or key[4:] == 'sqrt'):
+     hValDatn[mark_nst[it]].append(fitCount+0.5-parity_offset)
+     enCentral[mark_nst[it]].append(sum)
+     enError[mark_nst[it]].append(x.sdev)
+     it += 1
+     if it > max_nst-1:
+      break
+      pass
+    elif key[-2:] == 'Eo' and not(key[3:] == 'log' or key[4:] == 'sqrt'):
+     hValDato[mark_ost[it]].append(fitCount+0.5+parity_offset)
+     eoCentral[mark_ost[it]].append(sum)
+     eoError[mark_ost[it]].append(x.sdev)
+     if it > max_ost-1:
+      break
+      pass
+    
+   #for key in fit_collector[tkey]:
+   # sum=0
+   # it=0 #iterator, decides on nucleon vs delta vs unknown
+   # if key[:2] == 'En' and not(key[3:] == 'log'):
+   #  for x in fit_collector[tkey][key]:
+   #   sum += x.mean
+   #   hValDatn[mark_nst[it]].append(fitCount+0.5-parity_offset)
+   #   enCentral[mark_nst[it]].append(sum)
+   #   enError[mark_nst[it]].append(x.sdev)
+   #   it+=1
+   #   if it > max_nst-1:
+   #    break
+   #    pass
+   # elif key[:2] == 'Eo' and not(key[3:] == 'log'):
+   #  for x in fit_collector[tkey][key]:
+   #   sum += x.mean
+   #   hValDato[mark_ost[it]].append(fitCount+0.5+parity_offset)
+   #   eoCentral[mark_ost[it]].append(sum)
+   #   eoError[mark_ost[it]].append(x.sdev)
+   #   it+=1
+   #   if it > max_ost-1:
+   #    break
+   #    pass
    fitCount += 1
  fig = plt.figure(facecolor='white')
  plt.subplots_adjust(bottom=0.15,left=0.15,right=0.97,top=0.95)
@@ -134,11 +150,9 @@ def plot_stability(fit_collector,**kwargs):
  #boxLabel += r'$t_{\rm max}='+str(df.rangeMax)+'$'
  boxLabel  = r'$t\in ['+str(df.rangeMin)+','+str(df.rangeMax)+']$'
  boxLabel += '\n'
- #boxLabel += r'$N^{(3)}_{\rm even}='+str(n3st)+'$'
- boxLabel += r'$N^{(3)}_{\rm even}='+str(nst)+'$'
+ boxLabel += r'$N^{(3)}_{\rm even}='+str(n3st)+'$'
  boxLabel += '\n'
- #boxLabel += r'$N^{(3)}_{\rm odd}='+str(o3st)+'$'
- boxLabel += r'$N^{(3)}_{\rm odd}='+str(ost)+'$'
+ boxLabel += r'$N^{(3)}_{\rm odd}='+str(o3st)+'$'
  #ax.text(.80*fitCount,1.15,boxLabel,fontsize=20,
  ax.text(.80*fitCount,1.30,boxLabel,fontsize=20,
   bbox={'facecolor':'white', 'alpha':0.8, 'pad':10})
@@ -151,24 +165,18 @@ def plot_stability(fit_collector,**kwargs):
 
 if __name__ == "__main__":
  fit_collector = {}
- for xfile in os.walk('./fit-stability/'):
+ for xfile in os.walk('./fit-adv/'):
   for file in xfile[2]:
    if '.pyc' in file:
-    print '4 continue'
     continue ## only want non-compiled versions
-   #if int(file.split('_')[3][2:]) != n3st:
-   if int(file.split('_')[3][2:]) != nst and fix_even:
-    print '1 continue'
+   if int(file.split('_')[3][2:]) != n3st:
     continue
-   #if int(file.split('_')[4].split('.')[0][2:]) != o3st:
-   if int(file.split('_')[4].split('.')[0][2:]) != ost and fix_odd:
-    print '2 continue'
+   if int(file.split('_')[4].split('.')[0][2:]) != o3st:
     continue
    try:
     nin = int(file.split('_')[1][1:])
     oin = int(file.split('_')[2][1:])
-    #fit_collector[nin,oin,n3st,o3st] = mi.load_dict_from_fit_file_3pt('./fit-stability/',file.split('.')[0])
-    fit_collector[nin,oin,nin,oin] = mi.load_dict_from_fit_file_3pt('./fit-stability/',file.split('.')[0])
+    fit_collector[nin,oin,n3st,o3st] = mi.load_dict_from_fit_file_3pt('./fit-adv/',file.split('.')[0])
    except IOError:
     print "IOError"
     continue

@@ -3,6 +3,7 @@ import numpy as np
 import os
 from make_init      import load_dict_from_fit_file_3pt
 #from plot_stability import plot_stability as pstab
+from plot_splitting       import plot_splitting as psplit
 from plot_stability_prior import plot_stability as pstab
 from util_files     import read_fit_file
 
@@ -45,3 +46,4 @@ for file in filelist:
   except IndexError:
    continue
 pstab(fit_collector)
+#psplit(fit_collector)

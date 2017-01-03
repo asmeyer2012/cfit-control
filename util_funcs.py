@@ -151,35 +151,7 @@ def get_prior_dict(prior,nkey,okey,nn,no,vkey=tuple(),nn3=1,no3=1,do_v_symm=Fals
   rprior['vkey'] = prior['vkey']
  except KeyError:
   pass
- ## -- was this ever used?
 
- #for key in nkey:
- # rprior[key] = prior[key][:nn]
- # if len(rprior[key]) < nn:
- #  raise ValueError("Not enough prior states to fill prior dictionary")
- #for key in okey:
- # rprior[key] = prior[key][:no]
- # if len(rprior[key]) < no:
- #  raise ValueError("Not enough prior states to fill prior dictionary")
- #try:
- # for key in prior['vkey']:
- #  if key[-2] == 'n':
- #   n1=nn
- #  elif key[-2] == 'o':
- #   n1=no
- #  else:
- #   raise ValueError("Unparseable key:",key)
- #  if key[-1] == 'n':
- #   n2=nn
- #  elif key[-1] == 'o':
- #   n2=no
- #  else:
- #   raise ValueError("Unparseable key:",key)
- #  rprior[key] = prior[key][:n1][:n2]
- #  if len(rprior[key]) < n1 or len(rprior[key][0]) < n2:
- #   raise ValueError("Not enough prior states to fill prior dictionary")
- #except KeyError:
- # pass # probably 2-point function
  for key in prior:
   if key in nkey+okey+vkey+('nkey','okey','vkey'):
    continue
@@ -249,9 +221,6 @@ def stack_prior_states(prior,lkey,mstk,estk):
   gstack[i] = gv.gvar(mde,es)
   for m in ms:
    lorder.append([m,i])
-  #print "stack ",i," mass : ",ms
-  #print "stack ",i," error: ",es
-  #print "stack ",i," split: ",gstack[i]
 
  ## -- sorting of states
  lsort = np.transpose(sorted(lorder,key=lambda x: x[0])) ## -- sorted list of masses vs stacks
@@ -260,45 +229,24 @@ def stack_prior_states(prior,lkey,mstk,estk):
  npos = [[i for i,y in enumerate(lsort[1]) if x==y] for x in range(len(mstk))]
  niter = [0 for i in range(len(mstk))]
  lasti = -1
- #print "sorted : ",lsort
- #print "niter  : ",niter
 
  ## -- construct the gvars for the spectrum
  gstate = np.array([])
  for i,x in zip(range(len(lsort[1])),lsort[1]):
-  #print gstate
-  #if i==0:
-  # lasti = int(x)
-  # gstack['de'] = [gstack[x][0]] ## -- get lowest energy state
-  #else:
   if lasti == int(x):
    ## -- correlated with most recent, just add next splitting
-   #print "append"
-   #print np.append(gstate,gstack[int(x)][niter[int(x)]])
    gstate = np.append(gstate,gstack[int(x)][niter[int(x)]])
   else:
    ## -- find out if this stack has been used yet
    if niter[int(x)] == 0:
     ## -- if not, decorrelate with all previous states
-    #print "decorrelate"
-    #print np.append(gstate,gstack[int(x)][0] - np.sum(gstate))
     gstate = np.append(gstate,gstack[int(x)][0] - np.sum(gstate))
    else:
     ## -- else, decorrelate with all states between last occurrence
     lastpos = [j for j,y in enumerate(lsort[1][:i]) if x==int(y)][-1]
-    #print "decorrelate between"
-    #print lastpos,"  ",np.sum(gstate[lastpos+1:])
     gstate = np.append(gstate,gstack[int(x)][niter[int(x)]] - np.sum(gstate[lastpos+1:]))
    lasti = int(x)
   niter[lasti] += 1
-
- ## -- pull prior values from defines
- #lAm = df.lAm
- #Am  = df.Am
- #lAcs= df.lAcs
- #lAks= df.lAks
- #Acs = df.Acs
- #Aks = df.Aks
 
  ## -- defined again in DEFINES
  lAm  = 1e2 # log amplitude mean
@@ -330,4 +278,53 @@ def retrieve_block_keys(prior, key):
           #print "appending key ",pkey
           keyList.append(pkey)
     return sorted(keyList)
+
+## -- reconstruct spectrum from advanced dictionary
+##    returns a new dictionary with the summed spectrum
+##    keys in new dictionary are prefixes of old keys
+##    other keys and log/sqrt are ignored
+def retrieve_spectrum_advanced(dict):
+ klst = {}
+ rval = {}
+ for key in dict:
+  skey = key.split('_')
+  if skey[0][-2:] == 'En' or skey[0][-2:] == 'Eo':
+   if skey[0][:3] == 'log' or skey[0][:4] == 'sqrt':
+    continue
+   ## -- keep a dictionary of prefixes and blocks for energies
+   if skey[0] in klst:
+    klst[skey[0]].append(skey[1])
+   else: 
+    klst[skey[0]] = [skey[1]]
+ ## -- iterate over prefixes
+ for pkey in klst:
+  E0 = 0
+  ## -- iterate over blocks
+  for i in sorted(klst[pkey]):
+   key = pkey +'_'+str(i)
+   tmp = dict[key]
+   ## -- correct the first energy
+   E0 += tmp[0]
+   tmp[0] = E0
+   if not(pkey in rval):
+    rval[pkey] = np.array([])
+   ## -- add all of the energies
+   for e in np.cumsum(tmp):
+    rval[pkey] = np.append(rval[pkey],e)
+  ## -- sort the states in increasing order
+  rval[pkey] = sorted(rval[pkey])
+ return rval
+
+## -- fold data together, leaving first and middle points alone
+def fold_data(dat,antisym=False):
+ sg = (-1 if antisym else 1)
+ lt = len(dat)
+ #rval = np.array((np.array(dat[1:lt/2]) + sg*np.array(dat[lt/2+1:lt]))/2.)
+ rval = np.array((np.array(dat[1:lt/2]) + sg*np.array(dat[lt-1:lt/2:-1]))/2.)
+ rval = np.append(rval,dat[lt/2])
+ #rval = np.hstack((np.array([dat[0]]),rval))
+ #rval = np.insert(rval,0,dat[0],axis=0)
+ rval = np.insert(list(rval),0,dat[0])
+ return rval
+ #return np.insert(np.append(rval,dat[lt/2]),0,dat[0])
 

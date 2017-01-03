@@ -10,9 +10,9 @@ import matplotlib as mpl
 mpl.use('TkAgg')
 
 print_quality = True
-sn_ratio = True
+sn_ratio = False
 
-def plot_corr_effective_mass(models,data,fit=None,**kwargs):
+def plot_corr_effective_mass(models,data,fit=None,req=[list(),list()],**kwargs):
  """
  Get all data ready so that it can be plotted on command
  Allows for dynamic cycling through plots
@@ -185,21 +185,32 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
    _emTData = model.tdata
    _emTFit = range(_emFitMin,_emFitMax)
    _emTFit = np.append(_emTFit,list(sorted([len(_emTData) - t for t in _emTFit])))
-   _emTDataNonZero = [t for t in _emTData if np.abs(gv.mean(data[key])[t]) > 1e-20]
+   if not(fit is None) and (len(req[0]) > 0 or len(req[1]) > 0):
+     _emSubFcn = utp.mask_fit_fcn(model,fit,req,invert=False)
+     _emSub = np.array(_emSubFcn(np.array(_emTData)))
+   else:
+     _emSub = 0
+   _emDataFold = utf.fold_data(data[key]-_emSub,(model.tp < 0))
+   #_emTDataNonZero = [t for t in _emTData if np.abs(gv.mean(data[key])[t]) > 1e-20]
+   #_emTDataNonZero = [t for t in range(len(_emDataFold)) if np.mean(_emDataFold[t]) > 1e-20]
    #
    ## -- data
-   _emTDataRatio =\
-    [t for t in _emTData
-    if (t in _emTDataNonZero) and (t <= _emTData[-1]/2 +1 - _emSep) ]   # first half
-   _emTDataRatio = np.append(_emTDataRatio,
-    [t for t in _emTData
-    if (t in _emTDataNonZero) and (t >= _emTData[-1]/2 +1 + _emSep) ] ) # second half
-   _emRatio =\
-    [data[key][t+_emSep]/data[key][t] for t in _emTData
-    if (t in _emTDataNonZero) and (t <= _emTData[-1]/2 +1 - _emSep) ]   # first half
-   _emRatio = np.append(_emRatio,
-    [data[key][t-_emSep]/data[key][t] for t in _emTData
-    if (t in _emTDataNonZero) and (t >= _emTData[-1]/2 +1 + _emSep) ] ) # second half
+   _emRatio = np.array(_emDataFold[_emSep:])/np.array(_emDataFold[:-_emSep])
+   _emTDataRatio = np.array(range(len(_emRatio)))
+   _emTDataNonZero = np.array([t for t in range(len(_emRatio)) if _emRatio[t] > 1e-20])
+   #_emRatio = np.array([-gv.log(x)/_emSep for x in _emRatio if x > 1e-20])
+   #_emTDataRatio =\
+   # [t for t in _emTData
+   # if (t in _emTDataNonZero) and (t <= _emTData[-1]/2 +1 - _emSep) ]   # first half
+   #_emTDataRatio = np.append(_emTDataRatio,
+   # [t for t in _emTData
+   # if (t in _emTDataNonZero) and (t >= _emTData[-1]/2 +1 + _emSep) ] ) # second half
+   #_emRatio =\
+   # [data[key][t+_emSep]/data[key][t] for t in _emTData
+   # if (t in _emTDataNonZero) and (t <= _emTData[-1]/2 +1 - _emSep) ]   # first half
+   #_emRatio = np.append(_emRatio,
+   # [data[key][t-_emSep]/data[key][t] for t in _emTData
+   # if (t in _emTDataNonZero) and (t >= _emTData[-1]/2 +1 + _emSep) ] ) # second half
    ## -- times
    _emTPosRatio.append(
     [_emTDataRatio[t] for t in range(len(_emTDataRatio)) if _emRatio[t] > 0] )
@@ -212,26 +223,30 @@ def plot_corr_effective_mass(models,data,fit=None,**kwargs):
    _emLogRatioFit.append(
     [-gv.log(_emRatio[t])/_emSep for t in range(len(_emTDataRatio))
     if (gv.mean(_emRatio[t]) > 0) and (_emTDataRatio[t] in _emTPosFit[-1])] )
-   # -- folding
-   _emFoldRatio.append(list())
-   _emFoldRatioFit.append(list())
-   _emTPosFold.append(list())
-   _emTPosFoldFit.append(list())
-   for t in range(1,len(_emTData)/2):
-    if not(t in _emTPosRatio[-1]) or not(len(_emTData)-t in _emTPosRatio[-1]):
-     continue
-    _emFoldRatio[-1].append((_emLogRatio[-1][list(_emTPosRatio[-1]).index(t)]
-      +_emLogRatio[-1][list(_emTPosRatio[-1]).index(len(_emTData)-t)])/2)
-    _emTPosFold[-1].append(t)
-    if not(t in _emTPosFit[-1]) or not(len(_emTData)-t in _emTPosFit[-1]):
-     continue
-    _emFoldRatioFit[-1].append((_emLogRatio[-1][list(_emTPosRatio[-1]).index(t)]
-      +_emLogRatio[-1][list(_emTPosRatio[-1]).index(len(_emTData)-t)])/2)
-    _emTPosFoldFit[-1].append(t)
-   for t in range(len(_emTPosFold[-1])):
-    print t,_emTPosFold[-1][t],_emFoldRatio[-1][t]
-   for t in range(len(_emTPosFoldFit[-1])):
-    print t,_emTPosFoldFit[-1][t],_emFoldRatioFit[-1][t]
+   _emFoldRatio.append(_emLogRatio[-1])
+   _emFoldRatioFit.append(_emLogRatioFit[-1])
+   _emTPosFold.append(_emTPosRatio[-1])
+   _emTPosFoldFit.append(_emTPosFit[-1])
+   ## -- folding
+   #_emFoldRatio.append(list())
+   #_emFoldRatioFit.append(list())
+   #_emTPosFold.append(list())
+   #_emTPosFoldFit.append(list())
+   #for t in range(1,len(_emTData)/2):
+   # if not(t in _emTPosRatio[-1]) or not(len(_emTData)-t in _emTPosRatio[-1]):
+   #  continue
+   # _emFoldRatio[-1].append((_emLogRatio[-1][list(_emTPosRatio[-1]).index(t)]
+   #   +_emLogRatio[-1][list(_emTPosRatio[-1]).index(len(_emTData)-t)])/2)
+   # _emTPosFold[-1].append(t)
+   # if not(t in _emTPosFit[-1]) or not(len(_emTData)-t in _emTPosFit[-1]):
+   #  continue
+   # _emFoldRatioFit[-1].append((_emLogRatio[-1][list(_emTPosRatio[-1]).index(t)]
+   #   +_emLogRatio[-1][list(_emTPosRatio[-1]).index(len(_emTData)-t)])/2)
+   # _emTPosFoldFit[-1].append(t)
+   #for t in range(len(_emTPosFold[-1])):
+   # print t,_emTPosFold[-1][t],_emFoldRatio[-1][t]
+   #for t in range(len(_emTPosFoldFit[-1])):
+   # print t,_emTPosFoldFit[-1][t],_emFoldRatioFit[-1][t]
    _emLogRatioCentral.append(gv.mean(_emLogRatio[-1]))
    _emLogRatioError.append([ list(gv.sdev(_emLogRatio[-1])), list(gv.sdev(_emLogRatio[-1])) ])
    _emFoldRatioCentral.append(gv.mean(_emFoldRatio[-1]))

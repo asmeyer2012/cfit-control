@@ -121,7 +121,7 @@ define_prior3_s16['okey'] = okey3_s16
 define_prior3_s16['vkey'] = vkey3_s16
 
 Vm  = 0  # current mean
-Vs  = 1  # current sdev (different parity entries)
+Vs  = 10  # current sdev (different parity entries)
 #Vs  = 10 # current sdev (different parity entries)
 Vd  = 10 # current sdev (diagonal same-parity entries)
 #Vx  = 1  # current sdev (offdiagonal same-parity entries)

@@ -10,6 +10,7 @@ from make_prior               import make_prior
 from make_prior_3pt           import make_prior_3pt
 from make_bootstrap           import make_bootstrap
 from manipulate_dataset       import *
+from mock_data_generator      import generate_mock_data
 from print_results            import fmt_reduced_chi2
 from print_results            import print_fit
 from print_results            import print_error_budget
@@ -21,11 +22,14 @@ from make_plot                import make_plot_corr_neg
 from make_plot                import make_plot_1plus1
 from plot_corr_double_log_folded import plot_corr_double_log_folded
 #from plot_corr_effective_mass import plot_corr_effective_mass
-from plot_corr_effective_mass_check import plot_corr_effective_mass_check
+#from plot_corr_effective_mass_check import plot_corr_effective_mass_check
+from plot_corr_adv_effm_clean import plot_corr_effective_mass
 from plot_corr_normalized     import plot_corr_normalized
 #from plot_corr_3pt            import plot_corr_3pt
+#from plot_splitting           import plot_splitting
 from plot_corr_stacked_3pt    import plot_corr_3pt
 #from plot_corr_stacked_3pt_clean    import plot_corr_3pt
+from plot_corr_adv_stacked_3pt import plot_corr_adv_stacked_3pt
 from meta_data                import *
 from util_files               import read_fit_file
 import defines           as df
@@ -65,7 +69,9 @@ elif df.do_irrep == "16":
 taglist = list() # for gvar.dump hash key
 filekey = 'a'  ## -- standard choice, no filters
 #filekey = 'm'  ## -- munich filter
+#filekey = 'n'  ## -- munich filter
 #print "Using munich filter"
+#print "*** USING -1^t FILTER ***"
 #taglist.append(('l32v5.mes2pt','mes'))
 taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
 if not(df.do_irrep == "16"):
@@ -91,9 +97,15 @@ else:
  taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
  taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
  taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
+## -- for later
+if df.do_irrep == "16":
+ irrepStr = '16'
 
 ## -- consolidated all loading into a single file:
-dall = standard_load(taglist,filekey,argsin)
+if df.do_mock:
+ dall = generate_mock_data()
+else:
+ dall = standard_load(taglist,filekey,argsin)
   
 models2 = make_models    (data=dall,lkey=df.lkey)
 models3 = make_models_3pt(data=dall,lkey=df.lkey3)
@@ -115,7 +127,12 @@ for key in priors3:
 if df.do_init2:
   init2={}
   if argsin['override_init']:
-   init2 = make_init_from_fit_file_3pt(models2,'fit_dict')
+   try:
+    init2 = make_init_from_fit_file_3pt(models2,'fit_dict'+irrepStr+'_2pt.py')
+    print "loaded initial values from file: ",'fit_dict'+irrepStr+'_2pt.py'
+   except:
+    init2 = None
+    print "could not load 2-point function initial values"
   else:
    for key in df.define_init:
      if key[-1] == 'n':
@@ -126,8 +143,13 @@ else:
   init2=None
 if df.do_init3:
   init3={}
-  if argsin['override_init']:
-   init3 = make_init_from_fit_file_3pt(models3,'fit_dict')
+  if not(argsin['override_init']):
+#   try:
+    init3 = make_init_from_fit_file_3pt(models,'fit_dict'+irrepStr+'_3pt')
+    print "loaded initial values from file: ",'fit_dict'+irrepStr+'_3pt.py'
+#   except:
+#    init3 = None
+#    print "could not load 3-point function initial values"
   else:
    for key in df.define_init_3pt:
      if key[-2:] == 'nn':
@@ -151,10 +173,49 @@ if df.do_init3:
 else:
   init3=None
 pass 
-init3 = None ## -- test
+print 'init: ',init3
+#init3 = None ## -- test
 
 fitter2 = CorrFitter(models=models2,maxit=df.maxit)
 fitter3 = CorrFitter(models=models,maxit=df.maxit)
+
+#np.set_printoptions(precision=4,linewidth=100)
+#d1 = list()
+#d2 = list()
+#conv = .197/.15
+#d1.append(np.cumsum(gv.mean(gv.exp(priors['logEn']))))
+#d1.append(gv.mean(gv.exp(priors['logEn'])))
+#d1.append(gv.sdev(gv.exp(priors['logEn'])))
+#d1.append(conv*np.cumsum(gv.mean(gv.exp(priors['logEn']))))
+#d1.append(conv*gv.mean(gv.exp(priors['logEn'])))
+#d1.append(conv*gv.sdev(gv.exp(priors['logEn'])))
+#d1.append(gv.sdev(gv.exp(priors['logEn']))/gv.mean(gv.exp(priors['logEn'])))
+#d2.append(np.cumsum(gv.mean(gv.exp(priors['logEo']))))
+#d2.append(gv.mean(gv.exp(priors['logEo'])))
+#d2.append(gv.sdev(gv.exp(priors['logEo'])))
+#d2.append(conv*np.cumsum(gv.mean(gv.exp(priors['logEo']))))
+#d2.append(conv*gv.mean(gv.exp(priors['logEo'])))
+#d2.append(conv*gv.sdev(gv.exp(priors['logEo'])))
+#d2.append(gv.sdev(gv.exp(priors['logEo']))/gv.mean(gv.exp(priors['logEo'])))
+#print np.array(d1).T
+#
+#f = open('s'+irrepStr+'.prior','w')
+#f.write('#i sumE dE sigE sumE[GeV] dE[GeV] sigE[GeV] sigE/dE \n')
+#f.write('#even\n')
+#for i,x in enumerate(np.array(d1).T):
+# #f.write( str(i)+' '+str(x)+'\n' )
+# #f.write( '%d %1.3f %1.3f %1.3f %1.3f \n' % (i,)+tuple(x))
+# outdat = (i,)+tuple(x)
+# f.write( '%d %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f \n' % outdat)
+#f.write('#odd\n')
+#for i,x in enumerate(np.array(d2).T):
+# #f.write( str(i)+' '+str(x)+'\n' )
+# outdat = (i,)+tuple(x)
+# f.write( '%d %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f \n' % outdat)
+#f.close()
+#
+#raise ValueError("test")
+
 if df.do_2pt:
  print "starting 2pt fit..."
  fit2 = fitter2.lsqfit(data=dall,prior=priors2,p0=init2,svdcut=df.svdcut)
@@ -177,8 +238,6 @@ print fmt_reduced_chi2(fit3,df.do_v_symmetric)
 print_fit(fit3,priors,df.do_v_symmetric)
 
 ## -- save fit as an initial value dictionary
-if df.do_irrep == "16":
- irrepStr = '16'
 if df.do_2pt:
  save_init_from_fit(fit2,'fit_dict'+irrepStr+'_2pt.py')
 if df.do_3pt:
@@ -198,15 +257,192 @@ if df.do_3pt:
 #  ## -- 2pt
 #  pass
 
+np.set_printoptions(precision=3,linewidth=100)
+elst = []
+for key in sorted(fit3.transformed_p):
+ if key[:2] == 'En' or key[:2] == 'Eo':
+  for e in fit3.transformed_p[key]:
+   elst.append(e)
+cor = gv.evalcorr(elst)
+evl,evc = gv.linalg.eigvalsh(cor,True)
+chol = np.linalg.cholesky(cor).T
+print 'correlation E:'
+print gv.evalcorr(elst)
+print 'eigenvalues:'
+print evl
+print 'eigenvectors:'
+print evc
+print 'cholesky:'
+print chol
+
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[2] == 'n') and (key[0] == 'c'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation anc:'
+#print gv.evalcorr(alst)
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[2] == 'o') and (key[0] == 'c'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation aoc:'
+#print gv.evalcorr(alst)
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[2] == 'n') and (key[0] == 'k'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation ank:'
+#print gv.evalcorr(alst)
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[2] == 'o') and (key[0] == 'k'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation aok:'
+#print gv.evalcorr(alst)
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[2] == 'n') and (key[1] == '4'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation a4n:'
+#print gv.evalcorr(alst)
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[2] == 'n') and (key[1] == '7'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation a7n:'
+#print gv.evalcorr(alst)
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[2] == 'o') and (key[1] == '4'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation a4o:'
+#print gv.evalcorr(alst)
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[2] == 'o') and (key[1] == '7'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation a7o:'
+#print gv.evalcorr(alst)
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[0] == 'c') and (key[1] == '4'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation ac4:'
+#print gv.evalcorr(alst)
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[0] == 'k') and (key[1] == '4'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation ak4:'
+#print gv.evalcorr(alst)
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[0] == 'c') and (key[1] == '7'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation ac7:'
+#print gv.evalcorr(alst)
+#alst = []
+#for key in sorted(fit3.transformed_p):
+# try:
+#  if (key[0] == 'k') and (key[1] == '7'):
+#   print key
+#   for a in fit3.transformed_p[key]:
+#    alst.append(a)
+# except IndexError:
+#  continue
+#print 'correlation ak7:'
+#print gv.evalcorr(alst)
+##np.set_printoptions(precision=3,linewidth=100)
+#np.set_printoptions()
+#print gv.evalcorr(alst)
+
 ## -- plot
 if df.do_plot or argsin['override_plot']:
- #plot_corr_effective_mass_check(models2,dall,None,**df.fitargs)
- #plot_corr_effective_mass(models2,dall,None,**df.fitargs)
- #plot_corr_double_log(models2,dall,fit3,**df.fitargs)
- plot_corr_double_log_folded(models2,dall,fit3,**df.fitargs)
- plot_corr_normalized(models2,dall,fit3,**df.fitargs)
- if df.do_3pt:
-  plot_corr_3pt(models3,dall,fit3,**df.fitargs)
+ ##plot_corr_effective_mass_check(models2,dall,None,**df.fitargs)
+ ##plot_corr_effective_mass(models2,dall,None,**df.fitargs)
+ #plot_corr_effective_mass(models2,dall,fit3,**df.fitargs)
+ #plot_corr_effective_mass(models2,dall,fit3,req=[[0],list()],**df.fitargs)
+ #plot_corr_effective_mass(models2,dall,fit3,req=[[0,1],list()],**df.fitargs)
+ #plot_corr_effective_mass(models2,dall,fit3,req=[list(),[0]],**df.fitargs)
+ #plot_corr_effective_mass(models2,dall,fit3,req=[list(),[1]],**df.fitargs)
+ #plot_corr_effective_mass(models2,dall,fit3,req=[list(),[2]],**df.fitargs)
+ #plot_corr_effective_mass(models2,dall,fit3,req=[list(),[0,1,2]],**df.fitargs)
+ ##plot_corr_effective_mass(models2,dall,fit3,req=[[2],list()],**df.fitargs)
+ #plot_corr_effective_mass(models2,dall,fit3,req=[list(),[0]],**df.fitargs)
+ ##plot_corr_double_log(models2,dall,fit3,**df.fitargs)
+ ##plot_corr_double_log_folded(models2,dall,fit3,**df.fitargs)
+ #plot_corr_double_log_folded(models2,dall,fit3,**df.fitargs)
+ #plot_corr_double_log_folded(models2,dall,fit3,req=[[0],list()],**df.fitargs)
+ #plot_corr_double_log_folded(models2,dall,fit3,req=[[0,1],list()],**df.fitargs)
+ #plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[0]],**df.fitargs)
+ #plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[1]],**df.fitargs)
+ #plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[2]],**df.fitargs)
+ #plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[0,1,2]],**df.fitargs)
+ ##plot_corr_double_log_folded(models2,dall,fit3,req=[[2],list()],**df.fitargs)
+ #plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[0]],**df.fitargs)
+ ###plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[1]],**df.fitargs)
+ ##plot_corr_normalized(models2,dall,fit3,**df.fitargs)
+ ##if df.do_3pt:
+ ## plot_corr_3pt(models3,dall,fit3,**df.fitargs)
+ plot_corr_adv_stacked_3pt(models3,dall,fit3,**df.fitargs)
+ #plot_corr_adv_stacked_3pt(models3,dall,fit3,req=[[0],list()],**df.fitargs)
+ #plot_corr_adv_stacked_3pt(models3,dall,fit3,req=[[1],list()],**df.fitargs)
+ #plot_corr_adv_stacked_3pt(models3,dall,fit3,req=[list(),[0,1]],**df.fitargs)
  if df.do_plot_terminal:
   plt.show()
 

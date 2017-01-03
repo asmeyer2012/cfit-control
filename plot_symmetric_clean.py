@@ -12,12 +12,14 @@ import os
 ## -- works better for X11 forwarding
 mpl.use('TkAgg')
 
-nst = 8
-ost = 8
+nst = 6
+ost = 7
 #n3st = 5
 #o3st = 5
 max_nst = 9
 max_ost = 9
+min_n_in = 3
+min_o_in = 4
 max_n_in = 8
 max_o_in = 9
 fix_even = True
@@ -28,7 +30,8 @@ print_quality = True
 num_symbols = 3
 symbList = ['o','^','s']
 numN = [3,2,0,3,2,0,5] #Ns, Ds, unknowns, 8
-numO = [0,0,1,6,3,0,4]
+numO = [0,0,0,6,3,0,4]
+#numO = [0,0,1,6,3,0,4] ## -- really this
 #numN = [1,3,0,1,3,0,5] #Ns, Ds, unknowns, 16
 #numO = [5,1,0,1,1,0,1,1,0,1,1,0]
 mark_nst = [([y+1>sum(numN[:x]) for x in range(len(numN))].count(True)-1)%num_symbols
@@ -71,6 +74,8 @@ def plot_stability(fit_collector,**kwargs):
     tkey=(stin,ost)
    nin = tkey[0]
    oin = tkey[1]
+   if nin < min_n_in or oin < min_o_in:
+    continue
    if nin > max_n_in or oin > max_o_in:
     continue
    ## -- ignore fits with large chi2
@@ -134,9 +139,9 @@ def plot_stability(fit_collector,**kwargs):
  ax.set_ylim(plotLimit[:2])
  for x in range(num_symbols):
   ax.errorbar(hValDatn[x],enCentral[x],enError[x],
-   color='r',marker=symbList[x],linestyle='')
+   color='r',marker=symbList[x],markersize=7,linestyle='')
   ax.errorbar(hValDato[x],eoCentral[x],eoError[x],
-   color='b',marker=symbList[x],linestyle='')
+   color='b',marker=symbList[x],markersize=7,linestyle='')
   pass
  if print_quality:
   ax.yaxis.set_label_coords(-0.1,labelVert)

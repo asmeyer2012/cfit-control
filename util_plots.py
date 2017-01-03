@@ -317,132 +317,99 @@ def create_fit_func_3pt(model,fit):
  return new_func
 pass
 
-def create_fit_func_adv(model,fit):
+## -- project out all but the requested states
+##    invert will project out the requested states and keep the rest rather than the other way
+## 
+def mask_fit_fcn(model,fit,req=[list(),list()],invert=False):
+ if not(invert) and len(req[0]) == 0 and len(req[1]) == 0:
+  def fitfcn(t):
+   try:
+    return np.array([0 for tx in t])
+   except TypeError:
+    return 0
+  return fitfcn
  try:
-  tfp = fit.transformed_p
+  tmp = fit.transformed_p.copy()
  except AttributeError:
-  ## -- prior was input instead
-  tfp = fit
+  ## -- prior was input
+  tmp = fit.copy()
  pass
- tfk = tfp.keys()
- tpsa = ( 1 if model.tpa > 0 else -1) ## -- symmetry or antisymmetry factor
- tpsb = ( 1 if model.tpb > 0 else -1) ## -- symmetry or antisymmetry factor
- tpa = abs(model.tpa)
- tpb = abs(model.tpb)
- ## -- find keys and ensure they are tuples
- akey = model.a
- bkey = model.b
- Eakey = model.dEa
- Ebkey = model.dEb
- ## -- just assume that everything is odd+even
- la = {}
- lb = {}
- lEa = {}
- lEb = {}
- akeys = [utf.retrieve_block_keys(tfp,x) for x in akey]
- bkeys = [utf.retrieve_block_keys(tfp,x) for x in bkey]
- Eakeys = [utf.retrieve_block_keys(tfp,x) for x in Eakey]
- Ebkeys = [utf.retrieve_block_keys(tfp,x) for x in Ebkey]
- ## -- save data to dictionaries
- for key in akeys:
-  if key[:3] == 'log':
-   la[key[3:]] = gv.exp(tfp[key])
-  elif key[:4] == 'sqrt':
-   la[key[4:]] = [x*x for x in tfp[key]]
-  else:
-   la[key] = tfp[key]
- for key in bkeys:
-  if key[:3] == 'log':
-   lb[key[3:]] = gv.exp(tfp[key])
-  elif key[:4] == 'sqrt':
-   lb[key[4:]] = [x*x for x in tfp[key]]
-  else:
-   lb[key] = tfp[key]
- for key in Eakeys:
-  if key[:3] == 'log':
-   lEa[key[3:]] = gv.exp(tfp[key])
-  elif key[:4] == 'sqrt':
-   lEa[key[4:]] = [x*x for x in tfp[key]]
-  else:
-   lEa[key] = tfp[key]
- for key in Ebkeys:
-  if key[:3] == 'log':
-   lEb[key[3:]] = gv.exp(tfp[key])
-  elif key[:4] == 'sqrt':
-   lEb[key[4:]] = [x*x for x in tfp[key]]
-  else:
-   lEb[key] = tfp[key]
- ## -- define prototype functions
- def fn_evn(a,e,t,ts):
-  return np.array([x*y for x,y in zip(a,gv.exp(-np.outer(e,t)))]) +\
-    np.sign(ts)*np.array([x*y for x,y in zip(a,gv.exp(-np.outer(e,np.abs(ts)-np.array(t))))])
- def fn_odd(a,e,t,ts):
-  return np.cos(np.pi*np.array(t))*fn_evn(a,e,t,ts)
- ## -- finish constructing functions
- ## -- assuming only even+odd
- ## TODO: here
- lan = la[akey[0]]
- lao = la[akey[1]]
- lbn = lb[bkey[0]]
- lbo = lb[bkey[1]]
- lEan = utf.sum_dE(lEa[Eakey[0]])
- lEao = utf.sum_dE(lEa[Eakey[1]])
- lEbn = utf.sum_dE(lEb[Ebkey[0]])
- lEbo = utf.sum_dE(lEb[Ebkey[1]])
- tsa = model.tpa
- tsb = model.tpb
- T = model.T
- ## -- of course the new one is different, typical
- #if df.do_v_symmetric:
- if do_v_symm:
-  lvnn = utf.reconstruct_upper_triangle(tfp[model.V[0][0]],
-   int(np.sqrt(8*len(tfp[model.V[0][0]])+1)-1)/2)
-  lvoo = utf.reconstruct_upper_triangle(tfp[model.V[1][1]],
-   int(np.sqrt(8*len(tfp[model.V[1][1]])+1)-1)/2)
-  lvno = tfp[model.V[0][1]]
-  lvon = np.transpose(tfp[model.V[0][1]])
+ ## -- get the key prefixes of the sink overlaps
+ (bnp,bop) = model.b
+
+ ## -- if inverted, get rid of requested states, else keep them
+ if not(invert):
+  tmp0 = tmp.copy()
+ for j in req[0]:
+  tmp[bnp][j] = 0
+ for j in req[1]:
+  tmp[bop][j] = 0
+
+ if invert:
+  def fitfcn(t):
+   return model.fitfcn(tmp,t=t)
+  return fitfcn
  else:
-  lvnn = tfp[model.V[0][0]]
-  lvoo = tfp[model.V[1][1]]
-  lvno = tfp[model.V[0][1]]
-  lvon = tfp[model.V[1][0]]
- nn = len(lvnn)
- no = len(lvoo)
- ## need to resize arrays if matrix is not same size as parameter list length
- nt = np.abs(model.tpa)
- def new_func(t):
-  #print no,len(t)
-  #print np.shape(np.transpose(lvon)),np.transpose(lvon)
-  #print np.shape(np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t)))),
-  # np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t)))
-  #print np.dot(np.transpose(lvon),np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t))))
-  #print np.resize(fn_evn(lbn,lEbn,T-np.array(t),tsb),(nn,len(t)))
-  #print np.transpose(np.dot(np.transpose(lvon),np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t))))*\
-  # np.resize(fn_evn(lbn,lEbn,T-np.array(t),tsb),(nn,len(t))))
-  #print model.sa[1]*model.sb[0]*np.array([np.sum(x) for x in\
-  # np.transpose(np.dot(np.transpose(lvon),np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t))))*\
-  # np.resize(fn_evn(lbn,lEbn,T-np.array(t),tsb),(nn,len(t))))])
-  return list(
-     model.sa[0]*model.sb[0]*np.array([np.sum(x) for x in\
-     np.transpose(np.dot(np.transpose(lvnn),np.resize(fn_evn(lan,lEan,t,tsa),(nn,len(t))))*\
-     np.resize(fn_evn(lbn,lEbn,T-np.array(t),tsb),(nn,len(t))))])\
-   + model.sa[1]*model.sb[0]*np.array([np.sum(x) for x in\
-     np.transpose(np.dot(np.transpose(lvon),np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t))))*\
-     np.resize(fn_evn(lbn,lEbn,T-np.array(t),tsb),(nn,len(t))))])\
-   + model.sa[0]*model.sb[1]*np.array([np.sum(x) for x in\
-     np.transpose(np.dot(np.transpose(lvno),np.resize(fn_evn(lan,lEan,t,tsa),(nn,len(t))))*\
-     np.resize(fn_odd(lbo,lEbo,T-np.array(t),tsb),(no,len(t))))])\
-   + model.sa[1]*model.sb[1]*np.array([np.sum(x) for x in\
-     np.transpose(np.dot(np.transpose(lvoo),np.resize(fn_odd(lao,lEao,t,tsa),(no,len(t))))*\
-     np.resize(fn_odd(lbo,lEbo,T-np.array(t),tsb),(no,len(t))))])\
-   )
- #def new_func(t,ts):
- # ## -- even and odd
- # return list(model.s[0]*(
- #      np.array([np.dot(lcn,gv.exp(x)) for x in np.outer(np.array(t),    -np.array(lEn))]) +\
- #  tps*np.array([np.dot(lcn,gv.exp(x)) for x in np.outer(tpa-np.array(t),-np.array(lEn))]) )+\
- #  model.s[1]*gv.cos([np.pi*x for x in t])*(
- #      np.array([np.dot(lco,gv.exp(x)) for x in np.outer(np.array(t),    -np.array(lEo))]) +\
- #  tps*np.array([np.dot(lco,gv.exp(x)) for x in np.outer(tpa-np.array(t),-np.array(lEo))]) ) )
- return new_func
-pass
+  def fitfcn(t):
+   return model.fitfcn(tmp0,t=t)-model.fitfcn(tmp,t=t)
+  return fitfcn
+
+
+## -- project out all but the requested states
+##    states are ordered first by block, then taste splitting
+##    this means that a 'higher' state may have a lower energy than its predecessors
+##    invert will project out the requested states and keep the rest rather than the other way
+## 
+def mask_fit_fcn_adv(model,fit,req=[list(),list()],invert=False):
+ if not(invert) and len(req[0]) == 0 and len(req[1]) == 0:
+  def fitfcn(t):
+   try:
+    return np.array([0 for tx in t])
+   except TypeError:
+    return 0
+  return fitfcn
+ try:
+  tmp = fit.transformed_p.copy()
+ except AttributeError:
+  ## -- prior was input
+  tmp = fit.copy()
+ pass
+ ## -- get the key prefixes of the sink overlaps
+ (bnp,bop) = model.b
+ ## -- get state blocks, index, and energy
+ ##    energy currently unnecessary info
+ enall = list()
+ eoall = list()
+ for key in sorted(tmp):
+  skey = key.split('_')
+  i = int(skey[1])
+  if skey[0][:3] == 'log' or skey[0][:4] == 'sqrt':
+   continue
+  if   skey[0][-2:] == 'En':
+   for j,e in enumerate(tmp[key]):
+    enall.append([i,j,e])
+  elif skey[0][-2:] == 'Eo':
+   for j,e in enumerate(tmp[key]):
+    eoall.append([i,j,e])
+  else:
+   continue
+
+ ## -- if inverted, get rid of requested states, else keep them
+ if not(invert):
+  tmp0 = tmp.copy()
+ for i in req[0]:
+  #print "inverted: reject even state ",bnp,i,enall[i]
+  tmp[bnp+'_'+str(enall[i][0])][enall[i][1]] = 0
+ for i in req[1]:
+  #print "inverted: reject odd state ",bop,i,eoall[i]
+  tmp[bop+'_'+str(eoall[i][0])][eoall[i][1]] = 0
+
+ if invert:
+  def fitfcn(t):
+   return model.fitfcn(tmp,t=t)
+  return fitfcn
+ else:
+  def fitfcn(t):
+   return model.fitfcn(tmp0,t=t)-model.fitfcn(tmp,t=t)
+  return fitfcn
+

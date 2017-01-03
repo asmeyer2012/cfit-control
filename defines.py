@@ -22,10 +22,11 @@ do_baryon=True
 do_sn_minimize=False
 do_initial=True
 do_init2=True
-do_init3=False
+do_init3=True
+do_mock=True
 do_v_symmetric=dfp3.do_v_symmetric
-#do_irrep="8'"
-do_irrep="8"
+do_irrep="8'"
+#do_irrep="8"
 #do_irrep="16"
 do_symm="s"
 #do_symm="m"
@@ -38,20 +39,20 @@ do_3pt=True
 cor_len=48 # parse this from filename?
 ## --
 
-num_nst_s8p=4
-num_ost_s8p=5
-num_nst_s8=7
-num_ost_s8=7
-num_nst_s16=8
-num_ost_s16=10
+num_nst_s8p=3
+num_ost_s8p=2
+num_nst_s8=10
+num_ost_s8=10
+num_nst_s16=9
+num_ost_s16=9
 
 ## -- control size of matrices here!
 ##    symmetric puts a restriction that 3pt #states = 2pt #states
 if do_v_symmetric:
- num_n3_s8p=min(3,num_nst_s8p)
- num_o3_s8p=min(4,num_ost_s8p)
- #num_n3_s8p=num_nst_s8p
- #num_o3_s8p=num_ost_s8p
+ #num_n3_s8p=min(3,num_nst_s8p)
+ #num_o3_s8p=min(4,num_ost_s8p)
+ num_n3_s8p=num_nst_s8p
+ num_o3_s8p=num_ost_s8p
  num_n3_s8 =num_nst_s8
  num_o3_s8 =num_ost_s8
  num_n3_s16=num_nst_s16
@@ -64,8 +65,10 @@ else:
  num_n3_s16=min(5,num_nst_s16)
  num_o3_s16=min(5,num_ost_s16)
 
+#rangeMin=2
+#rangeMax=12
 rangeMin=2
-rangeMax=14
+rangeMax=9
 #rangeMin=5
 #rangeMax=10
 mesonAvgMin=12
@@ -126,6 +129,10 @@ elif do_irrep == "16":
      if not(cur+key+'t'+str(tsep) in lkey3):
       lkey3.append(cur+key+'t'+str(tsep))
 pass
+
+## -- TODO: spectrum only test
+if do_mock or True:
+ lkey3 = list()
 
 maxit      =10000   # maximum iterations
 #svdcut     =None
@@ -354,11 +361,13 @@ if do_irrep == "8":
   stab_max_states=20
   stab_min_nst=5
   stab_mid_nst=5
-  stab_max_nst=12
-  stab_min_ost=3
-  stab_mid_ost=3
-  stab_max_ost=14
-  nost_3pt = ((3,3),(3,6),(4,4),(4,6),(4,7),(5,5),(6,7),(6,8),(5,6),(5,7),(5,8),(7,8),(7,7),(7,6),(7,9))
+  stab_max_nst=10
+  stab_min_ost=4
+  stab_mid_ost=4
+  stab_max_ost=10
+  #nost_3pt = ((3,2),(3,3),(3,4),(4,4),(4,5),(4,6),(5,5),(6,5),(6,6),(6,7),(6,8),(5,6),(5,7),(5,8),(7,4),(7,5))
+  nost_3pt = ((5,5),(6,5),(6,6),(6,7),(6,8),(5,6),(5,7),(5,8),(7,5),(7,6),(7,7),(7,8))
+  #nost_3pt = ((1,1),) ## -- test
   plot_n_maxprior = 3
   plot_o_maxprior = 2
   tmvr_tmax=range(9,14)
@@ -394,13 +403,13 @@ if do_irrep == "8":
    suppressKey(tkey,'plottitlep3',"")
 
 elif do_irrep == "8'":
-  stab_min_nst=1
-  stab_mid_nst=1
+  stab_min_nst=2
+  stab_mid_nst=2
   stab_max_nst=5
-  stab_min_ost=1
-  stab_mid_ost=1
+  stab_min_ost=2
+  stab_mid_ost=2
   stab_max_ost=7
-  stab_max_states=7
+  stab_max_states=9
   nost_3pt = ((1,1),(1,2),(1,3),(2,1),(2,2),(2,3),(3,2),(3,3))
   plot_n_maxprior = 2
   plot_o_maxprior = 1
@@ -439,10 +448,10 @@ elif do_irrep == "8'":
 elif do_irrep == "16":
   stab_min_nst=4
   stab_mid_nst=4
-  stab_max_nst=11
-  stab_min_ost=4
-  stab_mid_ost=4
-  stab_max_ost=12
+  stab_max_nst=8
+  stab_min_ost=2
+  stab_mid_ost=2
+  stab_max_ost=8
   stab_max_states=18
   nost_3pt = ((6,5),(6,6),(6,4),(7,5),(7,6),(5,4),(5,5),(4,5),(4,4))
   plot_n_maxprior = 2
@@ -482,8 +491,8 @@ elif do_irrep == "16":
 for key in lkey:
  #suppressKey(key,'y_pos_limit',[1e-3,1e2])
  #suppressKey(key,'y_neg_limit',[1e-3,1e2])
- suppressKey(key,'y_pos_limit',[1e-5,1e0])
- suppressKey(key,'y_neg_limit',[1e-5,1e0])
+ suppressKey(key,'y_pos_limit',[1e-5,1e2])
+ suppressKey(key,'y_neg_limit',[1e-5,1e2])
 if do_irrep == "8":
   for key in key_list_s8:
     suppressKey(key[0],"meff_do_fold",True)
@@ -495,15 +504,17 @@ if do_irrep == "8":
       suppressKey(key[0],"to_file",True)
   for key in key_list3_s8:
     tkey = 't'.join(key[0].split('t')[:-1]) ## -- for 3-point stacked plots
-    suppressKey(key[0],"y_scale",[-0.2,0.6])
-    suppressKey(tkey,"y_scale",[-0.2,0.6])
+    #suppressKey(key[0],"y_scale",[-0.2,0.6])
+    #suppressKey(tkey,"y_scale",[-0.2,0.6])
+    suppressKey(key[0],"y_scale",[-0.03,0.05])
+    suppressKey(tkey,"y_scale",[-0.03,0.05])
     #if (int(key[1]) == 1 and int(key[2]) == 1):
     # suppressKey(key[0],"y_scale",[0,1.5])
     # suppressKey(tkey,"y_scale",[0,1.5])
     suppressKey(key[0],"yaxistitle",r"$\beta C_{ij}(t,T)$")
     suppressKey(tkey,"yaxistitle",r"$\beta C_{ij}(t,T)$")
-    suppressKey(key[0],"p3_do_fit",True)
-    suppressKey(tkey,"p3_do_fit",True)
+    suppressKey(key[0],"p3_do_fit",False)
+    suppressKey(tkey,"p3_do_fit",False)
     if not(do_plot_terminal):
       suppressKey(key[0],"to_terminal",False)
       suppressKey(tkey,"to_terminal",False)
@@ -514,8 +525,8 @@ if do_irrep == "8":
 elif do_irrep == "8'":
   for key in key_list_s8p:
     suppressKey(key[0],"meff_do_fold",True)
-    suppressKey(key[0],"meff_fit_min",3)
-    suppressKey(key[0],"meff_fit_max",9)
+    suppressKey(key[0],"meff_fit_min",2)
+    suppressKey(key[0],"meff_fit_max",7)
     if not(do_plot_terminal):
       suppressKey(key[0],"to_terminal",False)
     if do_plot_file:

@@ -216,7 +216,7 @@ def print_fit(fit, prior,do_v_symm=False):
        ((skey[-2:] == 'nn' or skey[-2:] == 'oo') or\
        ((skey.split('_')[0][-2:] == 'nn' or skey.split('_')[0][-2:] == 'oo') and\
         (int(skey.split('_')[1]) == int(skey.split('_')[2])) )):
-       if (len(skey.split('_')) > 0):
+       if (len(skey.split('_')) > 1):
         xi = 1
        else:
         xi = 0

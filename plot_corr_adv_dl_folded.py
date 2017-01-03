@@ -8,7 +8,7 @@ import defines as df
 import matplotlib as mpl
 mpl.use('TkAgg')
 
-def plot_corr_double_log_folded(models,data,fit,req=None,**kwargs):
+def plot_corr_adv_dl_folded(models,data,fit,req=None,**kwargs):
  """
  Get all data ready so that it can be plotted on command
  Allows for dynamic cycling through plots
@@ -34,14 +34,14 @@ def plot_corr_double_log_folded(models,data,fit,req=None,**kwargs):
  fig,axp = plt.subplots(1,figsize=(8,8))
  #
  ## -- setup plot function
- def do_plot_double_log_folded(idx,fig=fig):
+ def do_plot_adv_dl_folded(idx,fig=fig):
    fig.clear()
    axp = fig.add_subplot(111)
    key = models[idx[0]].datatag
 
    axp.set_yscale('log')
    axp.set_xlim([-1,len(_dfTData[idx[0]])])
-   axp.set_ylim(utp.get_option("y_pos_limit",[1e-8,1e3],**kwargs[key]))
+   axp.set_ylim(utp.get_option("y_pos_limit",[1e-8,1e0],**kwargs[key]))
    plt.sca(axp)
    expp = [int(np.floor(np.log10(np.abs(x)))) for x in plt.yticks()[0][2:]]
    expp = ['$10^{'+str(x)+'}$' for x in expp]
@@ -100,8 +100,8 @@ def plot_corr_double_log_folded(models,data,fit,req=None,**kwargs):
    pass
  #
  ## -- setup button press action function
- def press_double_log_folded(event,idx=_dfIdx):
-   #print('press_double_log_folded', event.key)
+ def press_adv_dl_folded(event,idx=_dfIdx):
+   #print('press_adv_dl_folded', event.key)
    try:
      ## -- manually indicate index
      idx[0] = int(event.key) + (idx[0])*10
@@ -109,13 +109,13 @@ def plot_corr_double_log_folded(models,data,fit,req=None,**kwargs):
      if event.key==' ': ## -- space
        ## -- allows for replotting when changing index by typing number keys
        idx[0] = idx[0] % _dfNMod
-       do_plot_double_log_folded(idx)
+       do_plot_adv_dl_folded(idx)
      elif event.key=='left':
        idx[0] = (idx[0] - 1) % _dfNMod
-       do_plot_double_log_folded(idx)
+       do_plot_adv_dl_folded(idx)
      elif event.key=='right':
        idx[0] = (idx[0] + 1) % _dfNMod
-       do_plot_double_log_folded(idx)
+       do_plot_adv_dl_folded(idx)
      elif event.key=='backspace':
        ## -- reset index so can manually flip through using number keys
        idx[0] = 0
@@ -125,25 +125,27 @@ def plot_corr_double_log_folded(models,data,fit,req=None,**kwargs):
          key = model.datatag
          save_dir  = utp.get_option("df_save_dir","./plotdump",**kwargs[key])
          save_name = utp.get_option("df_save_name","dfplot-"+key+".pdf",**kwargs[key])
-         do_plot_double_log_folded([ix])
+         do_plot_adv_dl_folded([ix])
          plt.savefig(save_dir+'/'+save_name)
-       do_plot_double_log_folded(idx)
+       do_plot_adv_dl_folded(idx)
  #
  ## -- 
- fig.canvas.mpl_connect('key_press_event',press_double_log_folded)
+ fig.canvas.mpl_connect('key_press_event',press_adv_dl_folded)
  ## -- save plot data
  for idx,model in zip(range(len(models)),models):
    key = model.datatag
    _dfTData.append([t for t in model.tdata if t < len(model.tdata)/2+1])
    _dfTFit.append([t for t in model.tfit if t < len(model.tdata)/2+1])
    ## -- fit
-   #_dfFitFunc = utp.create_fit_func(model,fit)
    if req is None:
-    _dfFitFunc = utp.mask_fit_fcn(model,fit,invert=True)
+    _dfFitFunc = utp.mask_fit_fcn_adv(model,fit,invert=True)
    else:
-    _dfFitFunc = utp.mask_fit_fcn(model,fit,req=req,invert=False)
+    _dfFitFunc = utp.mask_fit_fcn_adv(model,fit,req=req,invert=False)
    _dfFitMean = gv.mean(_dfFitFunc(np.array(_dfTData[-1])))
    _dfFitSdev = gv.sdev(_dfFitFunc(np.array(_dfTData[-1])))
+   #print 'fit tdat   : ',_dfTData[-1]
+   #print 'fit mean   : ',_dfFitMean
+   #print 'fit sdev   : ',_dfFitSdev
    _dfFitHiCentral.append(
      utf.pos_arr(_dfFitMean,utp.get_option("y_pos_limit",[1e-4,1e0],**kwargs[key])[0]/100) )
    _dfFitHiError.append([
@@ -153,13 +155,16 @@ def plot_corr_double_log_folded(models,data,fit,req=None,**kwargs):
      utp.get_option("y_pos_limit",[1e-4,1e0],**kwargs[key])[0]/1000) ])
    ## -- data
    if req is None:
-    _dfSubFunc = utp.mask_fit_fcn(model,fit,invert=False)
+    _dfSubFunc = utp.mask_fit_fcn_adv(model,fit,invert=False)
    else:
-    _dfSubFunc = utp.mask_fit_fcn(model,fit,req=req,invert=True)
+    _dfSubFunc = utp.mask_fit_fcn_adv(model,fit,req=req,invert=True)
    asym = (model.tp < 0)
    _dfSub = _dfSubFunc(np.array(_dfTData[-1]))
    _dfDatMean = gv.mean(utf.fold_data(data[key],asym)-_dfSub)
    _dfDatSdev = gv.sdev(utf.fold_data(data[key],asym)-_dfSub)
+   #print 'data       : ',utf.fold_data(data[key],asym)
+   #print 'subtraction: ',_dfSub
+   #print 'new        : ',gv.gvar(_dfDatMean,_dfDatSdev)
    _dfDatHiCentral.append( utf.pos_arr(_dfDatMean) )
    _dfDatHiError.append(utf.pos_err(_dfDatMean,_dfDatSdev))
  ## -- done saving data
@@ -168,6 +173,6 @@ def plot_corr_double_log_folded(models,data,fit,req=None,**kwargs):
     utp.get_option("to_file",False,**kwargs[key]):
   for ix in range(len(models)):
     ## -- loops and saves all without creating window
-    do_plot_double_log_folded([ix])
+    do_plot_adv_dl_folded([ix])
  else:
-  do_plot_double_log_folded(_dfIdx)
+  do_plot_adv_dl_folded(_dfIdx)

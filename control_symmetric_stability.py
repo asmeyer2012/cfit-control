@@ -3,6 +3,7 @@ from data_manipulations   import standard_load
 from extract_3pt_info     import *
 from make_data            import make_data,import_corfit_file
 from make_data_db         import make_data_db
+from make_init            import make_init_from_fit_file_3pt
 from make_models          import make_models
 from make_models_3pt      import make_models_3pt
 from make_prior           import make_prior
@@ -68,7 +69,6 @@ elif df.do_irrep == "16":
 
 ## 8+ representation
 taglist = list() # for gvar.dump hash key
-#filekey = ''   ## -- 
 #filekey = 'n'  ## -- 
 #filekey = 'mn' ## -- 
 #print "Using -1^T factor"
@@ -101,6 +101,9 @@ else:
  taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
  taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
  taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
+## -- for later
+if df.do_irrep == "16":
+ irrepStr = '16'
 
 ## -- consolidated all loading into a single file:
 dall = standard_load(taglist,filekey,argsin)
@@ -156,24 +159,44 @@ def doProcess(nst,ost,data=dall):
    fitter = CorrFitter(models=models,maxit=df.maxit)
    if df.do_init3:
      init={}
-     if argsin['override_init']:
-      init = make_init_from_fit_file_3pt(models,'fit_dict')
+     if not(argsin['override_init']):
+      init = make_init_from_fit_file_3pt(models,'fit_dict'+irrepStr+'_3pt',
+       fresh_overlap=False,fresh_amplitude=True)
      else:
       for key in df.define_init_3pt:
-        if key[-2:] == 'nn':
-         init[key] = np.resize(df.define_init_3pt[key],(nst,nst))
-        elif key[-2:] == 'no':
-         init[key] = np.resize(df.define_init_3pt[key],(nst,ost))
-        elif key[-2:] == 'on':
-         init[key] = np.resize(df.define_init_3pt[key],(ost,nst))
-        elif key[-2:] == 'oo':
-         init[key] = np.resize(df.define_init_3pt[key],(ost,ost))
-        elif key[-1] == 'n':
-         init[key] = df.define_init_3pt[key][:nst]
-        elif key[-1] == 'o':
-         init[key] = df.define_init_3pt[key][:ost]
+       if key[-2:] == 'nn':
+        init[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_nst_3pt))
+        if df.do_v_symmetric:
+         init[key] = utf.truncate_upper_triangle(init[key],df.num_nst_3pt)
+       elif key[-2:] == 'oo':
+        init[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_ost_3pt))
+        if df.do_v_symmetric:
+         init[key] = utf.truncate_upper_triangle(init[key],df.num_ost_3pt)
+       elif key[-2:] == 'no':
+        init[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_ost_3pt))
+       elif key[-2:] == 'on':
+        ## -- is this correct for symmetric v?
+        #init[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_nst_3pt))
+        pass
+       elif key[-1] == 'n':
+        init[key] = df.define_init_3pt[key][:df.num_nst]
+       elif key[-1] == 'o':
+        init[key] = df.define_init_3pt[key][:df.num_ost]
+       #if key[-2:] == 'nn':
+       # init[key] = np.resize(df.define_init_3pt[key],(nst,nst))
+       #elif key[-2:] == 'no':
+       # init[key] = np.resize(df.define_init_3pt[key],(nst,ost))
+       #elif key[-2:] == 'on':
+       # init[key] = np.resize(df.define_init_3pt[key],(ost,nst))
+       #elif key[-2:] == 'oo':
+       # init[key] = np.resize(df.define_init_3pt[key],(ost,ost))
+       #elif key[-1] == 'n':
+       # init[key] = df.define_init_3pt[key][:nst]
+       #elif key[-1] == 'o':
+       # init[key] = df.define_init_3pt[key][:ost]
    else:
      init=None
+  print init
   fit = fitter.lsqfit(data=dall,prior=priors,p0=init,svdcut=df.svdcut)
   ## --
   print_fit(fit,priors,do_v_symm=True)

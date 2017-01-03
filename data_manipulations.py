@@ -5,6 +5,7 @@ from meta_data                import *
 from util_files               import read_fit_file
 import defines           as df
 import define_prior_3pt  as dfp3
+import dnc_correlations  as dnc
 import gvar              as gv
 import gvar.dataset      as gvd
 import numpy             as np
@@ -35,7 +36,6 @@ def standard_load(taglist,filekey,argsin):
    for tag in taglist:
     dset0[tag[1:]] = import_corfit_file(tag[0]) ## -- import all of the files in taglist
 
-   ## -- HERE
    for tag in taglist:
     if tag[-1] == '16p':
      #or tag[-1] == '16m':
@@ -167,37 +167,64 @@ def standard_load(taglist,filekey,argsin):
     if not('bar2pt' in key):
      for xkey in dset2[key]:
       dset2[key][xkey] = average_tag_fn(dset2[key][xkey])
-    ## -- why is this not consolidating?
     dset3[key] = consolidate_tags(dset2[key])
-   
-   ## -- post-consolidation manipulation
-   for key in dset3:
-    for xkey in dset3[key]:
-     if 'axax' in xkey\
-     or 'ayay' in xkey\
-     or 'azaz' in xkey\
-     or 'aiai' in xkey\
-     or 'vxvx' in xkey\
-     or 'vyvy' in xkey\
-     or 'vzvz' in xkey\
-     or 'vivi' in xkey:
-      #print "applying filter to key",key,xkey
-      #munich_filter(dset3[key],xkey)
-      pass
-     if 't7' in xkey:
-      #print "multiplying by -1 for key",xkey
-      #scale_tag(dset3[key],xkey,-1)
-      pass
-   pass
-   
+
+   ## -- order data and pay attention to missing configurations
    dnavg = gv.dataset.Dataset()
-   for key in dset3:
-    for xkey in dset3[key]:
+   for key in dset2:
+    for xkey in dset2[key]:
      if 'm' in xkey:
       #print "skipping mixed symmetry key",key,xkey,"..."
       continue
-     dnavg[xkey] = dset3[key][xkey]
-   dall = gv.dataset.avg_data(dnavg)
+     #if 'axax' in xkey\
+     #or 'ayay' in xkey\
+     #or 'azaz' in xkey\
+     #or 'aiai' in xkey\
+     #or 'vxvx' in xkey\
+     #or 'vyvy' in xkey\
+     #or 'vzvz' in xkey\
+     #or 'vivi' in xkey:
+     # print "applying filter to key",key,xkey
+     # munich_filter(dset2[key],xkey)
+     # pass
+     if 't7' in xkey:
+      print "multiplying by -1 for key",xkey
+      scale_tag(dset2[key],xkey,-1)
+     dnavg[xkey] = dset2[key][xkey]
+   ## -- compute correlations
+   dall = dnc.divide_and_conquer_correlations(dnavg)
+   
+   ### -- post-consolidation manipulation
+   #for key in dset3:
+   # for xkey in dset3[key]:
+   #  if 'axax' in xkey\
+   #  or 'ayay' in xkey\
+   #  or 'azaz' in xkey\
+   #  or 'aiai' in xkey\
+   #  or 'vxvx' in xkey\
+   #  or 'vyvy' in xkey\
+   #  or 'vzvz' in xkey\
+   #  or 'vivi' in xkey:
+   #   #print "applying filter to key",key,xkey
+   #   #munich_filter(dset3[key],xkey)
+   #   pass
+   #  if 't7' in xkey:
+   #   #print "multiplying by -1 for key",xkey
+   #   #scale_tag(dset3[key],xkey,-1)
+   #   pass
+   #pass
+   #
+   #dnavg = gv.dataset.Dataset()
+   #for key in dset3:
+   # for xkey in dset3[key]:
+   #  if 'm' in xkey:
+   #   #print "skipping mixed symmetry key",key,xkey,"..."
+   #   continue
+   #  dnavg[xkey] = dset3[key][xkey]
+   ##return dnavg
+   #raise ValueError("test")
+   #dall = gv.dataset.avg_data(dnavg)
+
    ## -- if requested, save to pickle file
    if argsin['dump_gvar']:
     gvarhash = hashlib.md5(''.join(filelist)+filekey).hexdigest()[:8]

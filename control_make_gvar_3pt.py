@@ -41,9 +41,9 @@ print argsin
 
 ## -- this is completely independent of defines, just set here so we
 ##    can do simultaneous processing elsewhere
-#do_irrep = "8"
+do_irrep = "8"
 #do_irrep = "8'"
-do_irrep = "16"
+#do_irrep = "16"
 if do_irrep == "8":
   irrepStr = '8p'
 elif do_irrep == "8'":
@@ -53,9 +53,12 @@ elif do_irrep == "16":
 
 taglist = list() # for gvar.dump hash key
 #taglist.append(('l32v3.mes2pt','mes2pt'))
-filekey='a'
+#filekey='a'
 #filekey='m'
 #filekey='mn'
+filekey='n'
+#print "applying munich filter"
+print "applying -1^t filter"
 
 taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
 if not(do_irrep == "16"):
@@ -84,4 +87,5 @@ else:
 
 argsin['load_gvar'] = False
 argsin['dump_gvar'] = True
-standard_load(taglist,filekey,argsin)
+#standard_load(taglist,filekey,argsin)
+dnavg = standard_load(taglist,filekey,argsin)

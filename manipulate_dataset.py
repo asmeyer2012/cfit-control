@@ -283,18 +283,36 @@ def average_tags(dset):
   ==
   """
   dout = gv.dataset.Dataset()
+  maxn = 0
+  dowarn = False
   for key in dset:
    pfix='_'.join(key.split('_')[:-1])
    #print pfix
    try:
     ## -- test if entry already exists
     for cor in dset[key]:
+     if any([all(x in cor for x in corout) for corout in dout[pfix]]):
+      if dowarn:
+       print "warning: repeat entry for key",pfix
+      continue
      dout[pfix].append(cor)
+    maxn = max(len(dout[pfix]),maxn) ## -- keep track of lengths
    except KeyError:
     #dset[pfix] = list()
     dout[pfix] = list()
     for cor in dset[key]:
+     if any([all(x in cor for x in corout) for corout in dout[pfix]]):
+      if dowarn:
+       print "warning: repeat entry for key",pfix
+      continue
      dout[pfix].append(cor)
+  for key in dout:
+   ## -- if length is shorter, delete data from dictionary and warn
+   if len(dout[key]) < maxn:
+    if dowarn:
+     print "warning: key",key,"has",len(dout[key]),"of",maxn,\
+      "required entries to be averaged, ignoring"
+    dout.pop(key,None)
   for key in dout:
    dout[key] = average_tag_fn(dout[key])
   return dout
