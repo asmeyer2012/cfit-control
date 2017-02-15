@@ -57,14 +57,14 @@ elif df.do_irrep == "16":
 #taglist = list() # for gvar.dump hash key
 ##filekey = 'an'  ## -- e4b56737
 #filekey = 'a'  ## -- 4218b279
-##taglist.append(('l32v5.mes2pt','mes'))
-#taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
-#taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
-#taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
-#taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
-#taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
-#taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
-#taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
+##taglist.append(('l32v6.mes2pt','mes'))
+#taglist.append(('l32v6.bar2pt.'+irrepStr,'bar2pt'))
+#taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
+#taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
+#taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
+#taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
+#taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
+#taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
 
 ## 8+ representation
 taglist = list() # for gvar.dump hash key
@@ -76,31 +76,31 @@ taglist = list() # for gvar.dump hash key
 #filekey = 'm'  ## -- munich filter
 #print "Using Munich filter"
 filekey = 'a'  ## -- standard choice, no filters
-#taglist.append(('l32v5.mes2pt','mes'))
-taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
+#taglist.append(('l32v6.mes2pt','mes'))
+taglist.append(('l32v6.bar2pt.'+irrepStr,'bar2pt'))
 if not(df.do_irrep == "16"):
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
 else:
  ## -- both 16+ and 16-
  irrepStr = '16p'
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16p'))
  irrepStr = '16m'
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
 
 ## -- consolidated all loading into a single file:
 dall = standard_load(taglist,filekey,argsin)
@@ -120,9 +120,10 @@ def doProcess(nst,ost,data=dall):
       init = make_init_from_fit_file_3pt(models,'fit_dict')
      else:
       for key in df.define_init:
-        if key[-1] == 'n':
+        eokey = utf.get_evenodd(key)
+        if eokey == 'n':
          init[key] = df.define_init[key][:nst]
-        elif key[-1] == 'o':
+        elif eokey == 'o':
          init[key] = df.define_init[key][:ost]
    else:
      init=None
@@ -160,17 +161,18 @@ def doProcess(nst,ost,data=dall):
       init = make_init_from_fit_file_3pt(models,'fit_dict')
      else:
       for key in df.define_init_3pt:
-        if key[-2:] == 'nn':
+        eokey = utf.get_evenodd(key)
+        if eokey == 'nn':
          init[key] = np.resize(df.define_init_3pt[key],(nst,nst))
-        elif key[-2:] == 'no':
+        elif eokey == 'no':
          init[key] = np.resize(df.define_init_3pt[key],(nst,ost))
-        elif key[-2:] == 'on':
+        elif eokey == 'on':
          init[key] = np.resize(df.define_init_3pt[key],(ost,nst))
-        elif key[-2:] == 'oo':
+        elif eokey == 'oo':
          init[key] = np.resize(df.define_init_3pt[key],(ost,ost))
-        elif key[-1] == 'n':
+        elif eokey == 'n':
          init[key] = df.define_init_3pt[key][:nst]
-        elif key[-1] == 'o':
+        elif eokey == 'o':
          init[key] = df.define_init_3pt[key][:ost]
    else:
      init=None

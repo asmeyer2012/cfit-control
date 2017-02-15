@@ -42,24 +42,27 @@ def create_fit_func(model,fit):
  lE = {}
  ## -- save data to dictionaries
  for key in akey:
-  if key[:3] == 'log':
-   la[key[3:]] = gv.exp(tfp[key])
-  elif key[:4] == 'sqrt':
-   la[key[4:]] = [x*x for x in tfp[key]]
+  bskey = utf.get_basekey(key)
+  if bskey[0] == 'log':
+   la[bskey[1]] = gv.exp(tfp[key])
+  elif bskey[0] == 'sqrt':
+   la[bskey[1]] = [x*x for x in tfp[key]]
   else:
    la[key] = tfp[key]
  for key in bkey:
-  if key[:3] == 'log':
-   lb[key[3:]] = gv.exp(tfp[key])
-  elif key[:4] == 'sqrt':
-   lb[key[4:]] = [x*x for x in tfp[key]]
+  bskey = utf.get_basekey(key)
+  if bskey[0] == 'log':
+   lb[bskey[1]] = gv.exp(tfp[key])
+  elif bskey[0] == 'sqrt':
+   lb[bskey[1]] = [x*x for x in tfp[key]]
   else:
    lb[key] = tfp[key]
  for key in Ekey:
-  if key[:3] == 'log':
-   lE[key[3:]] = gv.exp(tfp[key])
-  elif key[:4] == 'sqrt':
-   lE[key[4:]] = [x*x for x in tfp[key]]
+  bskey = utf.get_basekey(key)
+  if bskey[0] == 'log':
+   lE[bskey[1]] = gv.exp(tfp[key])
+  elif bskey[0] == 'sqrt':
+   lE[bskey[1]] = [x*x for x in tfp[key]]
   else:
    lE[key] = tfp[key]
  ## -- sort out odd/even function to create
@@ -161,33 +164,66 @@ def create_fit_func_3pt(model,fit):
  lb = {}
  lEa = {}
  lEb = {}
+ ### -- save data to dictionaries
+ #for key in akey:
+ # if key[:3] == 'log':
+ #  la[key[3:]] = gv.exp(tfp[key])
+ # elif key[:4] == 'sqrt':
+ #  la[key[4:]] = [x*x for x in tfp[key]]
+ # else:
+ #  la[key] = tfp[key]
+ #for key in bkey:
+ # if key[:3] == 'log':
+ #  lb[key[3:]] = gv.exp(tfp[key])
+ # elif key[:4] == 'sqrt':
+ #  lb[key[4:]] = [x*x for x in tfp[key]]
+ # else:
+ #  lb[key] = tfp[key]
+ #for key in Eakey:
+ # if key[:3] == 'log':
+ #  lEa[key[3:]] = gv.exp(tfp[key])
+ # elif key[:4] == 'sqrt':
+ #  lEa[key[4:]] = [x*x for x in tfp[key]]
+ # else:
+ #  lEa[key] = tfp[key]
+ #for key in Ebkey:
+ # if key[:3] == 'log':
+ #  lEb[key[3:]] = gv.exp(tfp[key])
+ # elif key[:4] == 'sqrt':
+ #  lEb[key[4:]] = [x*x for x in tfp[key]]
+ # else:
+ #  lEb[key] = tfp[key]
  ## -- save data to dictionaries
  for key in akey:
-  if key[:3] == 'log':
-   la[key[3:]] = gv.exp(tfp[key])
-  elif key[:4] == 'sqrt':
-   la[key[4:]] = [x*x for x in tfp[key]]
+  bskey = utf.get_basekey(key)
+  if bskey[0] == 'log':
+   la[bskey[1]] = gv.exp(tfp[key])
+  elif bskey[0] == 'sqrt':
+   la[bskey[1]] = [x*x for x in tfp[key]]
   else:
    la[key] = tfp[key]
  for key in bkey:
-  if key[:3] == 'log':
-   lb[key[3:]] = gv.exp(tfp[key])
-  elif key[:4] == 'sqrt':
-   lb[key[4:]] = [x*x for x in tfp[key]]
+  bskey = utf.get_basekey(key)
+  if bskey[0] == 'log':
+   lb[bskey[1]] = gv.exp(tfp[key])
+  elif bskey[0] == 'sqrt':
+   lb[bskey[1]] = [x*x for x in tfp[key]]
   else:
    lb[key] = tfp[key]
  for key in Eakey:
-  if key[:3] == 'log':
-   lEa[key[3:]] = gv.exp(tfp[key])
-  elif key[:4] == 'sqrt':
-   lEa[key[4:]] = [x*x for x in tfp[key]]
+  bskey = utf.get_basekey(key)
+  if bskey[0] == 'log':
+   lEa[bskey[1]] = gv.exp(tfp[key])
+  elif bskey[0] == 'sqrt':
+   lEa[bskey[1]] = [x*x for x in tfp[key]]
   else:
    lEa[key] = tfp[key]
  for key in Ebkey:
-  if key[:3] == 'log':
-   lEb[key[3:]] = gv.exp(tfp[key])
-  elif key[:4] == 'sqrt':
-   lEb[key[4:]] = [x*x for x in tfp[key]]
+  bskey = utf.get_basekey(key)
+  if bskey[0] == 'log':
+   lEb[bskey[1]] = gv.exp(tfp[key])
+  elif bskey[0] == 'sqrt':
+   lEb[bskey[1]] = [x*x for x in tfp[key]]
   else:
    lEb[key] = tfp[key]
  ## -- sort out odd/even function to create
@@ -383,12 +419,14 @@ def mask_fit_fcn_adv(model,fit,req=[list(),list()],invert=False):
  for key in sorted(tmp):
   skey = key.split('_')
   i = int(skey[1])
-  if skey[0][:3] == 'log' or skey[0][:4] == 'sqrt':
+  bkey = utf.get_basekey(skey[0])
+  #if skey[0][:3] == 'log' or skey[0][:4] == 'sqrt':
+  if not(bkey[0] is None):
    continue
-  if   skey[0][-2:] == 'En':
+  if   bkey[1][-2:] == 'En':
    for j,e in enumerate(tmp[key]):
     enall.append([i,j,e])
-  elif skey[0][-2:] == 'Eo':
+  elif bkey[1][-2:] == 'Eo':
    for j,e in enumerate(tmp[key]):
     eoall.append([i,j,e])
   else:

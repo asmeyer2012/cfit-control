@@ -3,6 +3,10 @@ foo*
 bar*
 baz*
 *.pyc
+*.prior
+*.aprior
+*.out
+test*
 gvar.dump.*
 out.*
 bash_scripts/*

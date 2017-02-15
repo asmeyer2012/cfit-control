@@ -26,12 +26,12 @@ def make_prior_stacked_3pt(models,prior_dict=None,nst=-1,ost=-1,n3st=-1,o3st=-1)
    ## -- logarithmize the logarithmic coefficients
    for pkey in prior:
     ## -- don't do logs unless they are in the current model, else double counting
-    if not(pkey[3:] in model.a+model.b+model.dEa+model.dEb) and\
-       not(pkey[4:] in model.a+model.b+model.dEa+model.dEb):
+    bkey = utf.get_basekey(pkey)
+    if not(bkey[1] in model.a+model.b+model.dEa+model.dEb):
      continue
-    if pkey[:3] == 'log':
+    if bkey[0] == 'log':
      prior[pkey] = gv.log(prior[pkey])
-    elif pkey[:4] == 'sqrt':
+    elif bkey[0] == 'sqrt':
      prior[pkey] = gv.sqrt(prior[pkey])
   else: ## -- allow passing of new prior, for chained operations
    if (nst > -1 and ost > -1):
@@ -45,12 +45,12 @@ def make_prior_stacked_3pt(models,prior_dict=None,nst=-1,ost=-1,n3st=-1,o3st=-1)
     prior[pkey]=dprior[skey][pkey]
 
    for pkey in prior:
-    if not(pkey[3:] in model.a+model.b+model.dEa+model.dEb) and\
-       not(pkey[4:] in model.a+model.b+model.dEa+model.dEb):
+    bkey = utf.get_basekey(pkey)
+    if not(bkey[1] in model.a+model.b+model.dEa+model.dEb):
      continue
-    if pkey[:3] == 'log':
+    if bkey[0] == 'log':
      prior[pkey] = gv.log(prior[pkey])
-    elif pkey[:4] == 'sqrt':
+    elif bkey[0] == 'sqrt':
      prior[pkey] = gv.sqrt(prior[pkey])
 
  return prior
@@ -76,13 +76,13 @@ def make_prior_3pt(models,prior_dict=None,nst=-1,ost=-1,n3st=-1,o3st=-1):
    ## -- logarithmize the logarithmic coefficients
    for pkey in prior:
     ## -- don't do logs unless they are in the current model, else double counting
-    if not(pkey[3:] in model.a+model.b+model.dEa+model.dEb) and\
-       not(pkey[4:] in model.a+model.b+model.dEa+model.dEb):
+    bkey = utf.get_basekey(pkey)
+    if not(bkey[1] in model.a+model.b+model.dEa+model.dEb):
      continue
-    if pkey[:3] == 'log':
+    if bkey[0] == 'log':
      #print pkey,prior[pkey]
      prior[pkey] = gv.log(prior[pkey])
-    elif pkey[:4] == 'sqrt':
+    elif bkey[0] == 'sqrt':
      prior[pkey] = gv.sqrt(prior[pkey])
   else: ## -- allow passing of new prior, for chained operations
    if (nst > -1 and ost > -1):
@@ -96,12 +96,12 @@ def make_prior_3pt(models,prior_dict=None,nst=-1,ost=-1,n3st=-1,o3st=-1):
     prior[pkey]=dprior[skey][pkey]
 
    for pkey in prior:
-    if not(pkey[3:] in model.a+model.b+model.dEa+model.dEb) and\
-       not(pkey[4:] in model.a+model.b+model.dEa+model.dEb):
+    bkey = utf.get_basekey(pkey)
+    if not(bkey[1] in model.a+model.b+model.dEa+model.dEb):
      continue
-    if pkey[:3] == 'log':
+    if bkey[0] == 'log':
      prior[pkey] = gv.log(prior[pkey])
-    elif pkey[:4] == 'sqrt':
+    elif bkey[0] == 'sqrt':
      prior[pkey] = gv.sqrt(prior[pkey])
 
  return prior

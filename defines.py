@@ -23,10 +23,10 @@ do_sn_minimize=False
 do_initial=True
 do_init2=True
 do_init3=True
-do_mock=True
+do_mock=False
 do_v_symmetric=dfp3.do_v_symmetric
-do_irrep="8'"
-#do_irrep="8"
+#do_irrep="8'"
+do_irrep="8"
 #do_irrep="16"
 do_symm="s"
 #do_symm="m"
@@ -131,7 +131,7 @@ elif do_irrep == "16":
 pass
 
 ## -- TODO: spectrum only test
-if do_mock or True:
+if do_mock or False:
  lkey3 = list()
 
 maxit      =10000   # maximum iterations

@@ -72,38 +72,38 @@ filekey = 'a'  ## -- standard choice, no filters
 #filekey = 'n'  ## -- munich filter
 #print "Using munich filter"
 #print "*** USING -1^t FILTER ***"
-#taglist.append(('l32v5.mes2pt','mes'))
-taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
+#taglist.append(('l32v6.mes2pt','mes'))
+taglist.append(('l32v6.bar2pt.'+irrepStr,'bar2pt'))
 if not(df.do_irrep == "16"):
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
 else:
  ## -- both 16+ and 16-
  irrepStr = '16p'
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16p'))
  irrepStr = '16m'
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
 ## -- for later
 if df.do_irrep == "16":
  irrepStr = '16'
 
 ## -- consolidated all loading into a single file:
 if df.do_mock:
- dall = generate_mock_data()
+ dall,truth = generate_mock_data('mock8m.0')
 else:
  dall = standard_load(taglist,filekey,argsin)
   
@@ -135,9 +135,11 @@ if df.do_init2:
     print "could not load 2-point function initial values"
   else:
    for key in df.define_init:
-     if key[-1] == 'n':
+     eokey = utf.get_evenodd(key)
+     #if key[-1] == 'n':
+     if eokey == 'n':
       init2[key] = df.define_init[key][:df.num_nst]
-     elif key[-1] == 'o':
+     elif eokey == 'o':
       init2[key] = df.define_init[key][:df.num_ost]
 else:
   init2=None
@@ -152,28 +154,35 @@ if df.do_init3:
 #    print "could not load 3-point function initial values"
   else:
    for key in df.define_init_3pt:
-     if key[-2:] == 'nn':
+     eokey = utf.get_evenodd(key)
+     #if key[-2:] == 'nn':
+     if eokey == 'nn':
       init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_nst_3pt))
       if df.do_v_symmetric:
        init3[key] = utf.truncate_upper_triangle(init3[key],df.num_nst_3pt)
-     elif key[-2:] == 'oo':
+      #elif key[-2:] == 'oo':
+     elif eokey == 'oo':
       init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_ost_3pt))
       if df.do_v_symmetric:
        init3[key] = utf.truncate_upper_triangle(init3[key],df.num_ost_3pt)
-     elif key[-2:] == 'no':
+      #elif key[-2:] == 'no':
+     elif eokey == 'no':
       init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_ost_3pt))
-     elif key[-2:] == 'on':
+      #elif key[-2:] == 'on':
+     elif eokey == 'on':
       ## -- is this correct for symmetric v?
       #init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_nst_3pt))
       pass
-     elif key[-1] == 'n':
+      #elif key[-1] == 'n':
+     elif eokey == 'n':
       init3[key] = df.define_init_3pt[key][:df.num_nst]
-     elif key[-1] == 'o':
+      #elif key[-1] == 'o':
+     elif eokey == 'o':
       init3[key] = df.define_init_3pt[key][:df.num_ost]
 else:
   init3=None
 pass 
-print 'init: ',init3
+#print 'init: ',init3
 #init3 = None ## -- test
 
 fitter2 = CorrFitter(models=models2,maxit=df.maxit)
@@ -223,6 +232,7 @@ if df.do_2pt:
  print_fit(fit2,priors2)
 if df.do_3pt:
  print "starting 3pt fit..."
+ #print priors
  fit3 = fitter3.lsqfit(data=dall,prior=priors,p0=init3,svdcut=df.svdcut)
 else:
  print "Ignoring 3pt fit!"
@@ -259,9 +269,11 @@ if df.do_3pt:
 
 np.set_printoptions(precision=3,linewidth=100)
 elst = []
-for key in sorted(fit3.transformed_p):
- if key[:2] == 'En' or key[:2] == 'Eo':
-  for e in fit3.transformed_p[key]:
+for key in sorted(fit3.p):
+ #if key[:2] == 'En' or key[:2] == 'Eo':
+ tkey = utf.get_basekey(key)
+ if (tkey[0] is None) and (tkey[1][-2:] == 'En' or tkey[1][-2:] == 'Eo'):
+  for e in fit3.p[key]:
    elst.append(e)
 cor = gv.evalcorr(elst)
 evl,evc = gv.linalg.eigvalsh(cor,True)
@@ -274,142 +286,6 @@ print 'eigenvectors:'
 print evc
 print 'cholesky:'
 print chol
-
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[2] == 'n') and (key[0] == 'c'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation anc:'
-#print gv.evalcorr(alst)
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[2] == 'o') and (key[0] == 'c'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation aoc:'
-#print gv.evalcorr(alst)
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[2] == 'n') and (key[0] == 'k'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation ank:'
-#print gv.evalcorr(alst)
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[2] == 'o') and (key[0] == 'k'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation aok:'
-#print gv.evalcorr(alst)
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[2] == 'n') and (key[1] == '4'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation a4n:'
-#print gv.evalcorr(alst)
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[2] == 'n') and (key[1] == '7'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation a7n:'
-#print gv.evalcorr(alst)
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[2] == 'o') and (key[1] == '4'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation a4o:'
-#print gv.evalcorr(alst)
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[2] == 'o') and (key[1] == '7'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation a7o:'
-#print gv.evalcorr(alst)
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[0] == 'c') and (key[1] == '4'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation ac4:'
-#print gv.evalcorr(alst)
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[0] == 'k') and (key[1] == '4'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation ak4:'
-#print gv.evalcorr(alst)
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[0] == 'c') and (key[1] == '7'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation ac7:'
-#print gv.evalcorr(alst)
-#alst = []
-#for key in sorted(fit3.transformed_p):
-# try:
-#  if (key[0] == 'k') and (key[1] == '7'):
-#   print key
-#   for a in fit3.transformed_p[key]:
-#    alst.append(a)
-# except IndexError:
-#  continue
-#print 'correlation ak7:'
-#print gv.evalcorr(alst)
-##np.set_printoptions(precision=3,linewidth=100)
-#np.set_printoptions()
-#print gv.evalcorr(alst)
 
 ## -- plot
 if df.do_plot or argsin['override_plot']:

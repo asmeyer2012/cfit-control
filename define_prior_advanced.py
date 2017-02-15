@@ -91,12 +91,12 @@ define_init_s16={}
 #xAnom = 1e-3  # amplitude guess for possibly unconstrained states
 
 ## -- list of keys
-nkey_s8  = ('logEn','logc1n','c2n','c3n','c5n','c6n','k1n','k2n','k3n','k5n','k6n')
-okey_s8  = ('logEo','logc1o','c2o','c3o','c5o','c6o','k1o','k2o','k3o','k5o','k6o')
-nkey_s8p = ('logEn','logc4n','c7n','k4n','k7n')
-okey_s8p = ('logEo','logc4o','c7o','k4o','k7o')
-nkey_s16 = ('logEn','logc2n','c3n','c4n','c6n','k2n','k3n','k4n','k6n')
-okey_s16 = ('logEo','logc2o','c3o','c4o','c6o','k2o','k3o','k4o','k6o')
+nkey_s8  = ('log(En)','log(c1n)','c2n','c3n','c5n','c6n','k1n','k2n','k3n','k5n','k6n')
+okey_s8  = ('log(Eo)','log(c1o)','c2o','c3o','c5o','c6o','k1o','k2o','k3o','k5o','k6o')
+nkey_s8p = ('log(En)','log(c4n)','c7n','k4n','k7n')
+okey_s8p = ('log(Eo)','log(c4o)','c7o','k4o','k7o')
+nkey_s16 = ('log(En)','log(c2n)','c3n','c4n','c6n','k2n','k3n','k4n','k6n')
+okey_s16 = ('log(Eo)','log(c2o)','c3o','c4o','c6o','k2o','k3o','k4o','k6o')
 
 def curkey(key):
   return (key+'nn',key+'no',key+'on',key+'oo')
@@ -120,7 +120,7 @@ vkey_s16 = vkey_s8
 ### -- add blocks of states
 ### -- S8
 explicit_priors_s8 = {}
-for key in ['logc1n','logc1o']:
+for key in ['log(c1n)','log(c1o)']:
  explicit_priors_s8[key] = gv.gvar([1e1]*10,[1e2]*10)
 for key in ['c2n','c2o','c3n','c3o','c5n','c5o','c6n','c6o']:
  explicit_priors_s8[key] = gv.gvar([0]*10,[1e2]*10)
@@ -159,8 +159,8 @@ mpa.add_next_block(define_prior_s8,False,2, od1700,delt_s8,
 ## -- S8'
 ## -- actual
 explicit_priors_s8p = {}
-explicit_priors_s8p['logc4n'] = gv.gvar([1e1]*5,[1e2]*5)
-explicit_priors_s8p['logc4o'] = gv.gvar([1e1]*5,[1e2]*5)
+explicit_priors_s8p['log(c4n)'] = gv.gvar([1e1]*5,[1e2]*5)
+explicit_priors_s8p['log(c4o)'] = gv.gvar([1e1]*5,[1e2]*5)
 explicit_priors_s8p['c7n'] = gv.gvar([0]*5,[1e2]*5)
 explicit_priors_s8p['c7o'] = gv.gvar([0]*5,[1e2]*5)
 define_prior_s8p=\

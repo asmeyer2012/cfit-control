@@ -23,16 +23,18 @@ def make_prior(models,prior_dict=None,nst=-1,ost=-1):
    ## -- logarithmize the logarithmic coefficients
    for pkey in prior:
     ## -- don't do logs unless they are in the current model, else double counting
-    if not(pkey[3:] in model.a+model.b+model.dE) and\
-       not(pkey[4:] in model.a+model.b+model.dE):
+    bkey = utf.get_basekey(pkey)
+    #if not(pkey[3:] in model.a+model.b+model.dE) and\
+    #   not(pkey[4:] in model.a+model.b+model.dE):
+    if not(bkey[1] in model.a+model.b+model.dE):
      continue
-    if pkey[:3] == 'log':
+    if bkey[0] == 'log':
      negcheck = filter(lambda x: x[1].mean < 0,enumerate(prior[pkey]))
      if len(negcheck) > 0:
       raise ValueError("Prior indices ",list(np.array(negcheck)[:,0]),
        " have negative values, key ",pkey)
      prior[pkey] = gv.log(prior[pkey])
-    elif pkey[:4] == 'sqrt':
+    elif bkey[0] == 'sqrt':
      negcheck = filter(lambda x: x[1].mean < 0,enumerate(prior[pkey]))
      if len(negcheck) > 0:
       raise ValueError("Prior indices ",list(np.array(negcheck)[:,0]),
@@ -49,12 +51,14 @@ def make_prior(models,prior_dict=None,nst=-1,ost=-1):
     prior[pkey]=dprior[skey][pkey]
 
    for pkey in prior:
-    if not(pkey[3:] in model.a+model.b+model.dE) and\
-       not(pkey[4:] in model.a+model.b+model.dE):
+    bkey = utf.get_basekey(pkey)
+    #if not(pkey[3:] in model.a+model.b+model.dE) and\
+    #   not(pkey[4:] in model.a+model.b+model.dE):
+    if not(bkey[1] in model.a+model.b+model.dE):
      continue
-    if pkey[:3] == 'log':
+    if bkey[0] == 'log':
      prior[pkey] = gv.log(prior[pkey])
-    elif pkey[:4] == 'sqrt':
+    elif bkey[0] == 'sqrt':
      prior[pkey] = gv.sqrt(prior[pkey])
 
  return prior
@@ -73,11 +77,12 @@ def truncate_prior_states(prior,nn,no,nn3=-1,no3=-1,do_symm=False):
  newprior = gv.BufferDict()
  for key in prior:
   kp = len(prior[key])
+  bkey = utf.get_basekey(key)
   try:
    ## -- only works if prior is a matrix; 3-point currents
    lp = len(prior[key][0])
    for v, x1, x2 in [('nn',nn3x,nn3x),('no',nn3x,no3x),('on',no3x,nn3x),('oo',no3x,no3x)]:
-    if key[-2:] == v:
+    if bkey[1][-2:] == v:
      #print v,x1,x2,key,len(prior[key]),len(prior[key][0])
      if x1 == 0 and x2 == 0:
       continue
@@ -94,7 +99,7 @@ def truncate_prior_states(prior,nn,no,nn3=-1,no3=-1,do_symm=False):
   except (IndexError,TypeError):
    ## -- 3-point matrix diagonals for symmetric
    for v, x1 in [('nn',nn3x),('oo',no3x)]:
-    if key[-2:] == v:
+    if bkey[1][-2:] == v:
      pass
      #print 'test',key
      #if x1 == 0:
@@ -105,9 +110,9 @@ def truncate_prior_states(prior,nn,no,nn3=-1,no3=-1,do_symm=False):
      # tmp = np.array(utf.reconstruct_upper_triangle(prior[key],kpt))
      # newprior[key] = utf.truncate_upper_triangle(tmp,x1)
    ## -- everything else
-   if (key[-2:] != 'nn') and (key[-2:] != 'oo'):
+   if (bkey[1][-2:] != 'nn') and (bkey[1][-2:] != 'oo'):
     for v, x1 in [('n',nn),('o',no)]:
-     if key[-1] != v:
+     if bkey[1][-1] != v:
       continue
      if x1 == 0:
       continue

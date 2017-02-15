@@ -77,7 +77,8 @@ def plot_stability(fit_collector,**kwargs):
    print tspec
    for key in tspec:
     it = 0
-    if key[-2:] == 'En' and not(key[3:] == 'log' or key[4:] == 'sqrt'):
+    bkey = utf.get_basekey(key)
+    if bkey[1][-2:] == 'En' and (bkey[0] is None):
      hValDatn[mark_nst[it]].append(fitCount+0.5-parity_offset)
      enCentral[mark_nst[it]].append(sum)
      enError[mark_nst[it]].append(x.sdev)
@@ -85,7 +86,7 @@ def plot_stability(fit_collector,**kwargs):
      if it > max_nst-1:
       break
       pass
-    elif key[-2:] == 'Eo' and not(key[3:] == 'log' or key[4:] == 'sqrt'):
+    elif bkey[1][-2:] == 'Eo' and (bkey[0] is None):
      hValDato[mark_ost[it]].append(fitCount+0.5+parity_offset)
      eoCentral[mark_ost[it]].append(sum)
      eoError[mark_ost[it]].append(x.sdev)

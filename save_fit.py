@@ -6,6 +6,7 @@ from print_results import reduced_dof
 ## -- save a fit so it can be used as initial values in the next calculation
 
 def format_entries(f,obj,key,addc=True):
+ bkey = utf.get_basekey(key)
  ## -- input: file, array/matrix of gvars to write
  try:
   ## -- test object, will fail if 1-dim array
@@ -21,7 +22,7 @@ def format_entries(f,obj,key,addc=True):
    f.write('])\\\n')
  except TypeError:
   ## -- if symmetric matrix, reconstruct it before writing
-  if key[-2:] == 'nn' or key[-2:] == 'oo':
+  if bkey[1][-2:] == 'nn' or bkey[1][-2:] == 'oo':
    objx = utf.reconstruct_upper_triangle(obj,int((int(np.sqrt(1+8*len(obj)))-1)/2))
    f.write('\''+str(key)+'\': gv.gvar([[\''+'\', \''.join(['{:>10}'.format(x).strip()\
      for x in objx[0]])+'\']\\\n')
@@ -51,8 +52,8 @@ def save_init_from_fit(fit,file_name,do_v_symm=False):
  f.write('\'dof\':'+str(fit.dof)+'\\\n')
  f.write(',\'rdof\':'+str(reduced_dof(fit,do_v_symm))+'\\\n')
  f.write(',\'chi2\':'+str(fit.chi2)+',\\\n')
- ltfp = len(fit.transformed_p)
- for i,key in zip(range(ltfp),sorted(fit.transformed_p)):
-  format_entries(f,fit.transformed_p[key],key,not(i==ltfp-1))
+ ltfp = len(fit.p)
+ for i,key in zip(range(ltfp),sorted(fit.p)):
+  format_entries(f,fit.p[key],key,not(i==ltfp-1))
  f.write('}\n')
  f.close()

@@ -116,47 +116,47 @@ Anom  = 1     # amplitude guess for actual states (unknown sign)
 xAnom = 1e-3  # amplitude guess for possibly unconstrained states
 
 ## -- list of keys
-nkey_s8 = ('logEn' ,'logc1n','c2n','c3n','c5n','c6n','k1n','k2n','k3n','k5n','k6n')
-okey_s8 = ('logEo' ,'logc1o','c2o','c3o','c5o','c6o','k1o','k2o','k3o','k5o','k6o')
-nkey_s8p = ('logEn','logc4n','c7n','k4n','k7n')
-okey_s8p = ('logEo','logc4o','c7o','k4o','k7o')
-#nkey_s8p = ('logEn','c4n','c7n','k4n','k7n')
-#okey_s8p = ('logEo','c4o','c7o','k4o','k7o')
-nkey_s16 = ('logEn','logc2n','c3n','c4n','c6n','k2n','k3n','k4n','k6n')
-okey_s16 = ('logEo','logc2o','c3o','c4o','c6o','k2o','k3o','k4o','k6o')
+nkey_s8 = ('log(En)' ,'log(c1n)','c2n','c3n','c5n','c6n','k1n','k2n','k3n','k5n','k6n')
+okey_s8 = ('log(Eo)' ,'log(c1o)','c2o','c3o','c5o','c6o','k1o','k2o','k3o','k5o','k6o')
+nkey_s8p = ('log(En)','log(c4n)','c7n','k4n','k7n')
+okey_s8p = ('log(Eo)','log(c4o)','c7o','k4o','k7o')
+#nkey_s8p = ('log(En)','c4n','c7n','k4n','k7n')
+#okey_s8p = ('log(Eo)','c4o','c7o','k4o','k7o')
+nkey_s16 = ('log(En)','log(c2n)','c3n','c4n','c6n','k2n','k3n','k4n','k6n')
+okey_s16 = ('log(Eo)','log(c2o)','c3o','c4o','c6o','k2o','k3o','k4o','k6o')
 
 ## -- HISQ a=0.15 l3248 physical
 # S8
-define_init_s8['logEn']=list(gv.exp([0.710,.039,.039,.140,.054,.376,.065,.083] + [1]*10))
-define_init_s8['logEo']=list(gv.exp([1.170,.039,.039,.020,.100,.020,.1,.1] + [1]*10))
-#define_init_s8['logEn']=list(gv.exp([0.780,.019,.037,.095,.035,.142,.1,.1] + [1]*10))
-#define_init_s8['logEo']=list(gv.exp([0.932,.030,.081,.183,.030,.046,0.1,.1] + [1]*10))
-define_init_s8['logc1n']=list(gv.exp([Alog]*num_nreal_s8 + [xAlog]*10))
-define_init_s8['logc1o']=list(gv.exp([Alog]*num_oreal_s8 + [xAlog]*10))
+define_init_s8['log(En)']=list(gv.exp([0.710,.039,.039,.140,.054,.376,.065,.083] + [1]*10))
+define_init_s8['log(Eo)']=list(gv.exp([1.170,.039,.039,.020,.100,.020,.1,.1] + [1]*10))
+#define_init_s8['log(En)']=list(gv.exp([0.780,.019,.037,.095,.035,.142,.1,.1] + [1]*10))
+#define_init_s8['log(Eo)']=list(gv.exp([0.932,.030,.081,.183,.030,.046,0.1,.1] + [1]*10))
+define_init_s8['log(c1n)']=list(gv.exp([Alog]*num_nreal_s8 + [xAlog]*10))
+define_init_s8['log(c1o)']=list(gv.exp([Alog]*num_oreal_s8 + [xAlog]*10))
 for key in nkey_s8[2:]+okey_s8[2:]:
   define_init_s8[key]=[Anom]*num_nreal_s8 + [xAnom]*10
 
 # S8'
-define_init_s8p['logEn']=list(gv.exp([0.9401,.0854,.1212,.2111,.4103] + [1]*10))
-#define_init_s8p['logEn']=list(gv.exp([0.8520,.2293,.0753,.1132] + [1]*10))
-#define_init_s8p['logEn']=list(gv.exp([0.8520,.1426,.2754] + [1]*10))
-#define_init_s8p['logEn']=list(gv.exp([0.9701,.0825,.2754] + [1]*10))
-#define_init_s8p['logEn']=list(gv.exp([.955,0.045,.35,.84] + [1]*10))
-define_init_s8p['logEo']=list(gv.exp([1.2124,0.1966,0.7216,.32] + [1]*10))
-#define_init_s8p['logEo']=list(gv.exp([1.2205,0.0765,0.1924,.32] + [1]*10))
-#define_init_s8p['logEo']=list(gv.exp([1.2138,0.1924,.32] + [1]*10))
-define_init_s8p['logc4n']=list(gv.exp([Alog]*num_nreal_s8p + [xAlog]*10))
-define_init_s8p['logc4o']=list(gv.exp([Alog]*num_oreal_s8p + [xAlog]*10))
+define_init_s8p['log(En)']=list(gv.exp([0.9401,.0854,.1212,.2111,.4103] + [1]*10))
+#define_init_s8p['log(En)']=list(gv.exp([0.8520,.2293,.0753,.1132] + [1]*10))
+#define_init_s8p['log(En)']=list(gv.exp([0.8520,.1426,.2754] + [1]*10))
+#define_init_s8p['log(En)']=list(gv.exp([0.9701,.0825,.2754] + [1]*10))
+#define_init_s8p['log(En)']=list(gv.exp([.955,0.045,.35,.84] + [1]*10))
+define_init_s8p['log(Eo)']=list(gv.exp([1.2124,0.1966,0.7216,.32] + [1]*10))
+#define_init_s8p['log(Eo)']=list(gv.exp([1.2205,0.0765,0.1924,.32] + [1]*10))
+#define_init_s8p['log(Eo)']=list(gv.exp([1.2138,0.1924,.32] + [1]*10))
+define_init_s8p['log(c4n)']=list(gv.exp([Alog]*num_nreal_s8p + [xAlog]*10))
+define_init_s8p['log(c4o)']=list(gv.exp([Alog]*num_oreal_s8p + [xAlog]*10))
 #define_init_s8p['c4n']=list(gv.exp([Anom]*num_nreal_s8p + [xAnom]*10))
 #define_init_s8p['c4o']=list(gv.exp([Anom]*num_oreal_s8p + [xAnom]*10))
 for key in nkey_s8p[2:]+okey_s8p[2:]:
   define_init_s8p[key]=[Anom]*num_nreal_s8p + [xAnom]*10
 
 # S16
-define_init_s16['logEn']=list(gv.exp([0.852,.237,.026,.040,.186,.079,.117] + [1]*10))
-define_init_s16['logEo']=list(gv.exp([1.008,.076,.054,.095,.055,.171,1.011,.100] + [1]*10))
-define_init_s16['logc2n']=list(gv.exp([Alog]*num_nreal_s16 + [xAlog]*10))
-define_init_s16['logc2o']=list(gv.exp([Alog]*num_oreal_s16 + [xAlog]*10))
+define_init_s16['log(En)']=list(gv.exp([0.852,.237,.026,.040,.186,.079,.117] + [1]*10))
+define_init_s16['log(Eo)']=list(gv.exp([1.008,.076,.054,.095,.055,.171,1.011,.100] + [1]*10))
+define_init_s16['log(c2n)']=list(gv.exp([Alog]*num_nreal_s16 + [xAlog]*10))
+define_init_s16['log(c2o)']=list(gv.exp([Alog]*num_oreal_s16 + [xAlog]*10))
 for key in nkey_s16[2:]+okey_s16[2:]:
   define_init_s16[key]=[Anom]*num_nreal_s16 + [xAnom]*10
 
@@ -1007,49 +1007,55 @@ pass
 
 for key in key_list_s8:
   if key[1] == log_s8:
-    logstr1='log'
+    logstr1='log('
+    logstr2=')'
   else:
     logstr1=''
+    logstr2=''
   try:
     define_prior_s8[key[0]]=\
-     {logstr1+'c'+key[1]+'n':define_prior_s8[logstr1+'c'+key[1]+'n'],
-      logstr1+'c'+key[1]+'o':define_prior_s8[logstr1+'c'+key[1]+'o'],
+     {logstr1+'c'+key[1]+'n'+logstr2:define_prior_s8[logstr1+'c'+key[1]+'n'+logstr2],
+      logstr1+'c'+key[1]+'o'+logstr2:define_prior_s8[logstr1+'c'+key[1]+'o'+logstr2],
       'k'+key[2]+'n':define_prior_s8['k'+key[2]+'n'],
       'k'+key[2]+'o':define_prior_s8['k'+key[2]+'o'],
-      'logEn':define_prior_s8['logEn'],
-      'logEo':define_prior_s8['logEo'] }
+      'log(En)':define_prior_s8['log(En)'],
+      'log(Eo)':define_prior_s8['log(Eo)'] }
   except KeyError:
     continue ## -- key is not defined, don't worry about it
 pass
 for key in key_list_s8p:
   if key[1] == log_s8p:
-    logstr1='log'
+    logstr1='log('
+    logstr2=')'
   else:
     logstr1=''
+    logstr2=''
   try:
     define_prior_s8p[key[0]]=\
-     {logstr1+'c'+key[1]+'n':define_prior_s8p[logstr1+'c'+key[1]+'n'],
-      logstr1+'c'+key[1]+'o':define_prior_s8p[logstr1+'c'+key[1]+'o'],
+     {logstr1+'c'+key[1]+'n'+logstr2:define_prior_s8p[logstr1+'c'+key[1]+'n'+logstr2],
+      logstr1+'c'+key[1]+'o'+logstr2:define_prior_s8p[logstr1+'c'+key[1]+'o'+logstr2],
       'k'+key[2]+'n':define_prior_s8p['k'+key[2]+'n'],
       'k'+key[2]+'o':define_prior_s8p['k'+key[2]+'o'],
-      'logEn':define_prior_s8p['logEn'],
-      'logEo':define_prior_s8p['logEo'] }
+      'log(En)':define_prior_s8p['log(En)'],
+      'log(Eo)':define_prior_s8p['log(Eo)'] }
   except KeyError:
     continue ## -- key is not defined, don't worry about it
 pass
 for key in key_list_s16:
   if key[1] == log_s16:
-    logstr1='log'
+    logstr1='log('
+    logstr2=')'
   else:
     logstr1=''
+    logstr2=''
   try:
     define_prior_s16[key[0]]=\
-     {logstr1+'c'+key[1]+'n':define_prior_s16[logstr1+'c'+key[1]+'n'],
-      logstr1+'c'+key[1]+'o':define_prior_s16[logstr1+'c'+key[1]+'o'],
+     {logstr1+'c'+key[1]+'n'+logstr2:define_prior_s16[logstr1+'c'+key[1]+'n'+logstr2],
+      logstr1+'c'+key[1]+'o'+logstr2:define_prior_s16[logstr1+'c'+key[1]+'o'+logstr2],
       'k'+key[2]+'n':define_prior_s16['k'+key[2]+'n'],
       'k'+key[2]+'o':define_prior_s16['k'+key[2]+'o'],
-      'logEn':define_prior_s16['logEn'],
-      'logEo':define_prior_s16['logEo'] }
+      'log(En)':define_prior_s16['log(En)'],
+      'log(Eo)':define_prior_s16['log(Eo)'] }
   except KeyError:
     continue ## -- key is not defined, don't worry about it
 pass

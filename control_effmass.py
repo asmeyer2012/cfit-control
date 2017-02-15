@@ -65,31 +65,31 @@ taglist = list() # for gvar.dump hash key
 filekey = 'a'  ## -- standard choice, no filters
 #filekey = 'm'  ## -- munich filter
 #print "Using munich filter"
-#taglist.append(('l32v5.mes2pt','mes'))
-taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
+#taglist.append(('l32v6.mes2pt','mes'))
+taglist.append(('l32v6.bar2pt.'+irrepStr,'bar2pt'))
 if not(df.do_irrep == "16"):
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
 else:
  ## -- both 16+ and 16-
  irrepStr = '16p'
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16p'))
  irrepStr = '16m'
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
 
 dall = standard_load(taglist,filekey,argsin)
 if df.do_sn_minimize:
@@ -162,26 +162,28 @@ for key in priors3:
 if df.do_init2:
   init2={}
   for key in df.define_init:
-    if key[-1] == 'n':
+    eokey = utf.get_evenodd(key)
+    if eokey == 'n':
      init2[key] = df.define_init[key][:df.num_nst]
-    elif key[-1] == 'o':
+    elif eokey == 'o':
      init2[key] = df.define_init[key][:df.num_ost]
 else:
   init2=None
 if df.do_init3:
   init3={}
   for key in df.define_init_3pt:
-    if key[-2:] == 'nn':
+    eokey = utf.get_evenodd(key)
+    if eokey == 'nn':
      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst,df.num_nst))
-    elif key[-2:] == 'no':
+    elif eokey == 'no':
      init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst,df.num_ost))
-    elif key[-2:] == 'on':
+    elif eokey == 'on':
      init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost,df.num_nst))
-    elif key[-2:] == 'oo':
+    elif eokey == 'oo':
      init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost,df.num_ost))
-    elif key[-1] == 'n':
+    elif eokey == 'n':
      init3[key] = df.define_init_3pt[key][:df.num_nst]
-    elif key[-1] == 'o':
+    elif eokey == 'o':
      init3[key] = df.define_init_3pt[key][:df.num_ost]
 else:
   init3=None

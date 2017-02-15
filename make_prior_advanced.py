@@ -20,12 +20,14 @@ def add_first_blocks(keylistn,keylisto,keylistv,numstn,numsto,En,Eo,dEn,dEo,
   if key in explicit_priors:
    prior[key+tag0] = explicit_priors[key][:numstn]
   else:
-   if   key[-2:] == 'En':
+   bkey = utf.get_basekey(key)
+   if   bkey[1][-2:] == 'En':
     prior[key+tag0] = gv.gvar([En.mean]+[dEn.mean]*(numstn-1),[En.sdev]+[dEn.sdev]*(numstn-1))
-   elif key[-2:] == 'gn':
+   elif bkey[1][-2:] == 'gn':
     prior[key+tag0] = gv.gvar([g0n.mean]+[gxn.mean]*(numstn-1),[g0n.sdev]+[gxn.sdev]*(numstn-1))
    else:
-    if   key[:3] == 'log' or key[:4] == 'sqrt':
+    #if   bkey[0] == 'log' or bkey[0] == 'sqrt':
+    if not(bkey[0] is None):
      prior[key+tag0] = gv.gvar([lAn.mean]*numstn,[lAn.sdev]*numstn)
     else:
      prior[key+tag0] = gv.gvar([An.mean]*numstn,[An.sdev]*numstn)
@@ -33,12 +35,14 @@ def add_first_blocks(keylistn,keylisto,keylistv,numstn,numsto,En,Eo,dEn,dEo,
   if key in explicit_priors:
    prior[key+tag0] = explicit_priors[key][:numsto]
   else:
-   if   key[-2:] == 'Eo':
+   bkey = utf.get_basekey(key)
+   if   bkey[1][-2:] == 'Eo':
     prior[key+tag0] = gv.gvar([Eo.mean]+[dEo.mean]*(numsto-1),[Eo.sdev]+[dEo.sdev]*(numsto-1))
-   elif key[-2:] == 'go':
+   elif bkey[1][-2:] == 'go':
     prior[key+tag0] = gv.gvar([g0o.mean]+[gxo.mean]*(numsto-1),[g0o.sdev]+[gxo.sdev]*(numsto-1))
    else:
-    if   key[:3] == 'log' or key[:4] == 'sqrt':
+    #if   key[:3] == 'log' or key[:4] == 'sqrt':
+    if not(bkey[0] is None):
      prior[key+tag0] = gv.gvar([lAo.mean]*numsto,[lAo.sdev]*numsto)
     else:
      prior[key+tag0] = gv.gvar([Ao.mean]*numsto,[Ao.sdev]*numsto)
@@ -48,19 +52,20 @@ def add_first_blocks(keylistn,keylisto,keylistv,numstn,numsto,En,Eo,dEn,dEo,
    ## -- assume it is already properly truncated
    prior[key+tag0] = explicit_priors[key]
   else:
-   if   key[-2:] == 'nn':
+   eokey = utf.get_evenodd(key)
+   if   eokey == 'nn':
     if symmetric_V:
      prior[key+tag0] = gv.gvar([vdn.mean]*(numstn*(numstn-1)/2),[vdn.sdev]*(numstn*(numstn-1)/2))
     else:
      prior[key+tag0] = gv.gvar([[vdn.mean]*numstn]*numstn,[[vdn.sdev]*numstn]*numstn)
-   elif key[-2:] == 'oo':
+   elif eokey == 'oo':
     if symmetric_V:
      prior[key+tag0] = gv.gvar([vdo.mean]*(numsto*(numsto-1)/2),[vdo.sdev]*(numsto*(numsto-1)/2))
     else:
      prior[key+tag0] = gv.gvar([[vdo.mean]*numsto]*numsto,[[vdo.sdev]*numsto]*numsto)
-   elif key[-2:] == 'no':
+   elif eokey == 'no':
     prior[key+tag0] = gv.gvar([[vxs.mean]*numsto]*numstn,[[vxs.sdev]*numsto]*numstn)
-   elif key[-2:] == 'on':
+   elif eokey == 'on':
     if symmetric_V:
      continue
     prior[key+tag0] = gv.gvar([[vxs.mean]*numstn]*numsto,[[vxs.sdev]*numstn]*numsto)
@@ -85,10 +90,11 @@ def add_next_block(prior,newEven,numst,E0,dE, g0s=gv.gvar(0,1e1), gxs=gv.gvar(0,
    kpre.append(sp[0])
   if len(sp) < 3:
    continue
-  if sp[0][-2:] == 'on':
+  eokey = utf.get_evenodd(key)
+  if eokey == 'on':
    no = max(int(sp[1]),no)
    nn = max(int(sp[2]),nn)
-  if sp[0][-2:] != 'no':
+  if eokey != 'no':
    continue
   else:
    nn = max(int(sp[1]),nn)
@@ -99,7 +105,9 @@ def add_next_block(prior,newEven,numst,E0,dE, g0s=gv.gvar(0,1e1), gxs=gv.gvar(0,
  ## -- add a set of priors for each prefix
  for key in kpre:
   if newEven: ## -- add even state block
-   if   key[-2:] == 'nn': ## -- vnn
+   bkey = utf.get_basekey(key)
+   eokey = utf.get_evenodd(key)
+   if   eokey == 'nn': ## -- vnn
     for k in range(nn+1):   ## -- off diagonals
       lnn = len(prior[key+'_'+str(k)+'_'+str(k)])
       lnn = (1+int(np.round(np.sqrt(1+8*lnn))))/2
@@ -125,9 +133,10 @@ def add_next_block(prior,newEven,numst,E0,dE, g0s=gv.gvar(0,1e1), gxs=gv.gvar(0,
        prior[nkey] = gv.gvar([vxs.mean]*(numst*(numst-1)/2),[vds.sdev]*(numst*(numst-1)/2))
      else:
        prior[nkey] = gv.gvar([[vxs.mean]*numst]*numst,[[vds.sdev]*numst]*numst)
-   elif key[-2:] == 'no':
+   elif eokey == 'no':
+    prekey = utf.get_fnkey(bkey[1][:-2]+'oo',bkey[0])
     for k in range(no+1):
-      loo = len(prior[key[:-2]+'oo_'+str(k)+'_'+str(k)])
+      loo = len(prior[prekey+'_'+str(k)+'_'+str(k)])
       loo = (1+int(np.round(np.sqrt(1+8*loo))))/2
       #print key,'no',loo,numst
       nkey = key+'_'+str(nn+1)+'_'+str(k)
@@ -135,11 +144,12 @@ def add_next_block(prior,newEven,numst,E0,dE, g0s=gv.gvar(0,1e1), gxs=gv.gvar(0,
        prior[nkey] = gv.gvar([[vxs.mean]*loo]*numst,[[vxs.sdev]*loo]*numst)
       else:
        prior[nkey] = explicit_priors[key] 
-   elif key[-2:] == 'on':
+   elif eokey == 'on':
     if symmetric_V:
      continue
+    prekey = utf.get_fnkey(bkey[1][:-2]+'oo',bkey[0])
     for k in range(no+1):
-      loo = len(prior[key[:-2]+'oo_'+str(k)+'_'+str(k)])
+      loo = len(prior[prekey+'_'+str(k)+'_'+str(k)])
       loo = (1+int(np.round(np.sqrt(1+8*loo))))/2
       #print 'on',loo
       nkey = key+'_'+str(k)+'_'+str(nn+1)
@@ -147,27 +157,30 @@ def add_next_block(prior,newEven,numst,E0,dE, g0s=gv.gvar(0,1e1), gxs=gv.gvar(0,
        prior[nkey] = gv.gvar([[vxs.mean]*numst]*loo,[[vxs.sdev]*numst]*loo)
       else:
        prior[nkey] = explicit_priors[key] 
-   elif key[-1:] == 'n': ## -- different behavior for gn, En, an, bn
+   elif eokey == 'n': ## -- different behavior for gn, En, an, bn
     nkey = key+'_'+str(nn+1)
     if key in explicit_priors:
      prior[nkey] = explicit_priors[key][:numst]
     else:
-     if   key[-2:] == 'En':
+     if   bkey[1][-2:] == 'En':
       Ex = sum([prior[key+'_'+str(t)][0].mean for t in range(nn+1)])
       prior[nkey] = gv.gvar([E0.mean-Ex]+[dE.mean]*(numst-1), [E0.sdev]+[dE.sdev]*(numst-1))
       #prior[nkey] = gv.gvar([E0.mean-prior[key+'_'+str(nn)][0].mean]
       # +[dE.mean]*(numst-1),[E0.sdev]+[dE.sdev]*(numst-1))
       assert prior[nkey][0] > 0,"Even energy for block "+str(nn+1)+" not monotonically increasing"
-     elif key[-2:] == 'gn':
+     elif bkey[1][-2:] == 'gn':
       prior[nkey] = gv.gvar([g0s.mean]+[gxs.mean]*(numst-1),[g0s.sdev]+[gxs.sdev]*(numst-1))
      else: ## -- an, bn
-      if key[:3] == 'log' or key[:4] == 'sqrt':
+      #if key[:3] == 'log' or key[:4] == 'sqrt':
+      if not(bkey[0] is None):
        prior[nkey] = gv.gvar([lAs.mean]*numst,[lAs.sdev]*numst)
       else:
        prior[nkey] = gv.gvar([As.mean]*numst,[As.sdev]*numst)
 
   else: ## -- add odd state block
-   if   key[-2:] == 'oo':
+   bkey = utf.get_basekey(key)
+   eokey = utf.get_evenodd(key)
+   if   eokey == 'oo':
     for k in range(no+1):   ## -- off diagonals
       loo = len(prior[key+'_'+str(k)+'_'+str(k)])
       loo = (1+int(np.round(np.sqrt(1+8*loo))))/2
@@ -188,9 +201,10 @@ def add_next_block(prior,newEven,numst,E0,dE, g0s=gv.gvar(0,1e1), gxs=gv.gvar(0,
       prior[nkey] = gv.gvar([vxs.mean]*(numst*(numst-1)/2),[vds.sdev]*(numst*(numst-1)/2))
     else:
       prior[nkey] = gv.gvar([[vxs.mean]*numst]*numst,[[vds.sdev]*numst]*numst)
-   elif key[-2:] == 'no':
+   elif eokey == 'no':
+    prekey = utf.get_fnkey(bkey[1][:-2]+'nn',bkey[0])
     for k in range(nn+1):
-      lnn = len(prior[key[:-2]+'nn_'+str(k)+'_'+str(k)])
+      lnn = len(prior[prekey+'_'+str(k)+'_'+str(k)])
       lnn = (1+int(np.round(np.sqrt(1+8*lnn))))/2
       #print 'no',lnn
       nkey = key+'_'+str(k)+'_'+str(no+1)
@@ -198,11 +212,12 @@ def add_next_block(prior,newEven,numst,E0,dE, g0s=gv.gvar(0,1e1), gxs=gv.gvar(0,
        prior[nkey] = gv.gvar([[vxs.mean]*numst]*lnn,[[vxs.sdev]*numst]*lnn)
       else:
        prior[nkey] = explicit_priors[key] 
-   elif key[-2:] == 'on':
+   elif eokey == 'on':
     if symmetric_V:
      continue
+    prekey = utf.get_fnkey(bkey[1][:-2]+'nn',bkey[0])
     for k in range(nn+1):
-      lnn = len(prior[key[:-2]+'nn_'+str(k)+'_'+str(k)])
+      lnn = len(prior[prekey+'_'+str(k)+'_'+str(k)])
       lnn = (1+int(np.round(np.sqrt(1+8*lnn))))/2
       #print 'on',lnn
       nkey = key+'_'+str(no+1)+'_'+str(k)
@@ -210,21 +225,22 @@ def add_next_block(prior,newEven,numst,E0,dE, g0s=gv.gvar(0,1e1), gxs=gv.gvar(0,
        prior[nkey] = gv.gvar([[vxs.mean]*numst]*lnn,[[vxs.sdev]*numst]*lnn)
       else:
        prior[nkey] = explicit_priors[key] 
-   elif key[-1:] == 'o':
+   elif eokey == 'o':
     nkey = key+'_'+str(no+1)
     if key in explicit_priors:
      prior[nkey] = explicit_priors[key][:numst]
     else:
-     if   key[-2:] == 'Eo':
+     if   bkey[1][-2:] == 'Eo':
       Ex = sum([prior[key+'_'+str(t)][0].mean for t in range(no+1)])
       prior[nkey] = gv.gvar([E0.mean-Ex]+[dE.mean]*(numst-1), [E0.sdev]+[dE.sdev]*(numst-1))
       #prior[nkey] = gv.gvar([E0.mean-prior[key+'_'+str(no)][0].mean]
       # +[dE.mean]*(numst-1),[E0.sdev]+[dE.sdev]*(numst-1))
       assert prior[nkey][0] > 0,"Odd energy for block "+str(no+1)+" not monotonically increasing"
-     elif key[-2:] == 'go':
+     elif bkey[1][-2:] == 'go':
       prior[nkey] = gv.gvar([g0s.mean]+[gxs.mean]*(numst-1),[g0s.sdev]+[gxs.sdev]*(numst-1))
      else: ## -- ao, bo
-      if key[:3] == 'log' or key[:4] == 'sqrt':
+      #if key[:3] == 'log' or key[:4] == 'sqrt':
+      if not(bkey[0] is None):
        prior[nkey] = gv.gvar([lAs.mean]*numst,[lAs.sdev]*numst)
       else:
        prior[nkey] = gv.gvar([As.mean]*numst,[As.sdev]*numst)
@@ -240,18 +256,19 @@ def truncate_prior_states(prior,nn,no,nn3=-1,no3=-1):
  ## -- tabulate energies/blocks
  for key in prior:
   skey = key.split('_')
-  if skey[0][-2:] == 'En' or skey[0][-2:] == 'Eo':
+  bkey = utf.get_basekey(skey[0])
+  if bkey[1][-2:] == 'En' or bkey[1][-2:] == 'Eo':
    i = int(skey[1])
-   if   skey[0][:3] == 'log':
+   if   bkey[0] == 'log':
     en = gv.exp(prior[key])
-   elif skey[0][:4] == 'sqrt':
+   elif bkey[0] == 'sqrt':
     en = prior[key]*prior[key]
    else:
     en = prior[key]
    for e in en:
-    if   skey[0][-2:] == 'En':
+    if   bkey[1][-2:] == 'En':
       nst.append([e,i])
-    elif skey[0][-2:] == 'Eo':
+    elif bkey[1][-2:] == 'Eo':
       ost.append([e,i])
  nstx = []
  ostx = []
@@ -292,6 +309,8 @@ def truncate_prior_states(prior,nn,no,nn3=-1,no3=-1):
  newprior = gv.BufferDict()
  for key in prior:
   skey = key.split('_')
+  bkey = utf.get_basekey(skey[0])
+  eokey = utf.get_evenodd(skey[0])
   k = int(skey[1])
   kp = len(prior[key])
   try:
@@ -299,7 +318,7 @@ def truncate_prior_states(prior,nn,no,nn3=-1,no3=-1):
    l = int(skey[2])
    lp = len(prior[key][0])
    for v, x1, x2 in [('nn',nst3,nst3),('no',nst3,ost3),('on',ost3,nst3),('oo',ost3,ost3)]:
-    if skey[0][-2:] == v:
+    if eokey == v:
      c1 = list(x1).count(k)
      c2 = list(x2).count(l)
      if c1 == 0 and c2 == 0:
@@ -313,7 +332,7 @@ def truncate_prior_states(prior,nn,no,nn3=-1,no3=-1):
   except (IndexError,TypeError):
    ## -- 3-point matrix diagonals for symmetric
    for v, x1 in [('nn',nst3),('oo',ost3)]:
-    if skey[0][-2:] == v:
+    if eokey == v:
      c1 = list(x1).count(k)
      if c1 == 0:
       newprior[key] = prior[key]
@@ -327,11 +346,11 @@ def truncate_prior_states(prior,nn,no,nn3=-1,no3=-1):
        tmp = np.array(utf.reconstruct_upper_triangle(prior[key],kpt))
        newprior[key] = utf.truncate_upper_triangle(tmp,kpt-c1)
    ## -- everything else
-   if (skey[0][-2:] != 'nn') and (skey[0][-2:] != 'oo'):
+   if (eokey != 'nn') and (eokey != 'oo'):
     for v, x1, x2 in [('n',list(nst),list(nst3)),('o',list(ost),list(ost3))]:
-     if skey[0][-2:] == 'g'+v:
+     if bkey[1][-2:] == 'g'+v:
       c1 = list(x2).count(k)
-     elif skey[0][-1] == v:
+     elif eokey == v:
       c1 = list(x1).count(k)
      else:
       continue
@@ -347,9 +366,10 @@ def transform_prior(prior):
  ## -- if log/sqrt priors are present, apply log/sqrt to values
  ##    should be applied after all priors have been added
  for key in prior:
-  if key[:3] == 'log':
+  bkey = utf.get_basekey(key)
+  if bkey[0] == 'log':
    prior[key] = gv.log(prior[key])
-  elif key[:4] == 'sqrt':
+  elif bkey[0] == 'sqrt':
    prior[key] = gv.sqrt(prior[key])
   pass
  ## -- return
@@ -357,13 +377,19 @@ def transform_prior(prior):
  return prior
 
 def retrieve_linear_prior(prior):
- ## -- if log/sqrt priors are present, apply log/sqrt to values
+ ## -- if log/sqrt priors are present, apply inverse to values
  ##    should be applied after all priors have been added
  for key in prior:
-  if key[:3] == 'log':
-   prior[key[3:]] = gv.exp(prior[key])
-  elif key[:4] == 'sqrt':
-   prior[key[4:]] = prior[key]*prior[key]
+  skey = key.split('_')
+  bkey = utf.get_basekey(skey[0])
+  if len(skey) == 1:
+   nkey = skey[0]
+  else:
+   nkey = bkey[1] + '_' + '_'.join(skey[1:])
+  if bkey[0] == 'log':
+   prior[nkey] = gv.exp(prior[key])
+  elif bkey[0] == 'sqrt':
+   prior[nkey] = prior[key]*prior[key]
   pass
  ## -- return
  #print 'xform',prior

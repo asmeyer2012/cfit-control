@@ -1,5 +1,6 @@
 import gvar as gv
 import gvar.dataset as gvd
+import util_funcs as utf
 #import multiprocessing ## -- parallelization
 
 def make_bootstrap(fitter,dset,n_bs):
@@ -8,7 +9,8 @@ def make_bootstrap(fitter,dset,n_bs):
  for bs_fit in fitter.bootstrap_iter(bs_datalist):
   p = bs_fit.pmean;
   for key in p:
-   if key[:3] == 'log':
+   bkey = utf.get_basekey(key)
+   if bkey[0] == 'log':
     bs.append(key[3:],gv.exp(p[key]));
    else:
     bs.append(key,p[key]);

@@ -126,12 +126,12 @@ Vs  = 10  # current sdev (different parity entries)
 Vd  = 10 # current sdev (diagonal same-parity entries)
 #Vx  = 1  # current sdev (offdiagonal same-parity entries)
 Vx  = 10  # current sdev (offdiagonal same-parity entries)
-nlen8 = len(define_prior3_s8 ['logEn'])
-olen8 = len(define_prior3_s8 ['logEo'])
-nlen8p= len(define_prior3_s8p['logEn'])
-olen8p= len(define_prior3_s8p['logEo'])
-nlen16= len(define_prior3_s16['logEn'])
-olen16= len(define_prior3_s16['logEo'])
+nlen8 = len(define_prior3_s8 ['log(En)'])
+olen8 = len(define_prior3_s8 ['log(Eo)'])
+nlen8p= len(define_prior3_s8p['log(En)'])
+olen8p= len(define_prior3_s8p['log(Eo)'])
+nlen16= len(define_prior3_s16['log(En)'])
+olen16= len(define_prior3_s16['log(Eo)'])
 for cur in current_key:
  define_prior3_s8 [cur+'no'] = gv.gvar([[Vm]*nlen8 ]*olen8 ,[[Vs]*nlen8 ]*olen8)
  if do_v_symmetric:
@@ -262,17 +262,19 @@ for cur,ckey in zip(current_list,current_key):
 
 for key in key_list3_s8:
   if key[1] == log_s8:
-    logstr1='log'
+    logstr1='log('
+    logstr2=')'
   else:
     logstr1=''
+    logstr2=''
   try:
     define_prior3_s8[key[0]]=\
-     {logstr1+'c'+key[1]+'n':define_prior3_s8[logstr1+'c'+key[1]+'n'],
-      logstr1+'c'+key[1]+'o':define_prior3_s8[logstr1+'c'+key[1]+'o'],
+     {logstr1+'c'+key[1]+'n'+logstr2:define_prior3_s8[logstr1+'c'+key[1]+'n'+logstr2],
+      logstr1+'c'+key[1]+'o'+logstr2:define_prior3_s8[logstr1+'c'+key[1]+'o'+logstr2],
       'k'+key[2]+'n':define_prior3_s8['k'+key[2]+'n'],
       'k'+key[2]+'o':define_prior3_s8['k'+key[2]+'o'],
-      'logEn':define_prior3_s8['logEn'],
-      'logEo':define_prior3_s8['logEo'] }
+      'log(En)':define_prior3_s8['log(En)'],
+      'log(Eo)':define_prior3_s8['log(Eo)'] }
     for cur in current_list:
      for tsep in tsep_list:
       define_prior3_s8[key[0]][key[5]+'nn']=define_prior3_s8[key[5]+'nn']
@@ -284,17 +286,19 @@ for key in key_list3_s8:
 pass
 for key in key_list3_s8p:
   if key[1] == log_s8p:
-    logstr1='log'
+    logstr1='log('
+    logstr2=')'
   else:
     logstr1=''
+    logstr2=''
   try:
     define_prior3_s8p[key[0]]=\
-     {logstr1+'c'+key[1]+'n':define_prior3_s8p[logstr1+'c'+key[1]+'n'],
-      logstr1+'c'+key[1]+'o':define_prior3_s8p[logstr1+'c'+key[1]+'o'],
+     {logstr1+'c'+key[1]+'n'+logstr2:define_prior3_s8p[logstr1+'c'+key[1]+'n'+logstr2],
+      logstr1+'c'+key[1]+'o'+logstr2:define_prior3_s8p[logstr1+'c'+key[1]+'o'+logstr2],
       'k'+key[2]+'n':define_prior3_s8p['k'+key[2]+'n'],
       'k'+key[2]+'o':define_prior3_s8p['k'+key[2]+'o'],
-      'logEn':define_prior3_s8p['logEn'],
-      'logEo':define_prior3_s8p['logEo'] }
+      'log(En)':define_prior3_s8p['log(En)'],
+      'log(Eo)':define_prior3_s8p['log(Eo)'] }
     define_prior3_s8p[key[0]][key[5]+'nn']=define_prior3_s8p[key[5]+'nn']
     define_prior3_s8p[key[0]][key[5]+'no']=define_prior3_s8p[key[5]+'no']
     define_prior3_s8p[key[0]][key[5]+'on']=define_prior3_s8p[key[5]+'on']
@@ -304,17 +308,19 @@ for key in key_list3_s8p:
 pass
 for key in key_list3_s16:
   if key[1] == log_s16:
-    logstr1='log'
+    logstr1='log('
+    logstr2=')'
   else:
     logstr1=''
+    logstr2=''
   try:
     define_prior3_s16[key[0]]=\
-     {logstr1+'c'+key[1]+'n':define_prior3_s16[logstr1+'c'+key[1]+'n'],
-      logstr1+'c'+key[1]+'o':define_prior3_s16[logstr1+'c'+key[1]+'o'],
+     {logstr1+'c'+key[1]+'n'+logstr2:define_prior3_s16[logstr1+'c'+key[1]+'n'+logstr2],
+      logstr1+'c'+key[1]+'o'+logstr2:define_prior3_s16[logstr1+'c'+key[1]+'o'+logstr2],
       'k'+key[2]+'n':define_prior3_s16['k'+key[2]+'n'],
       'k'+key[2]+'o':define_prior3_s16['k'+key[2]+'o'],
-      'logEn':define_prior3_s16['logEn'],
-      'logEo':define_prior3_s16['logEo'] }
+      'log(En)':define_prior3_s16['log(En)'],
+      'log(Eo)':define_prior3_s16['log(Eo)'] }
     for cur in current_list:
      for tsep in tsep_list:
       define_prior3_s16[key[0]][key[5]+'nn']=define_prior3_s16[key[5]+'nn']

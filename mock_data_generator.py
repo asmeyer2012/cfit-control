@@ -1,9 +1,28 @@
 import gvar as gv
 import numpy as np
 import defines as df
+#import json
+import pickle
+import os
 from numpy.linalg import cholesky
 
-def generate_mock_data():
+def generate_mock_data(fkey=None):
+ if not(fkey is None) and os.path.isfile('gvar.dump.'+fkey):
+  print 'reading mock data from dump file'
+  dall = gv.load('gvar.dump.'+fkey)
+  #with open('truth.'+fkey+'.json', 'r') as f:
+  # try:
+  #  truth = json.load(f)
+  # except ValueError:
+  #  print "could not load truth data"
+  #  truth = {}
+  try: 
+   f = open('truth.'+fkey+'.pkl','rb')
+   truth = pickle.load(f)
+  except IOError:
+   print "could not load truth data"
+   truth = {}
+  return dall,truth
  ## -- initial values
  do_test = False
  if do_test:
@@ -337,25 +356,35 @@ def generate_mock_data():
  
  ##    amplitude prep
  anamp = list(np.array(random_amp(Nop,Nampn))*10.)
- bnamp = random_amp(Nop,Nampo)
- aoamp = list(np.array(random_amp(Nop,Nampn))*10.)
+ bnamp = random_amp(Nop,Nampn)
+ aoamp = list(np.array(random_amp(Nop,Nampo))*10.)
  boamp = random_amp(Nop,Nampo)
+
  scnamp = duplicate_amp(anamp,True)
  sknamp = duplicate_amp(bnamp,False)
  scoamp = duplicate_amp(aoamp,True)
  skoamp = duplicate_amp(boamp,False)
- scnrot = duplicate_amp(np.dot(amat,anamp),True)
- sknrot = duplicate_amp(np.dot(bmat,bnamp),False)
- scorot = duplicate_amp(np.dot(amat,aoamp),True)
- skorot = duplicate_amp(np.dot(bmat,boamp),False)
+
+ ##     don't actually need to rotate amplitudes
+ #scnrot = duplicate_amp(np.dot(amat,anamp),True)
+ #sknrot = duplicate_amp(np.dot(bmat,bnamp),False)
+ #scorot = duplicate_amp(np.dot(amat,aoamp),True)
+ #skorot = duplicate_amp(np.dot(bmat,boamp),False)
+ scnrot = scnamp
+ sknrot = sknamp
+ scorot = scoamp
+ skorot = skoamp
+
  #print En
  #print Eo
  #print aamp
  #print bamp
  #print scamp
  #print skamp
- #print scrot
- #print skrot
+ #print 'scnrot',scnrot
+ #print 'sknrot',sknrot
+ #print 'scorot',scorot
+ #print 'skorot',skorot
  
  ##    correlator prep
  rlmat = []
@@ -393,6 +422,25 @@ def generate_mock_data():
   meas = gen_mock_data_2pt(kdatc,kerrc,klmat)
   for key in opkey:
    data[key].append(meas[opslc[key]])
+
+ ##    prepare truth for pickling
+ truth = {}
+ truth['En'] = En
+ truth['Eo'] = Eo
+ for i,opi in enumerate(opcls):
+  truth['c'+str(opi)+'n'] = scnrot[i]
+  truth['c'+str(opi)+'o'] = scorot[i]
+  truth['k'+str(opi)+'n'] = sknrot[i*Nop]
+  truth['k'+str(opi)+'o'] = skorot[i*Nop]
+ tmpcor = np.dot(klmat,klmat.T)
+ for opi in opkey:
+  truth['cv'+opi] = kdatc[opslc[opi]]
+  truth['er'+opi] = kerrc[opslc[opi]]
+  for opj in opkey:
+   truth[opi,opj]  = tmpcor[opslc[opi],opslc[opj]]
+ truth['lmat'] = klmat
+ truth['opcls'] = opcls
+ truth['opkey'] = opkey
  
  #testnum = 1
  #mean = 0
@@ -425,7 +473,17 @@ def generate_mock_data():
   print "bn_"+str(i)+": ",bn
  for i,bo in enumerate(np.dot(bmat,boamp)):
   print "bo_"+str(i)+": ",bo
- return davg
+ 
+ if not(fkey is None):
+  print 'saving mock data to dump file'
+  gv.dump(davg,'gvar.dump.'+fkey)
+  #with open('truth.'+fkey+'.json', 'w') as f:
+  # json.dump(truth, f)
+  #f.close()
+  f = open('truth.'+fkey+'.pkl','ab+')
+  pickle.dump(truth,f)
+  f.close()
+ return davg,truth
  #covm = gv.evalcov(davg)
  
  ### -- slice out the parts to fit

@@ -57,12 +57,13 @@ def plot_stability(fit_collector,**kwargs):
    #print tspec
    for key in tspec:
     it = 0
-    if key[-2:] == 'En' and not(key[3:] == 'log' or key[4:] == 'sqrt'):
+    bkey = utf.get_basekey(key)
+    if bkey[1][-2:] == 'En' and (bkey[0] is None):
      for e in tspec[key]:
       hValDatn.append(fitCount+0.25)
       enCentral.append(e.mean)
       enError.append(e.sdev)
-    elif key[-2:] == 'Eo' and not(key[3:] == 'log' or key[4:] == 'sqrt'):
+    elif bkey[1][-2:] == 'Eo' and (bkey[0] is None):
      for e in tspec[key]:
       hValDato.append(fitCount+0.75)
       eoCentral.append(e.mean)

@@ -66,31 +66,31 @@ taglist = list() # for gvar.dump hash key
 filekey = 'a'  ## -- standard choice, no filters
 #filekey = 'm'  ## -- munich filter
 #print "Using munich filter"
-#taglist.append(('l32v5.mes2pt','mes'))
-taglist.append(('l32v5.bar2pt.'+irrepStr,'bar2pt'))
+#taglist.append(('l32v6.mes2pt','mes'))
+taglist.append(('l32v6.bar2pt.'+irrepStr,'bar2pt'))
 if not(df.do_irrep == "16"):
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7'))
 else:
  ## -- both 16+ and 16-
  irrepStr = '16p'
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16p'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16p'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16p'))
  irrepStr = '16m'
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
- taglist.append(('l32v5.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t06.p00','axax','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.axax.t-7.p00','axax','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t06.p00','ayay','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.ayay.t-7.p00','ayay','t7','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t06.p00','azaz','t6','16m'))
+ taglist.append(('l32v6.bar3pt.'+irrepStr+'.azaz.t-7.p00','azaz','t7','16m'))
 
 ## -- consolidated all loading into a single file:
 dall = standard_load(taglist,filekey,argsin)
@@ -118,9 +118,10 @@ if df.do_init2:
    init2 = make_init_from_fit_file_3pt(models2,'fit_dict')
   else:
    for key in df.define_init:
-     if key[-1] == 'n':
+     eokey = utf.get_evenodd(key)
+     if eokey == 'n':
       init2[key] = df.define_init[key][:df.num_nst]
-     elif key[-1] == 'o':
+     elif eokey == 'o':
       init2[key] = df.define_init[key][:df.num_ost]
 else:
   init2=None
@@ -130,23 +131,24 @@ if df.do_init3:
    init3 = make_init_from_fit_file_3pt(models3,'fit_dict')
   else:
    for key in df.define_init_3pt:
-     if key[-2:] == 'nn':
+     eokey = utf.get_evenodd(key)
+     if eokey == 'nn':
       init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_nst_3pt))
       if df.do_v_symmetric:
        init3[key] = utf.truncate_upper_triangle(init3[key],df.num_nst_3pt)
-     elif key[-2:] == 'oo':
+     elif eokey == 'oo':
       init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_ost_3pt))
       if df.do_v_symmetric:
        init3[key] = utf.truncate_upper_triangle(init3[key],df.num_ost_3pt)
-     elif key[-2:] == 'no':
+     elif eokey == 'no':
       init3[key] = np.resize(df.define_init_3pt[key],(df.num_nst_3pt,df.num_ost_3pt))
-     elif key[-2:] == 'on':
+     elif eokey == 'on':
       ## -- is this correct for symmetric v?
       #init3[key] = np.resize(df.define_init_3pt[key],(df.num_ost_3pt,df.num_nst_3pt))
       pass
-     elif key[-1] == 'n':
+     elif eokey == 'n':
       init3[key] = df.define_init_3pt[key][:df.num_nst]
-     elif key[-1] == 'o':
+     elif eokey == 'o':
       init3[key] = df.define_init_3pt[key][:df.num_ost]
 else:
   init3=None

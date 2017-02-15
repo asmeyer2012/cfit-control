@@ -57,7 +57,8 @@ def plot_splitting(fit_collector,**kwargs):
   ## -- TODO here
    for key in fit_collector[tkey]:
     #sum=0
-    if key[-2:] == 'En' and not(key[3:] == 'log'):
+    bkey = utf.get_basekey(key)
+    if bkey[1][-2:] == 'En' and not(bkey[0] == 'log'):
      hValDatn.append(list())
      enCentral.append(list())
      enError.append(list())
@@ -65,7 +66,7 @@ def plot_splitting(fit_collector,**kwargs):
       hValDatn[-1].append(fitCount+0.25)
       enCentral[-1].append(x.mean)
       enError[-1].append(x.sdev)
-    elif key[-2:] == 'Eo' and not(key[3:] == 'log'):
+    elif bkey[1][-2:] == 'Eo' and not(bkey[0] == 'log'):
      hValDato.append(list())
      eoCentral.append(list())
      eoError.append(list())

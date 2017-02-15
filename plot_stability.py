@@ -63,13 +63,14 @@ def plot_stability(fit_collector,**kwargs):
    #hChi2.append(fit_collector[tkey]['chi2'])
    for key in fit_collector[tkey]:
     sum=0
-    if key[:2] == 'En' and not(key[3:] == 'log'):
+    bkey = utf.get_basekey(key)
+    if bkey[1][-2:] == 'En' and (bkey[0] is None):
      for x in fit_collector[tkey][key]:
       hValDatn.append(fitCount+0.25)
       sum += x.mean
       enCentral.append(sum)
       enError.append(x.sdev)
-    elif key[:2] == 'Eo' and not(key[3:] == 'log'):
+    elif bkey[1][-2:] == 'Eo' and (bkey[0] is None):
      for x in fit_collector[tkey][key]:
       hValDato.append(fitCount+0.75)
       sum += x.mean

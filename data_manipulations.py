@@ -12,8 +12,21 @@ import numpy             as np
 import sn_minimizer      as snm
 import argparse
 import hashlib
+import pickle
 import sys
 
+## carbon copy of gvar.dump, but using precomputed correlations rather than recomputing
+def dump_precompute(g, outputfile):
+    if isinstance(outputfile, str):
+        outputfile = open(outputfile, 'wb')
+    mn = gv.mean(g)
+    evb = gv.evalcov(g.buf)
+    covm = {}
+    for keyi in g:
+     for keyj in g:
+      covm[keyi,keyj] = evb[g.slice(keyi),g.slice(keyj)]
+    pickle.dump((mn, covm), outputfile)
+    outputfile.close()
 
 ## -- requires current_list and current_key set in define_prior_3pt
 def standard_load(taglist,filekey,argsin):
@@ -134,7 +147,7 @@ def standard_load(taglist,filekey,argsin):
    #   dtmp[keya] = fn_apply_tags2(dset0[key],dmesrw,corr_pi_ratio7,
    #    '_'.join(keya.split('_')[:-1]),'a4a4_'+keya.split('_')[1])
    # dset0[key] = dtmp
-  
+
    for key in dset0:
     if 'bar2pt' in key\
     or '2pt'    in key:
@@ -162,12 +175,15 @@ def standard_load(taglist,filekey,argsin):
       for cor in dset1[key][xkey]:
        dset2[newkey][newxkey].append(cor)
   
-   for key in dset2:
-    ## -- average 3-point currents per configuration
-    if not('bar2pt' in key):
-     for xkey in dset2[key]:
-      dset2[key][xkey] = average_tag_fn(dset2[key][xkey])
-    dset3[key] = consolidate_tags(dset2[key])
+   #for key in dset2:
+   # ## -- average 3-point currents per configuration
+   # if not('bar2pt' in key):
+   #  for xkey in dset2[key]:
+   #   dset2[key][xkey] = average_tag_fn(dset2[key][xkey])
+   # dset3[key] = consolidate_tags(dset2[key])
+   #print dset2
+   #print dset3
+   #raise ValueError("test")
 
    ## -- order data and pay attention to missing configurations
    dnavg = gv.dataset.Dataset()
@@ -187,12 +203,14 @@ def standard_load(taglist,filekey,argsin):
      # print "applying filter to key",key,xkey
      # munich_filter(dset2[key],xkey)
      # pass
-     if 't7' in xkey:
-      print "multiplying by -1 for key",xkey
-      scale_tag(dset2[key],xkey,-1)
+     #if 't7' in xkey:
+     # print "multiplying by -1 for key",xkey
+     # scale_tag(dset2[key],xkey,-1)
      dnavg[xkey] = dset2[key][xkey]
    ## -- compute correlations
-   dall = dnc.divide_and_conquer_correlations(dnavg)
+   #dall = dnc.divide_and_conquer_correlations(dnavg)
+   dall = dnc.divide_and_conquer_parallel(dnavg)
+   print "done with computing correlations"
    
    ### -- post-consolidation manipulation
    #for key in dset3:
@@ -228,7 +246,8 @@ def standard_load(taglist,filekey,argsin):
    ## -- if requested, save to pickle file
    if argsin['dump_gvar']:
     gvarhash = hashlib.md5(''.join(filelist)+filekey).hexdigest()[:8]
-    gv.dump(dall,'gvar.dump.'+gvarhash)
+    #gv.dump(dall,'gvar.dump.'+gvarhash)
+    dump_precompute(dall,'gvar.dump.'+gvarhash)
     print "dumped data to gvar file: gvar.dump."+gvarhash
 
   return dall ## -- return averaged data
@@ -286,3 +305,135 @@ def sn_minimize_postload_3pt(dall,t,v):
  cmat = np.array(cmat)
  cvec,kvec = snm.minimize_3pt(cmat,t)
  return cvec,kvec,cmat
+
+## -- requires current_list and current_key set in define_prior_3pt
+def standard_load_subset(taglist,filekey,argsin,corcut):
+  ## -- assume that data has already been parsed into import files, complete with config tags
+  dset0 = {}
+  dset1 = {}
+  dset2 = {}
+  dset3 = {}
+  davg  = {}
+  
+  ## -- get just the first entry of array
+  filelist = list(np.transpose(np.array(taglist))[0])
+  
+  if argsin['load_gvar']:
+   gvarhash = hashlib.md5(''.join(filelist)+filekey).hexdigest()[:8]
+   print "loading data from gvar file: gvar.dump."+gvarhash
+   dall = gv.load('gvar.dump.'+gvarhash)
+   print "data load complete"
+  else:
+   for tag in taglist:
+    print "loading tag ",tag
+    dset0[tag[1:]] = import_corfit_file(tag[0]) ## -- import all of the files in taglist
+
+   for tag in taglist:
+    if tag[-1] == '16p':
+     #or tag[-1] == '16m':
+     ## -- special averaging of 16 irrep
+     def fn16(cora,corb):
+      cout = list()
+      for cor in cora:
+       cout.append(cor)
+      for cor in corb:
+       cout.append(cor)
+      return average_tag_fn(cout)
+     ## -- apply function
+     dset0[tag[1:-1]] = gv.dataset.Dataset()
+     for key in dset0[tag[1:]]:
+      try:
+       dset0[tag[1:-1]][key] = fn16(dset0[tag[1:]][key],dset0[tag[1:-1]+('16m',)][key])
+      except KeyError:
+       print "missing tag: ",tag[1:-1]+('16m',)," : ",key
+       continue
+     pass
+  
+   print "rejecting keys with 't6' in them"
+   for key in dset0:
+    if 't6' in key:
+     #print "rejecting key",key
+     continue
+
+    if 'bar2pt' in key\
+    or '2pt'    in key:
+     ## -- just consolidate 2-points, skip current averaging
+     dset2[key] = consolidate_tags(dset0[key])
+    elif '16p' in key\
+    or   '16m' in key:
+     ## -- don't want anymore
+     continue
+    else:
+     dset0a = {}
+     for xkey in dset0[key]:
+      if not(any(all(y in xkey for y in x) for x in corcut)):
+       #print "cutting key",xkey
+       continue
+      ## averaging different time sources, cut out time source from name
+      #tkey = 't'.join(xkey.split('_')[0].split('t')[:2])+'_'+'_'.join(xkey.split('_')[1:]) # wrong
+      tkey = 't'.join(xkey.split('_')[0].split('t')[:2])+'_'\
+       +xkey.split('_')[1]+'t'+xkey.split('_')[0].split('t')[2]\
+       +'_'+xkey.split('_')[2]
+      #tkey = xkey
+      try:
+       dset0a[key]
+      except KeyError:
+       dset0a[key] = {}
+      try:
+       dset0a[key][tkey]+dset0[key][xkey]
+      except KeyError:
+       dset0a[key][tkey] = dset0[key][xkey]
+     ## -- average random walls for 3-points per configuration per current
+     #dset1[key] = average_tags(dset0[key])
+     dset1[key] = average_tags(dset0a[key])
+     ## -- collect currents by their "current_key"s in define_prior_3pt
+     newkey = (dfp3.current_key[dfp3.current_list.index(key[0])],) + key[1:]
+     try: #check if dataset exists; if not, add it
+      dset2[newkey]
+     except KeyError:
+      dset2[newkey] = gv.dataset.Dataset()
+     for xkey in dset1[key]:
+      #if not(any(all(y in xkey for y in x) for x in corcut)):
+      # print "cutting key",xkey
+      # continue
+      newxkey = newkey[0].join(xkey.split(key[0])) #replace with new current key
+      try:
+       dset2[newkey][newxkey]
+      except KeyError:
+       dset2[newkey][newxkey] = list()
+      for cor in dset1[key][xkey]:
+       dset2[newkey][newxkey].append(cor)
+     print newkey
+  
+   #for key in dset2:
+   # ## -- average 3-point currents per configuration
+   # if not('bar2pt' in key):
+   #  for xkey in dset2[key]:
+   #   dset2[key][xkey] = average_tag_fn(dset2[key][xkey])
+   # dset3[key] = consolidate_tags(dset2[key])
+   #print dset2
+   #print dset3
+   #raise ValueError("test")
+
+   ## -- order data and pay attention to missing configurations
+   dnavg = gv.dataset.Dataset()
+   for key in dset2:
+    for xkey in dset2[key]:
+     if 'm' in xkey:
+      #print "skipping mixed symmetry key",key,xkey,"..."
+      continue
+     dnavg[xkey] = dset2[key][xkey]
+   ## -- compute correlations
+   #dall = dnc.divide_and_conquer_correlations(dnavg)
+   dall = dnc.divide_and_conquer_parallel(dnavg)
+   print "done with computing correlations"
+
+   ### -- if requested, save to pickle file
+   #if argsin['dump_gvar']:
+   # gvarhash = hashlib.md5(''.join(filelist)+filekey).hexdigest()[:8]
+   # #gv.dump(dall,'gvar.dump.'+gvarhash)
+   # dump_precompute(dall,'gvar.dump.'+gvarhash)
+   # print "dumped data to gvar file: gvar.dump."+gvarhash
+
+  return dall ## -- return averaged data
+pass # end of function

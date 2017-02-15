@@ -24,12 +24,13 @@ def get_prior_mean(prior_dict,fit,key,i,round_a):
   if none exists in fit. Done for a specific key and state number i.
   Rounds if requested.
   """
-  if key[:3] == 'log':
+  bkey = utf.get_basekey(key)
+  if bkey[0] == 'log':
    skey = key[3:]
   else:
    skey = key
   try:
-   if key[:3] == 'log': ## -- prevent log(0)
+   if bkey[0] == 'log': ## -- prevent log(0)
     val = max(fit.transformed_p[skey][i].mean,0.1)
    else:
     val = fit.transformed_p[skey][i].mean
@@ -48,8 +49,9 @@ def get_prior_sdev(prior_dict,fit,key,i,round_a,preserve_a_widths):
   Rounds if requested, and can bypass fit value and take sdev from prior_dict
   if requested.
   """
-  if key[:3] == 'log':
-   skey = key[:3]
+  bkey = utf.get_basekey(key)
+  if bkey[0] == 'log':
+   skey = bkey[0]
   else:
    skey = key
   try:

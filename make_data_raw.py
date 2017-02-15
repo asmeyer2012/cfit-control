@@ -107,7 +107,7 @@ def make_tag_data_raw_fast(mdp,filename):
     update_params(mdp,lsp)
     if not mdp.flag_out_open: ## -- try to open output file
      try:
-      if mdp.flag_overwrite:
+      if mdp.flag_overwrite == "True": ## check string value!
        ## -- open save file for read+write
        try:
         mdp.save_file = open(mdp.output_path + '/' + mdp.output_fname,'r+')
@@ -131,6 +131,14 @@ def make_tag_data_raw_fast(mdp,filename):
       print "Attempted to open invalid output file"
     ## -- try open output file
     for file in glob.glob(mdp.input_path):
+     # get sign which corrects for boundary condition
+     tvals = file.split('/')[-1].split('_')[3].split('t')
+     try:
+      ## flip sign if requested
+      bcsign = ((int(tvals[1])+int(tvals[2])) != (int(tvals[1])+int(tvals[2])) % mdp.corr_len)
+     except IndexError:
+      ## 2-point function
+      bcsign = False
      try:
       # open correlator file
       mdp.corr_file = open(file,'r')
@@ -140,13 +148,19 @@ def make_tag_data_raw_fast(mdp,filename):
      ## -- get tag
      ##  baryons:
      #mdp.tag = '_'+file.split('/')[-1].split('_')[1][1:]+'_r'+file.split('/')[-1].split('_')[4][-1]
-     ##  mesons:
+     ##  with time source tag
+     #mdp.tag = file.split('/')[-1].split('_')[3][:3]\
+     # +'_'+file.split('/')[-1].split('_')[1][1:]+'_'+file.split('/')[-1].split('_')[4][0]\
+     # +file.split('/')[-1].split('_')[4][3:]
+     ## no time source tag
      mdp.tag = '_'+file.split('/')[-1].split('_')[1][1:]+'_'+file.split('/')[-1].split('_')[4][0]\
-      +file.split('/')[-1].split('_')[4][-1]
+      +file.split('/')[-1].split('_')[4][3:]
      #print file,',',mdp.tag
      iter+=1
      ##endif ! flag_out_open
-     save_data_fast(mdp)
+
+     #save_data_fast(mdp)
+     save_data_fast_bc(mdp,bcsign)
      mdp.corr_file.close()
      if iter%400 == 0:
       print "file",iter
@@ -343,7 +357,7 @@ def update_params (mdp,lsp):
 
 def save_data (mdp):
  """
- -- acutally write data to save file in correct format
+ -- actually write data to save file in correct format
  -- triggered by keyword "for" at beginning of line
  """
  for num,key in zip(mdp.corr_num,mdp.key):
@@ -386,6 +400,36 @@ def save_data_fast(mdp):
    ## -- correlator not present in file, skip
    continue
   cdat = extract_data_fast(mdp,pos)  # found the correlator, save to array
+  try:                           # write it to file
+   ## -- organizing is too slow, just write to end of file
+   mdp.save_file.seek(0,2)  # seek the end of file
+   mdp.save_file.write( key + mdp.tag + '  ' + \
+    '  '.join('{:e}'.format(cdat[x]) for x in range(0,mdp.corr_len))+'\n')
+  except IndexError:
+   print "-- In file",mdp.corr_file.name
+   print "Could not extract data from file with (pos,key) = ",num,key,pos,keyList[int(num)]
+  #else:
+  # print "-- In file",mdp.corr_file.name
+  # print "Failed to find correlator #",num
+## ------
+##
+
+def save_data_fast_bc(mdp,bcsign):
+ """
+ -- same as save_data_fast, except correct boundary condition mistake
+ """
+ htSize = np.power(2,14)
+ corrTable,keyList = uf.build_corr_table(mdp.corr_file,htSize)
+ for num,key in zip(mdp.corr_num,mdp.key):
+  try:
+   pos = uf.search_corr_table(keyList[int(num)],corrTable,mdp.corr_file) # get the position in file
+  except IndexError:
+   ## -- correlator not present in file, skip
+   continue
+  cdat = extract_data_fast(mdp,pos)  # found the correlator, save to array
+  if bcsign:
+   #print "correcting sign"
+   cdat = [-x for x in cdat]
   try:                           # write it to file
    ## -- organizing is too slow, just write to end of file
    mdp.save_file.seek(0,2)  # seek the end of file

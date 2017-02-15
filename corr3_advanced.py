@@ -25,14 +25,15 @@ def retrieve_block_keys(prior, key):
     for pkey in prior:
       #print key,pkey
       if key in pkey:
-        if   pkey[3:] == 'log':
-          #print "appending key ",pkey
-          keyList.append(pkey[3:])
-        elif pkey[4:] == 'sqrt':
-          keyList.append(pkey[4:])
-        else:
-          #print "appending key ",pkey
-          keyList.append(pkey)
+        keyList.append(utf.get_basekey(key)[1])
+        #if   pkey[3:] == 'log':
+        #  #print "appending key ",pkey
+        #  keyList.append(pkey[3:])
+        #elif pkey[4:] == 'sqrt':
+        #  keyList.append(pkey[4:])
+        #else:
+        #  #print "appending key ",pkey
+        #  keyList.append(pkey)
     return sorted(keyList)
 
 class Corr2Test(BaseModel):

@@ -1,7 +1,68 @@
 import gvar as gv
 import numpy as np
+import re
 import sys
 from math import log10, floor
+
+## -- pull key name out of log() or sqrt()
+##    returns both function name and contained key
+##    if no function used, replaces function name with None
+##    fails on error if old-style key used
+def get_basekey(key):
+ regrp = re.match('(\w+)\((\w+)\)',key)
+ if regrp is None:
+  if key[:3] == 'log' or key[:4] == 'sqrt':
+   raise KeyError("Error: old-style key",key)
+  else:
+   return (None,key)
+ else:
+  return regrp.groups()
+
+## -- parse key for even/odd, or raise exception if not
+def get_evenodd(key):
+ skey = key.split('_')
+ suffix = get_basekey(skey[0])[1][-2:]
+ if suffix[0] == 'n' or suffix[0] == 'o':
+  return suffix
+ else:
+  if suffix[1] == 'n' or suffix[1] == 'o':
+   return suffix[1]
+  else:
+   raise KeyError("Key parity not specified",key)
+ 
+## -- returns key as an argument to function name
+def get_fnkey(key,fn=None):
+ if fn is None:
+  return key
+ else:
+  return fn+'('+key+')'
+
+## -- applies the function specified within key name
+def apply_fn_op(key,val):
+ bkey = get_basekey(key)
+ if bkey[0] is None:
+  return val
+ else:
+  if bkey[0] == 'log':
+   return gv.log(val)
+  elif bkey[0] == 'sqrt':
+   return gv.sqrt(val)
+  else:
+   raise KeyError("Unknown function operation:",bkey[0])
+
+## -- applies the inverse of function specified within key name
+def apply_invfn_op(key,val):
+ bkey = get_basekey(key)
+ if bkey[0] is None:
+  return val
+ else:
+  if bkey[0] == 'log':
+   return gv.exp(val)
+  elif bkey[0] == 'sqrt':
+   return val*val
+  else:
+   raise KeyError("Unknown function operation:",bkey[0])
+
 
 def round_to_n_sigdig(x,n):
   return round(x, n-1-int(floor(log10(abs(x)))))
@@ -164,26 +225,27 @@ def get_prior_dict(prior,nkey,okey,nn,no,vkey=tuple(),nn3=1,no3=1,do_v_symm=Fals
    elif (xkey in vkey):
     try:
      #for key in prior['vkey']:
-     if xkey[-2] == 'n':
+     eokey = get_evenodd(xkey)
+     if eokey[0] == 'n':
       n1=nn3
-     elif xkey[-2] == 'o':
+     elif eokey[0] == 'o':
       n1=no3
      else:
       raise ValueError("Unparseable key:",key)
-     if xkey[-1] == 'n':
+     if eokey[1] == 'n':
       n2=nn3
-     elif xkey[-1] == 'o':
+     elif eokey[1] == 'o':
       n2=no3
      else:
       raise ValueError("Unparseable key:",key)
      #rprior[key][xkey] = np.resize(prior[key][xkey],(n1,n2))
-     if do_v_symm and (xkey[-2:] == 'nn' or xkey[-2:] == 'oo'):
+     if do_v_symm and (eokey == 'nn' or eokey == 'oo'):
       #rprior[key][xkey] = prior[key][xkey][:(n1*(n1+1)/2)] ## -- outdated
       try:
        rprior[key][xkey] = truncate_upper_triangle(prior[key][xkey],n1)
       except:
        rprior[key][xkey] = prior[key][xkey]
-     elif do_v_symm and (xkey[-2:] == 'on'):
+     elif do_v_symm and (eokey == 'on'):
       continue ## -- use priors for 'no' instead
       #rprior[key][xkey] = prior[key][xkey][:(n1*(n1+1)/2)]
      else:
@@ -269,14 +331,16 @@ def retrieve_block_keys(prior, key):
     for pkey in prior:
       #print key,pkey
       if key in pkey:
-        if   pkey[3:] == 'log':
-          #print "appending key ",pkey
-          keyList.append(pkey[3:])
-        elif pkey[4:] == 'sqrt':
-          keyList.append(pkey[4:])
-        else:
-          #print "appending key ",pkey
-          keyList.append(pkey)
+        keyList.append(get_basekey(key)[1])
+        #xkey = get_basekey(key)
+        #if   xkey[0] == 'log':
+        #  #print "appending key ",pkey
+        #  keyList.append(xkey[1])
+        #elif xkey[0] == 'sqrt':
+        #  keyList.append(xkey[1])
+        #else:
+        #  #print "appending key ",pkey
+        #  keyList.append(pkey)
     return sorted(keyList)
 
 ## -- reconstruct spectrum from advanced dictionary
@@ -288,9 +352,10 @@ def retrieve_spectrum_advanced(dict):
  rval = {}
  for key in dict:
   skey = key.split('_')
+  bkey = get_basekey(skey[0])
+  if not(bkey[0] is None):
+   continue
   if skey[0][-2:] == 'En' or skey[0][-2:] == 'Eo':
-   if skey[0][:3] == 'log' or skey[0][:4] == 'sqrt':
-    continue
    ## -- keep a dictionary of prefixes and blocks for energies
    if skey[0] in klst:
     klst[skey[0]].append(skey[1])
@@ -319,11 +384,8 @@ def retrieve_spectrum_advanced(dict):
 def fold_data(dat,antisym=False):
  sg = (-1 if antisym else 1)
  lt = len(dat)
- #rval = np.array((np.array(dat[1:lt/2]) + sg*np.array(dat[lt/2+1:lt]))/2.)
  rval = np.array((np.array(dat[1:lt/2]) + sg*np.array(dat[lt-1:lt/2:-1]))/2.)
  rval = np.append(rval,dat[lt/2])
- #rval = np.hstack((np.array([dat[0]]),rval))
- #rval = np.insert(rval,0,dat[0],axis=0)
  rval = np.insert(list(rval),0,dat[0])
  return rval
  #return np.insert(np.append(rval,dat[lt/2]),0,dat[0])

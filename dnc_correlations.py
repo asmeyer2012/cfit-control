@@ -1,6 +1,9 @@
+import copy
+import itertools
 import numpy as np
 import gvar as gv
 import manipulate_dataset as md
+from multiprocessing import Pool
 
 #pi0:~simone/python/minFit/Zvqq/new-Zvqq.py
 # # intersection of config id
@@ -40,10 +43,13 @@ def compute_correlation_pair(dset,pfix1,pfix2):
  ##    a pair of prefixes is used, output averaged dataset is returned
  isect = get_intersect(dset,pfix1,pfix2)
  tdat0 = gv.dataset.Dataset()
+ print "starting correlations ",pfix1,pfix2
  for key in dset:
   skey = key.split('_')
   if skey[0] == pfix1:
    tdat0[key] = md.average_tag_fn(dset[key]) ## keep suffix
+   #print key
+   #print tdat0[key]
  if pfix1 != pfix2:
   for key in dset:
    skey = key.split('_')
@@ -57,7 +63,15 @@ def compute_correlation_pair(dset,pfix1,pfix2):
   for key in isect:
    tdat1.append(pfix1,tdat0[pfix1+'_'+key][0])
    tdat1.append(pfix2,tdat0[pfix2+'_'+key][0])
+ #print tdat1.keys()
+ #print len(tdat1[pfix1])
+ #raise ValueError("test")
+ #print "starting avg_data"
+ #testout = gv.dataset.avg_data(tdat1)
+ #print "ending   avg_data"
+ #return testout
  return gv.dataset.avg_data(tdat1)
+
  #tdat1[pfix1] = []
  #tdat1[pfix2] = []
  #for key in isect:
@@ -99,3 +113,55 @@ def divide_and_conquer_correlations(dset):
  ## -- add correlations and return
  rdat = gv.correlate(rdat,call)
  return rdat
+
+## map_async will only take single argument functions, so inputs must be provided as tuples
+def compute_diagonal((dset,key)):
+ print "diagonal key ",key
+ tdat = compute_correlation_pair(dset,key,key)
+ return (key,gv.mean(tdat[key]),gv.sdev(tdat[key]),gv.evalcorr(tdat)[key,key])
+
+def compute_offdiagonal((dset,key1,key2)):
+ print "off-diagonal key ",(key1,key2)
+ tdat = compute_correlation_pair(dset,key1,key2)
+ return (key1,key2,gv.evalcorr(tdat)[key1,key2])
+
+maxProcesses=6
+def divide_and_conquer_parallel(dset):
+ ## -- split up correlations into multiple small datasets and average each small set
+ ##    take correlations of small sets and stitch them together
+ ##    computations of small sets done in parallel
+ ##    assumes all keys in dset take form '<correlator key>_<series configuration>'
+ pflst = []
+ pool = Pool(processes=maxProcesses)
+ ## -- create a list of prefixes
+ for key in dset:
+  skey = key.split('_')
+  if not(skey[0] in pflst):
+   pflst.append(skey[0])
+  #if len(pflst) > 1:
+  # break
+ 
+ rdat = gv.BufferDict()
+ call = {}
+ # ## -- handled separately because there may be more configurations in full sample
+ print "computing diagonal"
+ mapout = pool.map(compute_diagonal,zip([dset for x in pflst],pflst))
+ print "done computing diagonal"
+ for val in mapout:
+  rdat[val[0]] = gv.gvar(val[1],val[2])
+  call[val[0],val[0]] = val[3]
+
+ idx = np.triu_indices(len(pflst),1)
+ print "computing off-diagonal"
+ mapout = pool.map(compute_offdiagonal,
+  zip([dset for x in idx[0]],[pflst[t] for t in idx[0]],[pflst[t] for t in idx[1]]))
+ print "done computing off-diagonal"
+ pool.close()
+ pool.join()
+ for val in mapout:
+  call[val[0],val[1]] = val[2]
+  call[val[1],val[0]] = np.transpose(val[2])
+ ## -- add correlations and return
+ rdat = gv.correlate(rdat,call)
+ return rdat
+ #return gv.BufferDict()

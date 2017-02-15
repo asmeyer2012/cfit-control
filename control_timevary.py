@@ -52,7 +52,8 @@ def doProcess(tmin,tmax,data=data,mdef=mdef):
    try:
     p0={}
     for key in df.define_init:
-     if key[-1] == 'o':
+     eokey = utf.get_evenodd(key)
+     if eokey == 'o':
       p0[key] = df.define_init[key][:df.num_ost]
      else:
       p0[key] = df.define_init[key][:df.num_nst]

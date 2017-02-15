@@ -15,36 +15,39 @@ import time
 ## -- raw correlator file input
 strtime = time.time()
 print "start time: ",strtime
-print "starting tag a4s..."
-make_tag_data(df.mdp,filename="import-files/import-tag-a4s")
+#print "starting tag a4s..."
+#make_tag_data(df.mdp,filename="import-files/import-tag-a4s")
 print "starting tag axax..."
 #make_tag_data(df.mdp,filename="import-files/import-tag-axax")
-print "starting tag axp..."
-make_tag_data(df.mdp,filename="import-files/import-tag-axp")
-print "starting tag axv4..."
-make_tag_data(df.mdp,filename="import-files/import-tag-axv4")
+make_tag_data(df.mdp,filename="import-files/import-tag-test-phys-axax")
+#print "starting tag axp..."
+#make_tag_data(df.mdp,filename="import-files/import-tag-axp")
+#print "starting tag axv4..."
+#make_tag_data(df.mdp,filename="import-files/import-tag-axv4")
 print "starting tag ayay..."
-make_tag_data(df.mdp,filename="import-files/import-tag-ayay")
-print "starting tag ayp..."
-make_tag_data(df.mdp,filename="import-files/import-tag-ayp")
-print "starting tag ayv4..."
-make_tag_data(df.mdp,filename="import-files/import-tag-ayv4")
+#make_tag_data(df.mdp,filename="import-files/import-tag-ayay")
+make_tag_data(df.mdp,filename="import-files/import-tag-test-phys-ayay")
+#print "starting tag ayp..."
+#make_tag_data(df.mdp,filename="import-files/import-tag-ayp")
+#print "starting tag ayv4..."
+#make_tag_data(df.mdp,filename="import-files/import-tag-ayv4")
 print "starting tag azaz..."
-make_tag_data(df.mdp,filename="import-files/import-tag-azaz")
-print "starting tag azp..."
-make_tag_data(df.mdp,filename="import-files/import-tag-azp")
-print "starting tag azv4..."
-make_tag_data(df.mdp,filename="import-files/import-tag-azv4")
-print "starting tag ss..."
-make_tag_data(df.mdp,filename="import-files/import-tag-ss")
-print "starting tag v4v4..."
-#make_tag_data(df.mdp,filename="import-files/import-tag-v4v4")
-print "starting tag vxvx..."
-make_tag_data(df.mdp,filename="import-files/import-tag-vxvx")
-print "starting tag vyvy..."
-make_tag_data(df.mdp,filename="import-files/import-tag-vyvy")
-print "starting tag vzvz..."
-make_tag_data(df.mdp,filename="import-files/import-tag-vzvz")
+#make_tag_data(df.mdp,filename="import-files/import-tag-azaz")
+make_tag_data(df.mdp,filename="import-files/import-tag-test-phys-azaz")
+#print "starting tag azp..."
+#make_tag_data(df.mdp,filename="import-files/import-tag-azp")
+#print "starting tag azv4..."
+#make_tag_data(df.mdp,filename="import-files/import-tag-azv4")
+#print "starting tag ss..."
+#make_tag_data(df.mdp,filename="import-files/import-tag-ss")
+#print "starting tag v4v4..."
+##make_tag_data(df.mdp,filename="import-files/import-tag-v4v4")
+#print "starting tag vxvx..."
+#make_tag_data(df.mdp,filename="import-files/import-tag-vxvx")
+#print "starting tag vyvy..."
+#make_tag_data(df.mdp,filename="import-files/import-tag-vyvy")
+#print "starting tag vzvz..."
+#make_tag_data(df.mdp,filename="import-files/import-tag-vzvz")
 endtime = time.time()
 print "start time: ",strtime
 print "  end time: ",endtime

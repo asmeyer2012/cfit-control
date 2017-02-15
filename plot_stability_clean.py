@@ -80,7 +80,8 @@ def plot_stability(fit_collector,**kwargs):
    for key in fit_collector[tkey]:
     sum=0
     it=0 #iterator, decides on nucleon vs delta vs unknown
-    if key[:2] == 'En' and not(key[3:] == 'log'):
+    bkey = utf.get_basekey(key)
+    if bkey[1][-2:] == 'En' and (bkey[0] is None):
      for x in fit_collector[tkey][key]:
       sum += x.mean
       hValDatn[mark_nst[it]].append(fitCount+0.5-parity_offset)
@@ -90,7 +91,7 @@ def plot_stability(fit_collector,**kwargs):
       if it > max_nst-1:
        break
        pass
-    elif key[:2] == 'Eo' and not(key[3:] == 'log'):
+    elif bkey[1][-2:] == 'Eo' and (bkey[0] is None):
      for x in fit_collector[tkey][key]:
       sum += x.mean
       hValDato[mark_ost[it]].append(fitCount+0.5+parity_offset)
