@@ -220,7 +220,8 @@ def create_prior_dict(nkey,okey):
   rprior[key] = []
  return rprior
 
-def get_prior_dict(prior,nkey,okey,nn,no,vkey=tuple(),nn3=1,no3=1,do_v_symm=False):
+def get_prior_dict(prior,nkey,okey,nn,no,vkey=tuple(),nn3=1,no3=1,
+   do_v_symm=False,do_amp_prior=True):
  """
  Get a prior dictionary which has many states in it and extract only
  the first nn+no states
@@ -238,6 +239,9 @@ def get_prior_dict(prior,nkey,okey,nn,no,vkey=tuple(),nn3=1,no3=1,do_v_symm=Fals
    continue
   rprior[key] = {}
   for xkey in prior[key]:
+   bkey = get_basekey(xkey)
+   if not(do_amp_prior) and not( bkey[1] == 'En' or bkey[1] == 'Eo' ):
+    continue
    if (xkey in nkey):
     rprior[key][xkey] = prior[key][xkey][:nn]
    elif (xkey in okey):
@@ -274,6 +278,8 @@ def get_prior_dict(prior,nkey,okey,nn,no,vkey=tuple(),nn3=1,no3=1,do_v_symm=Fals
        raise ValueError("Not enough prior states to fill prior dictionary")
     except KeyError:
      pass # probably 2-point function
+  #print 'new prior:'
+  #print rprior[key].keys()
  return rprior
 
 def append_prior_state(prior,lkey,lgvar):

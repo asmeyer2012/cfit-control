@@ -55,7 +55,7 @@ def make_prior_stacked_3pt(models,prior_dict=None,nst=-1,ost=-1,n3st=-1,o3st=-1)
 
  return prior
 
-def make_prior_3pt(models,prior_dict=None,nst=-1,ost=-1,n3st=-1,o3st=-1):
+def make_prior_3pt(models,prior_dict=None,nst=-1,ost=-1,n3st=-1,o3st=-1,do_amp_prior=True):
  prior = gv.BufferDict()
  
  for model in models:
@@ -65,11 +65,13 @@ def make_prior_3pt(models,prior_dict=None,nst=-1,ost=-1,n3st=-1,o3st=-1):
    if (nst > -1 and ost > -1):
     dprior = utf.get_prior_dict(df.define_prior_3pt,
      df.define_prior_3pt['nkey'],df.define_prior_3pt['okey'],nst,ost,
-     df.define_prior_3pt['vkey'],n3st,o3st,df.do_v_symmetric)
+     df.define_prior_3pt['vkey'],n3st,o3st,
+     do_v_symm=df.do_v_symmetric,do_amp_prior=df.do_amp_prior)
    else:
     dprior = utf.get_prior_dict(df.define_prior_3pt,
      df.define_prior_3pt['nkey'],df.define_prior_3pt['okey'],df.num_nst,df.num_ost,
-     df.define_prior_3pt['vkey'],df.num_nst_3pt,df.num_ost_3pt,df.do_v_symmetric)
+     df.define_prior_3pt['vkey'],df.num_nst_3pt,df.num_ost_3pt,
+     do_v_symm=df.do_v_symmetric,do_amp_prior=df.do_amp_prior)
    for pkey in dprior[skey]:
     prior[pkey]=dprior[skey][pkey]
 

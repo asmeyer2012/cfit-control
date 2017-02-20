@@ -4,7 +4,7 @@ import defines as df
 import define_prior as dfp
 import util_funcs as utf
 
-def make_prior(models,prior_dict=None,nst=-1,ost=-1):
+def make_prior(models,prior_dict=None,nst=-1,ost=-1,do_amp_prior=True):
  prior = gv.BufferDict()
  
  for model in models:
@@ -13,10 +13,11 @@ def make_prior(models,prior_dict=None,nst=-1,ost=-1):
   if prior_dict is None: ## -- take default from defines
    if (nst > -1 and ost > -1):
     dprior = utf.get_prior_dict(df.define_prior,
-     df.define_prior['nkey'],df.define_prior['okey'],nst,ost)
+     df.define_prior['nkey'],df.define_prior['okey'],nst,ost,do_amp_prior=do_amp_prior)
    else:
     dprior = utf.get_prior_dict(df.define_prior,
-     df.define_prior['nkey'],df.define_prior['okey'],df.num_nst,df.num_ost)
+     df.define_prior['nkey'],df.define_prior['okey'],df.num_nst,df.num_ost,
+      do_amp_prior=do_amp_prior)
    for pkey in dprior[skey]:
     prior[pkey]=dprior[skey][pkey]
 

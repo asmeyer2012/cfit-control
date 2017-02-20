@@ -111,8 +111,8 @@ else:
   
 models2 = make_models    (data=dall,lkey=df.lkey)
 models3 = make_models_3pt(data=dall,lkey=df.lkey3)
-priors2 = make_prior    (models2)
-priors3 = make_prior_3pt(models3)
+priors2 = make_prior    (models2,do_amp_prior=df.do_amp_prior)
+priors3 = make_prior_3pt(models3,do_amp_prior=df.do_amp_prior)
 
 models = list()
 for model in models2:
