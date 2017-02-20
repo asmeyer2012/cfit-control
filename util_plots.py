@@ -2,6 +2,7 @@ import numpy as np
 import gvar as gv
 import lsqfit as lsf
 import util_funcs as utf
+import copy as cp
 
 do_v_symm = True
 
@@ -13,7 +14,7 @@ def get_option(key,default,**kwargs):
 
 def create_fit_func(model,fit):
  try:
-  tfp = fit.transformed_p
+  tfp = fit.p
  except AttributeError:
   ## -- prior was input instead
   tfp = fit
@@ -128,7 +129,7 @@ pass
 
 def create_fit_func_3pt(model,fit):
  try:
-  tfp = fit.transformed_p
+  tfp = fit.p
  except AttributeError:
   ## -- prior was input instead
   tfp = fit
@@ -365,17 +366,17 @@ def mask_fit_fcn(model,fit,req=[list(),list()],invert=False):
     return 0
   return fitfcn
  try:
-  tmp = fit.transformed_p.copy()
+  tmp = cp.copy(fit.p)
  except AttributeError:
   ## -- prior was input
-  tmp = fit.copy()
+  tmp = cp.copy(fit)
  pass
  ## -- get the key prefixes of the sink overlaps
  (bnp,bop) = model.b
 
  ## -- if inverted, get rid of requested states, else keep them
  if not(invert):
-  tmp0 = tmp.copy()
+  tmp0 = cp.copy(tmp)
  for j in req[0]:
   tmp[bnp][j] = 0
  for j in req[1]:
@@ -405,10 +406,10 @@ def mask_fit_fcn_adv(model,fit,req=[list(),list()],invert=False):
     return 0
   return fitfcn
  try:
-  tmp = fit.transformed_p.copy()
+  tmp = cp.copy(fit.transformed_p)
  except AttributeError:
   ## -- prior was input
-  tmp = fit.copy()
+  tmp = cp.copy(fit)
  pass
  ## -- get the key prefixes of the sink overlaps
  (bnp,bop) = model.b
@@ -434,7 +435,7 @@ def mask_fit_fcn_adv(model,fit,req=[list(),list()],invert=False):
 
  ## -- if inverted, get rid of requested states, else keep them
  if not(invert):
-  tmp0 = tmp.copy()
+  tmp0 = cp.copy(tmp)
  for i in req[0]:
   #print "inverted: reject even state ",bnp,i,enall[i]
   tmp[bnp+'_'+str(enall[i][0])][enall[i][1]] = 0

@@ -103,7 +103,9 @@ if df.do_irrep == "16":
 
 ## -- consolidated all loading into a single file:
 if df.do_mock:
- dall,truth = generate_mock_data('mock8m.0')
+ dall,truth = generate_mock_data('mock8m.2')
+ if df.do_3pt:
+  raise ValueError("mock data studies for 3pt not yet coded!")
 else:
  dall = standard_load(taglist,filekey,argsin)
   
@@ -128,8 +130,14 @@ if df.do_init2:
   init2={}
   if argsin['override_init']:
    try:
-    init2 = make_init_from_fit_file_3pt(models2,'fit_dict'+irrepStr+'_2pt.py')
-    print "loaded initial values from file: ",'fit_dict'+irrepStr+'_2pt.py'
+    if df.do_mock:
+     truth_file = 'truth_out'
+     init2 = make_init_from_fit_file_3pt(models2,truth_file,
+      fresh_overlap=False,fresh_amplitude=True)
+     print "loaded mock truth values from file: ",truth_file
+    else:
+     init2 = make_init_from_fit_file_3pt(models2,'fit_dict'+irrepStr+'_2pt.py')
+     print "loaded initial values from file: ",'fit_dict'+irrepStr+'_2pt.py'
    except:
     init2 = None
     print "could not load 2-point function initial values"
@@ -234,18 +242,17 @@ if df.do_3pt:
  print "starting 3pt fit..."
  #print priors
  fit3 = fitter3.lsqfit(data=dall,prior=priors,p0=init3,svdcut=df.svdcut)
+ print fmt_reduced_chi2(fit3,df.do_v_symmetric)
+ print_fit(fit3,priors,df.do_v_symmetric)
 else:
  print "Ignoring 3pt fit!"
  fit3=None
 
-#fit3 = fitter3.lsqfit(data=dall,prior=priors,svdcut=df.svdcut)
-print fmt_reduced_chi2(fit3,df.do_v_symmetric)
 #save_data('./test.fit.out',fit,dall)
 
 ## -- print
 #if df.do_2pt:
 # print_fit(fit2,priors2)
-print_fit(fit3,priors,df.do_v_symmetric)
 
 ## -- save fit as an initial value dictionary
 if df.do_2pt:
@@ -267,58 +274,41 @@ if df.do_3pt:
 #  ## -- 2pt
 #  pass
 
-np.set_printoptions(precision=3,linewidth=100)
-elst = []
-for key in sorted(fit3.p):
- #if key[:2] == 'En' or key[:2] == 'Eo':
- tkey = utf.get_basekey(key)
- if (tkey[0] is None) and (tkey[1][-2:] == 'En' or tkey[1][-2:] == 'Eo'):
-  for e in fit3.p[key]:
-   elst.append(e)
-cor = gv.evalcorr(elst)
-evl,evc = gv.linalg.eigvalsh(cor,True)
-chol = np.linalg.cholesky(cor).T
-print 'correlation E:'
-print gv.evalcorr(elst)
-print 'eigenvalues:'
-print evl
-print 'eigenvectors:'
-print evc
-print 'cholesky:'
-print chol
+#np.set_printoptions(precision=3,linewidth=100)
+#elst = []
+#for key in sorted(fit3.p):
+# #if key[:2] == 'En' or key[:2] == 'Eo':
+# tkey = utf.get_basekey(key)
+# if (tkey[0] is None) and (tkey[1][-2:] == 'En' or tkey[1][-2:] == 'Eo'):
+#  for e in fit3.p[key]:
+#   elst.append(e)
+#cor = gv.evalcorr(elst)
+#evl,evc = gv.linalg.eigvalsh(cor,True)
+#chol = np.linalg.cholesky(cor).T
+#print 'correlation E:'
+#print gv.evalcorr(elst)
+#print 'eigenvalues:'
+#print evl
+#print 'eigenvectors:'
+#print evc
+#print 'cholesky:'
+#print chol
 
 ## -- plot
 if df.do_plot or argsin['override_plot']:
  ##plot_corr_effective_mass_check(models2,dall,None,**df.fitargs)
  ##plot_corr_effective_mass(models2,dall,None,**df.fitargs)
- #plot_corr_effective_mass(models2,dall,fit3,**df.fitargs)
- #plot_corr_effective_mass(models2,dall,fit3,req=[[0],list()],**df.fitargs)
- #plot_corr_effective_mass(models2,dall,fit3,req=[[0,1],list()],**df.fitargs)
- #plot_corr_effective_mass(models2,dall,fit3,req=[list(),[0]],**df.fitargs)
- #plot_corr_effective_mass(models2,dall,fit3,req=[list(),[1]],**df.fitargs)
- #plot_corr_effective_mass(models2,dall,fit3,req=[list(),[2]],**df.fitargs)
- #plot_corr_effective_mass(models2,dall,fit3,req=[list(),[0,1,2]],**df.fitargs)
- ##plot_corr_effective_mass(models2,dall,fit3,req=[[2],list()],**df.fitargs)
- #plot_corr_effective_mass(models2,dall,fit3,req=[list(),[0]],**df.fitargs)
- ##plot_corr_double_log(models2,dall,fit3,**df.fitargs)
- ##plot_corr_double_log_folded(models2,dall,fit3,**df.fitargs)
- #plot_corr_double_log_folded(models2,dall,fit3,**df.fitargs)
- #plot_corr_double_log_folded(models2,dall,fit3,req=[[0],list()],**df.fitargs)
- #plot_corr_double_log_folded(models2,dall,fit3,req=[[0,1],list()],**df.fitargs)
- #plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[0]],**df.fitargs)
- #plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[1]],**df.fitargs)
- #plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[2]],**df.fitargs)
- #plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[0,1,2]],**df.fitargs)
- ##plot_corr_double_log_folded(models2,dall,fit3,req=[[2],list()],**df.fitargs)
- #plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[0]],**df.fitargs)
- ###plot_corr_double_log_folded(models2,dall,fit3,req=[list(),[1]],**df.fitargs)
- ##plot_corr_normalized(models2,dall,fit3,**df.fitargs)
- ##if df.do_3pt:
- ## plot_corr_3pt(models3,dall,fit3,**df.fitargs)
- plot_corr_adv_stacked_3pt(models3,dall,fit3,**df.fitargs)
- #plot_corr_adv_stacked_3pt(models3,dall,fit3,req=[[0],list()],**df.fitargs)
- #plot_corr_adv_stacked_3pt(models3,dall,fit3,req=[[1],list()],**df.fitargs)
- #plot_corr_adv_stacked_3pt(models3,dall,fit3,req=[list(),[0,1]],**df.fitargs)
+ if df.do_3pt:
+  #plot_corr_effective_mass(models2,dall,fit3,**df.fitargs)
+  #plot_corr_effective_mass(models2,dall,fit3,req=[[0],list()],**df.fitargs)
+  #plot_corr_double_log(models2,dall,fit3,**df.fitargs) ## no longer defined in this file
+  #plot_corr_double_log_folded(models2,dall,fit3,**df.fitargs)
+  #plot_corr_double_log_folded(models2,dall,fit3,req=[[0],list()],**df.fitargs)
+  #plot_corr_normalized(models2,dall,fit3,**df.fitargs)
+  #plot_corr_3pt(models3,dall,fit3,**df.fitargs)
+  #plot_corr_adv_stacked_3pt(models3,dall,fit3,**df.fitargs)
+  #plot_corr_adv_stacked_3pt(models3,dall,fit3,req=[[0],list()],**df.fitargs)
+  pass
  if df.do_plot_terminal:
   plt.show()
 

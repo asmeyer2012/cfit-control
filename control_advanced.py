@@ -10,7 +10,7 @@ from make_models_3pt          import make_models_3pt,make_models_advanced
 from make_prior               import make_prior
 from make_prior_3pt           import make_prior_3pt
 #from make_prior_advanced      import make_prior_advanced
-from make_prior_advanced      import truncate_prior_states
+from make_prior_advanced      import truncate_prior_states,truncate_prior_states_2pt
 from make_bootstrap           import make_bootstrap
 from manipulate_dataset       import *
 from print_results            import fmt_reduced_chi2
@@ -108,69 +108,70 @@ models3 = make_models_advanced(data=dall,lkey=df.lkey3)
 priors2 = make_prior    (models2)
 priors3 = make_prior_3pt(models3)
 priorsa = df.define_prior_adv
-np.set_printoptions(precision=4,linewidth=100)
-d1 = {}
-d1['en0'] = list()
-d1['enc'] = list() 
-d1['enb'] = list()
-d1['ens'] = list()
-d1['enr'] = list()
-d1['eo0'] = list()
-d1['eoc'] = list() 
-d1['eob'] = list()
-d1['eos'] = list()
-d1['eor'] = list()
-for i in range(6):
- try:
-  d1['en0'].append(gv.mean(gv.exp(priorsa['logEn_'+str(i)][0])))
-  d1['enc'].append(gv.mean(gv.exp(priorsa['logEn_'+str(i)])))
-  d1['enc'][-1][0] = 0
-  d1['enb'].append(gv.mean(gv.exp(priorsa['logEn_'+str(i)])))
-  d1['ens'].append(gv.sdev(gv.exp(priorsa['logEn_'+str(i)])))
-  d1['enr'].append(gv.sdev(gv.exp(priorsa['logEn_'+str(i)]))\
-   /gv.mean(gv.exp(priorsa['logEn_'+str(i)])))
- except KeyError:
-  pass
- try:
-  d1['eo0'].append(gv.mean(gv.exp(priorsa['logEo_'+str(i)][0])))
-  d1['eoc'].append(gv.mean(gv.exp(priorsa['logEo_'+str(i)])))
-  d1['eoc'][-1][0] = 0
-  d1['eob'].append(gv.mean(gv.exp(priorsa['logEo_'+str(i)])))
-  d1['eos'].append(gv.sdev(gv.exp(priorsa['logEo_'+str(i)])))
-  d1['eor'].append(gv.sdev(gv.exp(priorsa['logEo_'+str(i)]))\
-   /gv.mean(gv.exp(priorsa['logEo_'+str(i)])))
- except KeyError:
-  continue
 
-conv = .197/.15
-f = open('s'+irrepStr+'.aprior','w')
-#for i,x,y in enumerate(zip(np.array(d1).T,np.array(d2).T)):
-f.write('#i block taste sumE dE sigE sumE[GeV] dE[GeV] sigE[GeV] sigE/dE \n')
-f.write('#even\n')
-k = 0
-for i,(e0,ec,eb,es,er) in enumerate(zip(np.cumsum(d1['en0']),\
-  d1['enc'],d1['enb'],d1['ens'],d1['enr'])):
- for j,(ecx,ebx,esx,erx) in enumerate(zip(e0+np.cumsum(ec),eb,es,er)):
-  #f.write( str(i)+' '+str(j)+' '+str(ecx)+' '+str(ebx)+' '+str(esx)+' '+str(erx)+'\n' )
-  #f.write('%d %d %d %1.3f %1.3f %1.3f %1.3f \n' % (k, i, j, ecx, ebx, esx, erx))
-  f.write('%d %d %d %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f\n' %\
-   (k, i, j, ecx, ebx, esx, conv*ecx, conv*ebx, conv*esx, erx))
-  k+=1
-f.write('#odd\n')
-k = 0
-for i,(e0,ec,eb,es,er) in enumerate(zip(np.cumsum(d1['eo0']),\
-  d1['eoc'],d1['eob'],d1['eos'],d1['eor'])):
- for j,(ecx,ebx,esx,erx) in enumerate(zip(e0+np.cumsum(ec),eb,es,er)):
-  #f.write( str(i)+' '+str(j)+' '+str(ecx)+' '+str(ebx)+' '+str(esx)+' '+str(erx)+'\n' )
-  f.write('%d %d %d %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f \n' %\
-   (k, i, j, ecx, ebx, esx, conv*ecx, conv*ebx, conv*esx, erx))
-  k+=1
-f.close()
+## for writing priors to file
+#np.set_printoptions(precision=4,linewidth=100)
+#d1 = {}
+#d1['en0'] = list()
+#d1['enc'] = list() 
+#d1['enb'] = list()
+#d1['ens'] = list()
+#d1['enr'] = list()
+#d1['eo0'] = list()
+#d1['eoc'] = list() 
+#d1['eob'] = list()
+#d1['eos'] = list()
+#d1['eor'] = list()
+#for i in range(6):
+# try:
+#  d1['en0'].append(gv.mean(gv.exp(priorsa['logEn_'+str(i)][0])))
+#  d1['enc'].append(gv.mean(gv.exp(priorsa['logEn_'+str(i)])))
+#  d1['enc'][-1][0] = 0
+#  d1['enb'].append(gv.mean(gv.exp(priorsa['logEn_'+str(i)])))
+#  d1['ens'].append(gv.sdev(gv.exp(priorsa['logEn_'+str(i)])))
+#  d1['enr'].append(gv.sdev(gv.exp(priorsa['logEn_'+str(i)]))\
+#   /gv.mean(gv.exp(priorsa['logEn_'+str(i)])))
+# except KeyError:
+#  pass
+# try:
+#  d1['eo0'].append(gv.mean(gv.exp(priorsa['logEo_'+str(i)][0])))
+#  d1['eoc'].append(gv.mean(gv.exp(priorsa['logEo_'+str(i)])))
+#  d1['eoc'][-1][0] = 0
+#  d1['eob'].append(gv.mean(gv.exp(priorsa['logEo_'+str(i)])))
+#  d1['eos'].append(gv.sdev(gv.exp(priorsa['logEo_'+str(i)])))
+#  d1['eor'].append(gv.sdev(gv.exp(priorsa['logEo_'+str(i)]))\
+#   /gv.mean(gv.exp(priorsa['logEo_'+str(i)])))
+# except KeyError:
+#  continue
 
-raise ValueError('test')
+#conv = .197/.15
+#f = open('s'+irrepStr+'.aprior','w')
+##for i,x,y in enumerate(zip(np.array(d1).T,np.array(d2).T)):
+#f.write('#i block taste sumE dE sigE sumE[GeV] dE[GeV] sigE[GeV] sigE/dE \n')
+#f.write('#even\n')
+#k = 0
+#for i,(e0,ec,eb,es,er) in enumerate(zip(np.cumsum(d1['en0']),\
+#  d1['enc'],d1['enb'],d1['ens'],d1['enr'])):
+# for j,(ecx,ebx,esx,erx) in enumerate(zip(e0+np.cumsum(ec),eb,es,er)):
+#  #f.write( str(i)+' '+str(j)+' '+str(ecx)+' '+str(ebx)+' '+str(esx)+' '+str(erx)+'\n' )
+#  #f.write('%d %d %d %1.3f %1.3f %1.3f %1.3f \n' % (k, i, j, ecx, ebx, esx, erx))
+#  f.write('%d %d %d %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f\n' %\
+#   (k, i, j, ecx, ebx, esx, conv*ecx, conv*ebx, conv*esx, erx))
+#  k+=1
+#f.write('#odd\n')
+#k = 0
+#for i,(e0,ec,eb,es,er) in enumerate(zip(np.cumsum(d1['eo0']),\
+#  d1['eoc'],d1['eob'],d1['eos'],d1['eor'])):
+# for j,(ecx,ebx,esx,erx) in enumerate(zip(e0+np.cumsum(ec),eb,es,er)):
+#  #f.write( str(i)+' '+str(j)+' '+str(ecx)+' '+str(ebx)+' '+str(esx)+' '+str(erx)+'\n' )
+#  f.write('%d %d %d %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f %1.3f \n' %\
+#   (k, i, j, ecx, ebx, esx, conv*ecx, conv*ebx, conv*esx, erx))
+#  k+=1
+#f.close()
+
+priorsa2 = truncate_prior_states_2pt(df.define_prior_adv,df.num_nst,df.num_ost)
 priorsa = truncate_prior_states(df.define_prior_adv,
  df.num_nst,df.num_ost,df.num_nst_3pt,df.num_ost_3pt)
-#raise ValueError('test')
 
 models = list()
 for model in models2:
@@ -178,8 +179,8 @@ for model in models2:
 for model in models3:
  models.append(model)
 priors = gv.BufferDict()
-for key in priors2:
- priors[key] = priors2[key]
+for key in priorsa2:
+ priors[key] = priorsa2[key]
 #for key in priors3:
 # if key in priors2:
 #  continue
@@ -212,8 +213,7 @@ pass
 ## -- temporary
 init2=None
 #init3=None
-print init3
-
+#print init3
 
 fitter2 = CorrFitter(models=models2,maxit=df.maxit)
 fitter3 = CorrFitter(models=models,maxit=df.maxit)
@@ -230,9 +230,9 @@ for key in sorted(priors):
 print
 if df.do_2pt:
  print "starting 2pt fit..."
- fit2 = fitter2.lsqfit(data=dall,prior=priors2,p0=init2,svdcut=df.svdcut)
+ fit2 = fitter2.lsqfit(data=dall,prior=priorsa2,p0=init2,svdcut=df.svdcut)
  ## -- fits take a long time, so print prematurely
- print_fit(fit2,priors2)
+ print_fit(fit2,priorsa2)
 if df.do_3pt:
  print "starting 3pt fit..."
  #print 'init',init3

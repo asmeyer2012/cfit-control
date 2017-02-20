@@ -8,6 +8,7 @@ import gvar as _gvar
 import lsqfit
 import numpy
 import random
+import util_funcs as utf
 from corrfitter import BaseModel
 #from corrfitter.BaseModel import basekey ## -- not implemented in current version!
 import time
@@ -25,7 +26,11 @@ def retrieve_block_keys(prior, key):
     for pkey in prior:
       #print key,pkey
       if key in pkey:
-        keyList.append(utf.get_basekey(key)[1])
+        #keyList.append(utf.get_basekey(key)[1]) ## first attempt
+        print 'pkey',pkey
+        skey = pkey.split('_')
+        print 'skey',skey
+        keyList.append(utf.get_basekey(skey[0])[1] +'_' + '_'.join(skey[1:]))
         #if   pkey[3:] == 'log':
         #  #print "appending key ",pkey
         #  keyList.append(pkey[3:])
@@ -602,18 +607,23 @@ class Corr2Adv(BaseModel):
         if nterm is None:
             nterm = (None, None)
 
+        print "buildprior prior",prior
+
         ## -- truncate priors based on number of energies available
         ntermx = [[],[]] ## -- store number of terms in each block
         #nidxx  = [[],[]] ## -- store indices of blocks being used
         for i in range(2):
             dEi = self.dE[i]
             ekl = retrieve_block_keys(prior,dEi)
-            #print ekl
+            print "block keys",dEi,"->",ekl
             self.esufx.append([])
             for eik in ekl:
-              eik = self._priorkey(prior,eik) ## -- this will change when gvar updated
-              #print 'prior',prior
-              #print 'test',len(prior[eik]),eik,prior[eik]
+              #eik = self._priorkey(prior,eik) ## -- this will change when gvar updated
+              #eik = self._priorkey(prior,eik) ## -- this will change when gvar updated
+              pk = utf.get_basekey(eik,do_adv=True) ##TODO here
+              eik = ''.join(pk[1:])
+              print pk,eik
+              print prior
               if prior[eik] is None:
                continue
               ntermx[i].append(len(prior[eik]))
@@ -629,7 +639,10 @@ class Corr2Adv(BaseModel):
                  if prior[xk] is None:
                   continue
                  k = int(xk.split('_')[1])
-                 xk = self._priorkey(prior,xk) ## -- this will change when gvar updated
+                 #xk = self._priorkey(prior,xk) ## -- this will change when gvar updated
+                 pk = utf.get_basekey(xk,do_adv=True) ##TODO here
+                 xk = ''.join(pk[1:])
+                 print pk,xk
                  #xk = self.basekey(prior, xk)
                  #print i,k
                  if k < len(ntermx[i]):

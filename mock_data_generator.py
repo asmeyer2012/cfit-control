@@ -28,26 +28,28 @@ def generate_mock_data(fkey=None):
  if do_test:
   Nop = 2
   opcls = [4,7]
-  En = list((.7,) + tuple([.3 for i in range(Nampn-1)]))
-  Eo = list((1.2,) + tuple([.3 for i in range(Nampo-1)]))
+  dEn = list((.7,) + tuple([.3 for i in range(Nampn-1)]))
+  dEo = list((1.2,) + tuple([.3 for i in range(Nampo-1)]))
  else:
   if df.do_irrep == "8'":
    Nop = 2
    opcls = [4,7]
-   En = [.9613,0.0488,0.2083,0.0477]
-   Eo = [1.2131,0.1023,0.0492,0.0481,0.0469]
+   dEn = [.9613,0.0488,0.2083,0.0477]
+   dEo = [1.2131,0.1023,0.0492,0.0481,0.0469]
   elif df.do_irrep == "8":
    Nop = 5
    opcls = [1,2,3,5,6]
-   En = list((.7,) + tuple([.3 for i in range(Nampn-1)]))
-   Eo = list((1.2,) + tuple([.3 for i in range(Nampo-1)]))
+   dEn = list((.7,) + tuple([.3 for i in range(Nampn-1)]))
+   dEo = list((1.2,) + tuple([.3 for i in range(Nampo-1)]))
   elif df.do_irrep == "16":
    Nop = 4
    opcls = [2,3,4,6]
-   En = list((.7,) + tuple([.3 for i in range(Nampn-1)]))
-   Eo = list((1.2,) + tuple([.3 for i in range(Nampo-1)]))
- Nampn = len(En)
- Nampo = len(Eo)
+   dEn = list((.7,) + tuple([.3 for i in range(Nampn-1)]))
+   dEo = list((1.2,) + tuple([.3 for i in range(Nampo-1)]))
+ En = np.cumsum(dEn)
+ Eo = np.cumsum(dEo)
+ Nampn = len(dEn)
+ Nampo = len(dEo)
  Nt = 48
  Nmeas = 1500
  
@@ -397,7 +399,7 @@ def generate_mock_data(fkey=None):
     (En,Eo),np.arange(Nt),Nt,1))
    rerrc.append(np.sign(rdatc[-1])*\
     er2ptd(16.,.011,-0.004,7.0711,37.606,56.2341,Nt,np.arange(Nt),1500))
- klmat = block_diagonalize(rlmat)
+ klmat = np.dot(xmat,block_diagonalize(rlmat))
  kdatc = np.array(rdatc).flatten()
  kerrc = np.array(rerrc).flatten()
  
@@ -425,8 +427,8 @@ def generate_mock_data(fkey=None):
 
  ##    prepare truth for pickling
  truth = {}
- truth['En'] = En
- truth['Eo'] = Eo
+ truth['dEn'] = dEn
+ truth['dEo'] = dEo
  for i,opi in enumerate(opcls):
   truth['c'+str(opi)+'n'] = scnrot[i]
   truth['c'+str(opi)+'o'] = scorot[i]
@@ -461,10 +463,10 @@ def generate_mock_data(fkey=None):
  ## -- get the averaged data and covariance
  davg = gv.dataset.avg_data(data)
  print "TRUTH VALUES:"
- print "dEn: ",En
- print " En: ",np.cumsum(En)
- print "dEo: ",Eo
- print " Eo: ",np.cumsum(Eo)
+ print "dEn: ",dEn
+ print " En: ",np.cumsum(dEn)
+ print "dEo: ",dEo
+ print " Eo: ",np.cumsum(dEo)
  for i,an in enumerate(np.dot(amat,anamp)):
   print "an_"+str(i)+": ",an
  for i,ao in enumerate(np.dot(amat,aoamp)):

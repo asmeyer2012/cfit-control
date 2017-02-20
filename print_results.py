@@ -42,9 +42,9 @@ def reduced_dof(fit,do_v_symm=False):
  for key in fit.p:
   skey = key.split('_')
   bkey = ut.get_basekey(skey[0])
-  if   bkey[1][-2:] == 'En':
+  if   (bkey[1][-2:] == 'En') and (bkey[0] is None):
    n2 += len(fit.p[key])
-  elif bkey[1][-2:] == 'Eo':
+  elif (bkey[1][-2:] == 'Eo') and (bkey[0] is None):
    o2 += len(fit.p[key])
  #else:
  # klen = len(df.define_prior['nkey'])

@@ -186,7 +186,6 @@ def doProcess(nst,ost,data=dall):
         init[key] = df.define_init_3pt[key][:df.num_ost]
    else:
      init=None
-  print init
   fit = fitter.lsqfit(data=dall,prior=priors,p0=init,svdcut=df.svdcut)
   ## --
   print_fit(fit,priors,do_v_symm=True)

@@ -23,15 +23,16 @@ do_sn_minimize=False
 do_initial=True
 do_init2=True
 do_init3=True
+do_amp_prior=False
 do_mock=False
 do_v_symmetric=dfp3.do_v_symmetric
-#do_irrep="8'"
-do_irrep="8"
+do_irrep="8'"
+#do_irrep="8"
 #do_irrep="16"
 do_symm="s"
 #do_symm="m"
-do_2pt=False
-do_3pt=True
+do_2pt=True
+do_3pt=False
 
 ## ------
 ## FROM MAKE_MODELS.PY
@@ -39,12 +40,12 @@ do_3pt=True
 cor_len=48 # parse this from filename?
 ## --
 
-num_nst_s8p=3
-num_ost_s8p=2
-num_nst_s8=10
-num_ost_s8=10
-num_nst_s16=9
-num_ost_s16=9
+num_nst_s8p=4
+num_ost_s8p=5
+num_nst_s8=8
+num_ost_s8=7
+num_nst_s16=7
+num_ost_s16=6
 
 ## -- control size of matrices here!
 ##    symmetric puts a restriction that 3pt #states = 2pt #states
@@ -68,7 +69,7 @@ else:
 #rangeMin=2
 #rangeMax=12
 rangeMin=2
-rangeMax=9
+rangeMax=11
 #rangeMin=5
 #rangeMax=10
 mesonAvgMin=12
@@ -403,14 +404,15 @@ if do_irrep == "8":
    suppressKey(tkey,'plottitlep3',"")
 
 elif do_irrep == "8'":
-  stab_min_nst=2
-  stab_mid_nst=2
-  stab_max_nst=5
-  stab_min_ost=2
-  stab_mid_ost=2
-  stab_max_ost=7
+  stab_min_nst=1
+  stab_mid_nst=1
+  stab_max_nst=4
+  stab_min_ost=1
+  stab_mid_ost=1
+  stab_max_ost=4
   stab_max_states=9
-  nost_3pt = ((1,1),(1,2),(1,3),(2,1),(2,2),(2,3),(3,2),(3,3))
+  #nost_3pt = ((1,1),(1,2),(1,3),(2,1),(2,2),(2,3),(3,2),(3,3))
+  nost_3pt = ((1,1),)#(1,2),(2,2),(2,1),(2,2),(2,3),(3,2),(3,3))
   plot_n_maxprior = 2
   plot_o_maxprior = 1
   tmvr_tmax=range(9,10)

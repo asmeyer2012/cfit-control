@@ -248,6 +248,75 @@ def add_next_block(prior,newEven,numst,E0,dE, g0s=gv.gvar(0,1e1), gxs=gv.gvar(0,
  #print 'out prior',prior
  return prior
 
+def truncate_prior_states_2pt(prior,nn,no):
+ ## -- reduce to nn even and no odd states
+ ##    highest energy states are removed before lower-energy states
+ nst = []
+ ost = []
+ ## -- tabulate energies/blocks
+ for key in prior:
+  skey = key.split('_')
+  bkey = utf.get_basekey(skey[0])
+  if bkey[1][-2:] == 'En' or bkey[1][-2:] == 'Eo':
+   i = int(skey[1])
+   if   bkey[0] == 'log':
+    en = gv.exp(prior[key])
+   elif bkey[0] == 'sqrt':
+    en = prior[key]*prior[key]
+   else:
+    en = prior[key]
+   for e in en:
+    if   bkey[1][-2:] == 'En':
+      nst.append([e,i])
+    elif bkey[1][-2:] == 'Eo':
+      ost.append([e,i])
+ nstx = []
+ ostx = []
+ for x,y in [(nst,nstx),(ost,ostx)]:
+  e0 = 0
+  i = -1
+  for ste,sti in x:
+   if sti > i:
+    i = sti
+    e0 += ste
+    e   = e0
+    y.append([e0,sti])
+   else:
+    e += ste
+    y.append([e,sti])
+ nst = nstx
+ ost = ostx
+
+ ## -- order states and determine how many to cut from each 
+ nst = np.array(sorted(nst)[nn:])
+ ost = np.array(sorted(ost)[no:])
+ if len(nst) > 0:
+  nst = sorted(np.transpose(nst)[1])
+ if len(ost) > 0:
+  ost = sorted(np.transpose(ost)[1])
+ ## -- build new prior dictionary
+ newprior = gv.BufferDict()
+ for key in prior:
+  skey = key.split('_')
+  bkey = utf.get_basekey(skey[0])
+  eokey = utf.get_evenodd(skey[0])
+  k = int(skey[1])
+  kp = len(prior[key])
+  ## -- everything else
+  if (eokey != 'nn') and (eokey != 'oo') and (bkey[1][-2] != 'g'):
+   for v, x1 in [('n',list(nst)),('o',list(ost))]:
+    if eokey == v:
+     c1 = list(x1).count(k)
+    else:
+     continue
+    if c1 == 0:
+     newprior[key] = prior[key]
+    elif c1 >= kp:
+      continue
+    else:
+     newprior[key] = prior[key][slice(None,kp-c1)]
+ return newprior
+
 def truncate_prior_states(prior,nn,no,nn3=-1,no3=-1):
  ## -- reduce to nn even and no odd states
  ##    highest energy states are removed before lower-energy states

@@ -31,6 +31,7 @@ import gvar              as gv
 import gvar.dataset      as gvd
 import matplotlib.pyplot as plt
 import numpy             as np
+import util_funcs        as utf
 import argparse
 import hashlib
 import sys

@@ -76,8 +76,8 @@ def plot_stability(fit_collector,**kwargs):
  plt.xticks(hVal,hName,rotation='vertical')
  ax.set_xlim([0,fitCount])
  ax.set_ylim([0.5,1.5])
- for i,en,den in zip(range(len(df.define_prior['logEn'])),
-  utf.sum_dE(df.define_prior['logEn']),df.define_prior['logEn']):
+ for i,en,den in zip(range(len(df.define_prior['log(En)'])),
+  utf.sum_dE(df.define_prior['log(En)']),df.define_prior['log(En)']):
    if i==0:
     ax.axhline(en.mean,color='r')
     ax.fill_between([0,fitCount],[en.mean-den.sdev,en.mean-den.sdev],
@@ -87,8 +87,8 @@ def plot_stability(fit_collector,**kwargs):
     if i<df.plot_n_maxprior:
      ax.fill_between([0,fitCount],[en.mean-den.sdev,en.mean-den.sdev],
       [en.mean+den.sdev,en.mean+den.sdev],facecolor='r',alpha=0.2)
- for i,eo,deo in zip(range(len(df.define_prior['logEo'])),
-  utf.sum_dE(df.define_prior['logEo']),df.define_prior['logEo']):
+ for i,eo,deo in zip(range(len(df.define_prior['log(Eo)'])),
+  utf.sum_dE(df.define_prior['log(Eo)']),df.define_prior['log(Eo)']):
    if i==0:
     ax.axhline(eo.mean,color='b')
     ax.fill_between([0,fitCount],[eo.mean-deo.sdev,eo.mean-deo.sdev],

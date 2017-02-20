@@ -57,3 +57,16 @@ def save_init_from_fit(fit,file_name,do_v_symm=False):
   format_entries(f,fit.p[key],key,not(i==ltfp-1))
  f.write('}\n')
  f.close()
+
+def save_init_from_dict(dict,file_name,do_v_symm=False):
+ f = open(file_name,'w')
+ f.write('import gvar as gv\n')
+ f.write('init_val_import = {\\\n')
+ f.write('\'dof\': 0,\\\n')
+ f.write('\'rdof\': 0,\\\n')
+ f.write('\'chi2\': 0,\\\n')
+ ltfp = len(dict.keys())
+ for i,key in zip(range(ltfp),sorted(dict.keys())):
+  format_entries(f,dict[key],key,not(i==ltfp-1))
+ f.write('}\n')
+ f.close()

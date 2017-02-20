@@ -4,17 +4,37 @@ import re
 import sys
 from math import log10, floor
 
+def get_basekey(key,do_adv=False):
+ if do_adv:
+  return get_basekey_adv(key)
+ else:
+  return get_basekey_std(key)
+
 ## -- pull key name out of log() or sqrt()
 ##    returns both function name and contained key
 ##    if no function used, replaces function name with None
 ##    fails on error if old-style key used
-def get_basekey(key):
+def get_basekey_std(key):
  regrp = re.match('(\w+)\((\w+)\)',key)
  if regrp is None:
   if key[:3] == 'log' or key[:4] == 'sqrt':
    raise KeyError("Error: old-style key",key)
   else:
    return (None,key)
+ else:
+  return regrp.groups()
+
+def get_basekey_adv(key):
+ regrp = re.match('(\w+)\((\w+)\)(\w+)',key)
+ if regrp is None:
+  if key[:3] == 'log' or key[:4] == 'sqrt':
+   raise KeyError("Error: old-style key",key)
+  else:
+   regrp = re.match('([a-zA-Z0-9]+)_(\w+)',key)
+   grps = regrp.groups()
+   grps2 = grps[:-1]
+   grps2 = grps2 + ('_'+grps[-1],)
+   return (None,) + grps2
  else:
   return regrp.groups()
 
